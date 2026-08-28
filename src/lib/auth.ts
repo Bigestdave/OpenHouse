@@ -1,87 +1,169 @@
-import { useState, useEffect } from 'react';
-import type { User, Session } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from './supabase';
+import { useState, useEffect } from 'react'
+import type { User, Session } from '@supabase/supabase-js'
+import { supabase, isSupabaseConfigured } from './supabase'
+
+export interface AuthUser {
+  id: string
+  email: string
+  fullName: string
+  agencyName?: string
+}
 
 export interface AuthState {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-  isConfigured: boolean;
+  user: User | null
+  session: Session | null
+  loading: boolean
+  isConfigured: boolean
+  profile: AuthUser | null
 }
 
-export async function signIn(email: string, password: string) {
-  if (!isSupabaseConfigured) {
-    // Offline / Demo simulated login
-    return { data: { user: { id: '00000000-0000-0000-0000-000000000001', email } }, error: null };
+const LOCAL_USER_KEY = 'openhouse_current_user'
+
+function getSavedLocalUser(): AuthUser | null {
+  try {
+    const saved = localStorage.getItem(LOCAL_USER_KEY)
+    if (saved) return JSON.parse(saved)
+  } catch {
+    // ignore
   }
-  return await supabase.auth.signInWithPassword({ email, password });
-}
-
-export async function signUp(email: string, password: string, fullName?: string) {
-  if (!isSupabaseConfigured) {
-    return { data: { user: { id: '00000000-0000-0000-0000-000000000001', email } }, error: null };
+  return {
+    id: 'usr-default-01',
+    email: 'david@openhouse.com',
+    fullName: 'David Olabowale',
+    agencyName: 'OpenHouse Realty Advisors',
   }
-  return await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName || 'Realtor' },
-    },
-  });
 }
 
-export async function signOut() {
-  if (!isSupabaseConfigured) return;
-  return await supabase.auth.signOut();
+export async function signIn(email: string, password: string): Promise<{ user: AuthUser | null; error: string | null }> {
+  if (!isSupabaseConfigured) {
+    // Offline / Local Demo mode
+    const mockUser: AuthUser = {
+      id: 'usr-' + Date.now(),
+      email: email.trim(),
+      fullName: email.split('@')[0] ? email.split('@')[0].replace('.', ' ') : 'Realtor',
+      agencyName: 'Lagos Luxury Realty',
+    }
+    localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(mockUser))
+    return { user: mockUser, error: null }
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { user: null, error: error.message }
+    if (data.user) {
+      const authUser: AuthUser = {
+        id: data.user.id,
+        email: data.user.email || email,
+        fullName: (data.user.user_metadata?.full_name as string) || 'Realtor',
+        agencyName: (data.user.user_metadata?.agency_name as string) || 'OpenHouse Realty',
+      }
+      localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(authUser))
+      return { user: authUser, error: null }
+    }
+    return { user: null, error: 'Unknown authentication error' }
+  } catch (err: any) {
+    return { user: null, error: err.message || 'Failed to sign in' }
+  }
 }
 
-export async function getSession() {
-  if (!isSupabaseConfigured) return null;
-  const { data } = await supabase.auth.getSession();
-  return data.session;
+export async function signUp(
+  email: string,
+  password: string,
+  fullName: string,
+  agencyName?: string
+): Promise<{ user: AuthUser | null; error: string | null }> {
+  if (!isSupabaseConfigured) {
+    const mockUser: AuthUser = {
+      id: 'usr-' + Date.now(),
+      email: email.trim(),
+      fullName: fullName.trim() || 'Realtor',
+      agencyName: agencyName?.trim() || 'OpenHouse Realty',
+    }
+    localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(mockUser))
+    return { user: mockUser, error: null }
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          agency_name: agencyName || '',
+        },
+      },
+    })
+    if (error) return { user: null, error: error.message }
+    if (data.user) {
+      const authUser: AuthUser = {
+        id: data.user.id,
+        email: data.user.email || email,
+        fullName: fullName || 'Realtor',
+        agencyName: agencyName || 'OpenHouse Realty',
+      }
+      localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(authUser))
+      return { user: authUser, error: null }
+    }
+    return { user: null, error: 'Failed to create account' }
+  } catch (err: any) {
+    return { user: null, error: err.message || 'Failed to sign up' }
+  }
 }
 
-/**
- * Custom React hook for tracking current auth user and session status.
- */
+export async function signOut(): Promise<void> {
+  localStorage.removeItem(LOCAL_USER_KEY)
+  if (isSupabaseConfigured) {
+    await supabase.auth.signOut().catch(() => {})
+  }
+}
+
 export function useAuth(): AuthState {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [profile, setProfile] = useState<AuthUser | null>(getSavedLocalUser())
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      // In demo/offline mode, provide a mock authenticated user
-      setUser({
-        id: '00000000-0000-0000-0000-000000000001',
-        email: 'david@openhouse.com',
-        user_metadata: { full_name: 'David Olabowale' },
-        app_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      } as User);
-      setLoading(false);
-      return;
+      setLoading(false)
+      return
     }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+      setSession(session)
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        setProfile({
+          id: session.user.id,
+          email: session.user.email || '',
+          fullName: (session.user.user_metadata?.full_name as string) || 'Realtor',
+          agencyName: (session.user.user_metadata?.agency_name as string) || 'OpenHouse Realty',
+        })
+      }
+      setLoading(false)
+    })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+      setSession(session)
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        setProfile({
+          id: session.user.id,
+          email: session.user.email || '',
+          fullName: (session.user.user_metadata?.full_name as string) || 'Realtor',
+          agencyName: (session.user.user_metadata?.agency_name as string) || 'OpenHouse Realty',
+        })
+      }
+      setLoading(false)
+    })
 
     return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+      subscription.unsubscribe()
+    }
+  }, [])
 
-  return { user, session, loading, isConfigured: isSupabaseConfigured };
+  return { user, session, loading, isConfigured: isSupabaseConfigured, profile }
 }

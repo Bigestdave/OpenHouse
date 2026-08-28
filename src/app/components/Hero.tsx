@@ -59,41 +59,41 @@ export function Hero() {
             className="max-w-xl"
           >
             <motion.div variants={item} className="mb-8 flex items-center gap-4">
-              <span className="h-px w-10 bg-emerald-500" />
-              <span className="text-[0.9rem] text-emerald-400 font-semibold">Autonomous spatial real estate agent</span>
+              <span className="h-px w-10 bg-accent" />
+              <span className="text-[0.9rem] text-accent">Your AI showrunner is ready.</span>
             </motion.div>
 
             <motion.h1
               variants={item}
               className="text-[clamp(2.75rem,6.5vw,4.75rem)] font-semibold leading-[1.02] tracking-[-0.035em] text-ink"
             >
-              From listing to
+              From story to
               <br />
-              virtual open house.
+              finished episode.
             </motion.h1>
 
             <motion.p
               variants={item}
               className="mt-7 max-w-md text-[1.05rem] leading-[1.6] text-ink-2"
             >
-              OpenHouse turns everyday property photos and videos into interactive 3D open houses.
-              List normally—our agent works autonomously in the background and reaches out only when a 15-second capture is needed.
+              Cre8Motion plans, storyboards, animates, reviews, and assembles consistent
+              animated episodes—while preserving your characters, world, and visual style.
             </motion.p>
 
             <motion.div variants={item} className="mt-10 flex flex-wrap items-center gap-3">
-              <CTAButton size="lg" href="#/properties">
-                Open Realtor Workspace
+              <CTAButton size="lg" href="#/shows">
+                Start creating
               </CTAButton>
-              <CTAButton variant="secondary" size="lg" href="#/import">
+              <CTAButton variant="secondary" size="lg">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-white/[0.04]">
                   <Play className="h-2.5 w-2.5 fill-current text-ink" />
                 </span>
-                MLS Intake Gateway
+                Watch an episode
               </CTAButton>
             </motion.div>
 
             <motion.p variants={item} className="mt-8 text-[0.9rem] text-ink-2">
-              Autonomous Ingestion · Grounded Spatial QA · Zero 3D Expertise Required
+              Built with <span className="text-accent">Qwen Cloud</span> · Designed for episodic animation
             </motion.p>
           </motion.div>
         </div>

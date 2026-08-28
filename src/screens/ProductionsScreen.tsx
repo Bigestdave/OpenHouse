@@ -1,43 +1,113 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
-import { SearchIcon, LockIcon, GlobeIcon } from '../components/icons2'
+import { SearchIcon, PlusIcon, LockIcon, GlobeIcon } from '../components/icons2'
 import { Ellipsis } from '../components/icons'
-import { useStore } from '../data/store'
-import { PROPERTY_STATUS_LABELS } from '../data/types'
-import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
-import propOrchidImg from '../assets/prop-orchid.jpg'
-import propLekkiImg from '../assets/prop-lekkigardens.jpg'
-import propBourdillonImg from '../assets/prop-bourdillon.jpg'
 
-const filterTabs = ['All', 'Live', 'Ready for review', 'Preparing', 'Needs attention'] as const
+interface ExperienceItem {
+  id: string
+  propertyTitle: string
+  propertyPremise: string
+  propertyImg: string
+  stateTitle: string
+  stateSub: string
+  stateKind: 'ready' | 'preparing' | 'live' | 'changes'
+  visibility: 'Unlisted' | 'Public' | 'Not published'
+  updated: string
+  actionLabel: string
+  actionKind: 'primary' | 'outline'
+  showId: string
+}
+
+const EXPERIENCES_DATA: ExperienceItem[] = [
+  {
+    id: 'exp-1',
+    propertyTitle: '8 Admiralty Way',
+    propertyPremise: '3-bedroom apartment · Lekki, Lagos',
+    propertyImg: '/src/assets/prop-admiralty.jpg',
+    stateTitle: 'Ready for review',
+    stateSub: '6 of 6 advertised rooms represented · 2 issues resolved',
+    stateKind: 'ready',
+    visibility: 'Unlisted',
+    updated: '8 minutes ago',
+    actionLabel: 'Review',
+    actionKind: 'primary',
+    showId: '8-admiralty-way',
+  },
+  {
+    id: 'exp-2',
+    propertyTitle: 'Orchid Apartments, Unit 4',
+    propertyPremise: '2-bedroom apartment · Lekki, Lagos',
+    propertyImg: '/src/assets/prop-orchid.jpg',
+    stateTitle: 'Preparing experience',
+    stateSub: 'Building connected room views',
+    stateKind: 'preparing',
+    visibility: 'Not published',
+    updated: '4 minutes ago',
+    actionLabel: 'Open',
+    actionKind: 'outline',
+    showId: 'orchid-1',
+  },
+  {
+    id: 'exp-3',
+    propertyTitle: 'Lekki Gardens, Unit 12',
+    propertyPremise: '3-bedroom terrace · Lekki, Lagos',
+    propertyImg: '/src/assets/prop-lekkigardens.jpg',
+    stateTitle: 'Running final checks',
+    stateSub: 'Checking room coverage and visual quality',
+    stateKind: 'preparing',
+    visibility: 'Not published',
+    updated: '18 minutes ago',
+    actionLabel: 'Open',
+    actionKind: 'outline',
+    showId: 'lekki-1',
+  },
+  {
+    id: 'exp-4',
+    propertyTitle: 'Bourdillon Court, Unit 8',
+    propertyPremise: '4-bedroom apartment · Ikoyi, Lagos',
+    propertyImg: '/src/assets/prop-bourdillon.jpg',
+    stateTitle: 'Live',
+    stateSub: 'Published yesterday',
+    stateKind: 'live',
+    visibility: 'Public',
+    updated: 'Yesterday',
+    actionLabel: 'Open experience',
+    actionKind: 'outline',
+    showId: 'bourdillon-1',
+  },
+  {
+    id: 'exp-5',
+    propertyTitle: 'Palm View Residence, Unit 5',
+    propertyPremise: '2-bedroom apartment · Victoria Island, Lagos',
+    propertyImg: '/src/assets/prop-hero-waterfront.jpg',
+    stateTitle: 'Changes requested',
+    stateSub: 'Bedroom 2 connection needs review',
+    stateKind: 'changes',
+    visibility: 'Unlisted',
+    updated: 'Yesterday',
+    actionLabel: 'View changes',
+    actionKind: 'outline',
+    showId: 'palm-view-5',
+  },
+]
+
+const filterTabs = ['All', 'Preparing', 'Ready for review', 'Live', 'Failed'] as const
 type FilterTab = (typeof filterTabs)[number]
 
 export function ProductionsScreen() {
-  const { properties } = useStore()
   const [filter, setFilter] = useState<FilterTab>('All')
   const [query, setQuery] = useState('')
 
-  const getCoverImage = (p: typeof properties[0]) => {
-    if (p.coverImage) return p.coverImage
-    if (p.title.includes('Admiralty')) return propAdmiraltyImg
-    if (p.title.includes('Bourdillon')) return propBourdillonImg
-    if (p.title.includes('Orchid')) return propOrchidImg
-    return propLekkiImg
-  }
-
-  const visibleProperties = properties.filter((p) => {
-    if (query) {
-      const q = query.toLowerCase()
-      if (!p.title.toLowerCase().includes(q) && !p.address.toLowerCase().includes(q)) {
-        return false
-      }
+  const visibleExperiences = EXPERIENCES_DATA.filter((e) => {
+    if (query && !e.propertyTitle.toLowerCase().includes(query.toLowerCase()) && !e.propertyPremise.toLowerCase().includes(query.toLowerCase())) {
+      return false
     }
     if (filter === 'All') return true
-    if (filter === 'Live') return p.status === 'live'
-    if (filter === 'Ready for review') return p.status === 'ready_for_review'
-    if (filter === 'Preparing') return p.status === 'preparing' || p.status === 'checking_media' || p.status === 'quality_check'
-    if (filter === 'Needs attention') return p.status === 'needs_recapture' || p.status === 'failed'
+    if (filter === 'Preparing') return e.stateKind === 'preparing'
+    if (filter === 'Ready for review') return e.stateKind === 'ready'
+    if (filter === 'Live') return e.stateKind === 'live'
+    if (filter === 'Failed') return e.stateKind === 'changes'
     return true
   })
 
@@ -51,28 +121,29 @@ export function ProductionsScreen() {
               Experiences
             </h1>
             <p className="text-[14px] text-text-secondary font-normal mt-0.5 whitespace-nowrap">
-              Published and preparing spatial experiences for renters and buyers.
+              Manage the interactive experiences visitors can open.
             </p>
           </div>
 
           <Link
-            to="/import"
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#194534] text-white px-4 py-2.5 text-xs font-bold shadow-2xs hover:bg-[#2F613D] transition-colors shrink-0 whitespace-nowrap"
+            to="/create-show"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-[13.5px] font-semibold text-text-inverse shadow-subtle hover:bg-primary-hover transition-colors shrink-0 whitespace-nowrap"
           >
-            <span>Ingest New Listing ➔</span>
+            <PlusIcon size={14} strokeWidth={2} />
+            <span>Create from property</span>
           </Link>
         </div>
 
-        {/* Toolbar: Filters, Search */}
+        {/* Toolbar: Filters, Search, Sort */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             {filterTabs.map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-150 whitespace-nowrap shrink-0 ${
+                className={`rounded-full px-3.5 py-1 text-[13px] font-semibold transition-all duration-150 whitespace-nowrap shrink-0 ${
                   filter === f
-                    ? 'bg-primary text-text-inverse shadow-xs'
+                    ? 'bg-primary text-text-inverse shadow-subtle'
                     : 'border border-border bg-surface text-text-primary hover:bg-surface-elevated'
                 }`}
               >
@@ -82,15 +153,20 @@ export function ProductionsScreen() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <div className="flex w-full sm:w-[220px] md:w-[260px] items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-xs text-text-primary shadow-2xs focus-within:border-primary">
-              <SearchIcon size={14} className="text-stone-400 shrink-0" />
+            <div className="flex w-full sm:w-[220px] md:w-[260px] items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-[13.5px] text-text-primary shadow-subtle focus-within:border-primary">
+              <SearchIcon size={15} className="text-text-secondary shrink-0" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search experiences..."
-                className="flex-1 bg-transparent text-stone-900 outline-none placeholder:text-stone-400 min-w-0 font-normal"
+                placeholder="Search..."
+                className="flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-secondary/70 min-w-0 font-normal"
               />
             </div>
+            <select className="rounded-lg border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-text-primary outline-none shadow-subtle whitespace-nowrap shrink-0">
+              <option>Recently updated ⌵</option>
+              <option>Alphabetical</option>
+              <option>Status</option>
+            </select>
           </div>
         </div>
 
@@ -106,21 +182,21 @@ export function ProductionsScreen() {
             </div>
 
             <div className="divide-y divide-border/60">
-              {visibleProperties.map((p) => (
+              {visibleExperiences.map((exp) => (
                 <div
-                  key={p.id}
+                  key={exp.id}
                   className="grid grid-cols-[1.8fr_2.4fr_1.1fr_1fr_140px] items-center gap-4 px-5 py-3.5 hover:bg-surface-elevated/40 transition-colors"
                 >
                   {/* Property */}
                   <div className="flex items-center gap-3 min-w-0">
                     <img
-                      src={getCoverImage(p)}
-                      alt={p.title}
+                      src={exp.propertyImg}
+                      alt={exp.propertyTitle}
                       className="h-10 w-14 rounded-lg object-cover border border-border shrink-0"
                     />
                     <div className="min-w-0">
-                      <p className="font-bold text-text-primary text-[13.5px] truncate">{p.title}</p>
-                      <p className="text-[12px] text-text-secondary truncate mt-0.5">{p.address}</p>
+                      <p className="font-bold text-text-primary text-[13.5px] truncate">{exp.propertyTitle}</p>
+                      <p className="text-[12px] text-text-secondary truncate mt-0.5">{exp.propertyPremise}</p>
                     </div>
                   </div>
 
@@ -129,50 +205,44 @@ export function ProductionsScreen() {
                     <div className="flex items-center gap-1.5 whitespace-nowrap">
                       <span
                         className={`h-2 w-2 rounded-full shrink-0 ${
-                          p.status === 'live'
-                            ? 'bg-emerald-600'
-                            : p.status === 'ready_for_review'
-                            ? 'bg-amber-600'
-                            : p.status === 'needs_recapture'
-                            ? 'bg-rose-600 animate-pulse'
-                            : 'bg-blue-600 animate-spin'
+                          exp.stateKind === 'live'
+                            ? 'bg-success'
+                            : exp.stateKind === 'ready'
+                            ? 'bg-success'
+                            : exp.stateKind === 'preparing'
+                            ? 'bg-accent animate-pulse'
+                            : 'bg-danger'
                         }`}
                       />
-                      <span className="font-semibold text-text-primary text-[13px] truncate">
-                        {PROPERTY_STATUS_LABELS[p.status] || p.status}
-                      </span>
+                      <span className="font-semibold text-text-primary text-[13px] truncate">{exp.stateTitle}</span>
                     </div>
-                    <p className="text-[12px] text-text-secondary mt-0.5 truncate">
-                      {p.spaces.length} spaces · {p.spaces.filter(s => s.captured).length} captured
-                    </p>
+                    <p className="text-[12px] text-text-secondary mt-0.5 truncate">{exp.stateSub}</p>
                   </div>
 
                   {/* Visibility */}
                   <div>
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-text-secondary rounded-full bg-surface-elevated border border-border px-2.5 py-0.5 whitespace-nowrap">
-                      {p.status === 'live' ? <GlobeIcon size={12} className="text-emerald-700" /> : <LockIcon size={12} className="text-stone-400" />}
-                      <span>{p.status === 'live' ? 'Public' : 'Unlisted link'}</span>
+                    <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-text-secondary rounded-full bg-surface-elevated border border-border px-2.5 py-0.5 whitespace-nowrap">
+                      {exp.visibility === 'Public' ? <GlobeIcon size={12} className="text-text-secondary" /> : <LockIcon size={12} className="text-text-secondary" />}
+                      <span>{exp.visibility}</span>
                     </span>
                   </div>
 
                   {/* Updated */}
-                  <div className="text-xs text-text-secondary whitespace-nowrap">
-                    {new Date(p.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <div className="text-[13px] text-text-secondary whitespace-nowrap">
+                    {exp.updated}
                   </div>
 
                   {/* Action */}
                   <div className="flex items-center justify-end gap-2">
                     <Link
-                      to={p.status === 'live' ? `/view/${p.id}` : `/show/${p.id}`}
-                      className={`inline-flex items-center justify-center rounded-xl px-3.5 py-1.5 text-xs font-bold transition-colors whitespace-nowrap ${
-                        p.status === 'ready_for_review'
-                          ? 'bg-[#0B1713] text-white shadow-2xs hover:bg-black'
-                          : p.status === 'live'
-                          ? 'border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                      to={exp.actionLabel === 'Open experience' ? `/view/${exp.showId}` : `/show/${exp.showId}`}
+                      className={`inline-flex items-center justify-center rounded-lg px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors whitespace-nowrap ${
+                        exp.actionKind === 'primary'
+                          ? 'bg-primary text-text-inverse shadow-subtle hover:bg-primary-hover'
                           : 'border border-border bg-surface text-text-primary hover:bg-surface-elevated'
                       }`}
                     >
-                      {p.status === 'live' ? 'View 3D Tour ↗' : p.status === 'ready_for_review' ? 'Review & Publish' : 'Open'}
+                      {exp.actionLabel}
                     </Link>
                     <button className="text-text-secondary hover:text-text-primary p-1 rounded-md hover:bg-surface-elevated transition-colors">
                       <Ellipsis size={16} />
@@ -184,12 +254,32 @@ export function ProductionsScreen() {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between text-xs text-stone-500 pt-2">
-          <span>Showing {visibleProperties.length} active property experiences</span>
+        {/* Pagination Footer */}
+        <div className="flex items-center justify-between text-[13.5px] text-text-secondary pt-2">
+          <span>Showing 1 to {visibleExperiences.length} of 25 experiences.</span>
+          <div className="flex items-center gap-1">
+            <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary hover:bg-surface-elevated">
+              &lt;
+            </button>
+            <button className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-text-inverse font-bold">
+              1
+            </button>
+            <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface text-text-primary hover:bg-surface-elevated">
+              2
+            </button>
+            <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface text-text-primary hover:bg-surface-elevated">
+              3
+            </button>
+            <span className="px-1">…</span>
+            <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface text-text-primary hover:bg-surface-elevated">
+              5
+            </button>
+            <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary hover:bg-surface-elevated">
+              &gt;
+            </button>
+          </div>
         </div>
       </div>
     </WorkspaceShell>
   )
 }
-

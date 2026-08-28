@@ -1,5 +1,5 @@
 import { getProperty, updatePropertyStatus, addCaptureRequest, addTimelineEvent, addProperty } from './store';
-import type { Space } from './types';
+import type { Property, Space } from './types';
 
 // Store active timers
 const activeTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -37,59 +37,52 @@ export function startPropertyWorkflow(propertyId: string): void {
   addTimelineEvent(propertyId, {
     type: 'detection',
     event: 'New listing detected',
-    detail: `Property at ${property.address} detected from listing portal. OpenHouse began background intake.`,
-    agentDecision: 'Ingest property description, media manifest, and room expectations.',
-    toolUsed: 'ListingWebhookHandler'
+    detail: 'Property information collected from listing portal',
   });
 
-  setWorkflowTimer(propertyId, 2500, () => {
+  setWorkflowTimer(propertyId, 2000, () => {
     const currentProp = getProperty(propertyId);
     if (!currentProp) return;
 
     updatePropertyStatus(propertyId, 'checking_media');
-    const mediaCount = currentProp.sourceMedia?.length || 8;
-    const spaceCount = currentProp.spaces?.length || 7;
+    const mediaCount = currentProp.sourceMedia?.length || 0;
+    const spaceCount = currentProp.spaces?.length || 0;
     addTimelineEvent(propertyId, {
       type: 'analysis',
       event: 'Checking media quality and coverage',
-      detail: `Evaluating ${mediaCount} source captures across ${spaceCount} advertised spaces. Checking overlap & motion stability.`,
-      agentDecision: 'Run multimodal Gemini room coverage assessment.',
-      evidence: 'Source photographs & listing floor plan',
-      toolUsed: 'GeminiMediaAnalyzer'
+      detail: `Evaluating ${mediaCount} source images across ${spaceCount} advertised spaces`,
     });
 
-    const missingSpace = currentProp.spaces.find(s => s.captured === false);
-    const delay = missingSpace ? 3500 : 4500;
+    // If insufficient, needs recapture in 3s; if sufficient, prepares in 4s.
+    const missingSpace = currentProp.spaces.find((s) => s.captured === false);
+    const delay = missingSpace ? 3000 : 4000;
 
     setWorkflowTimer(propertyId, delay, () => {
       const propToCheck = getProperty(propertyId);
       if (!propToCheck) return;
 
-      const stillMissingSpace = propToCheck.spaces.find(s => s.captured === false);
+      const stillMissingSpace = propToCheck.spaces.find((s) => s.captured === false);
 
       if (stillMissingSpace) {
         updatePropertyStatus(propertyId, 'needs_recapture');
         addTimelineEvent(propertyId, {
           type: 'capture_request',
           event: `Coverage insufficient for ${stillMissingSpace.name}`,
-          detail: `The ${stillMissingSpace.name} is listed, but doorway connection coverage is incomplete. One 15-second guided mobile walkthrough requested.`,
-          agentDecision: `Pause reconstruction and dispatch capture request to realtor via WhatsApp and in-app link.`,
-          evidence: `Floor plan indicates connection between Living Room and ${stillMissingSpace.name}, but video path is missing.`,
-          toolUsed: 'CaptureRequestDispatcher'
+          detail: 'Capture request sent to Property Manager',
         });
-        
-        addCaptureRequest({
-          propertyId,
-          propertyTitle: propToCheck.title,
-          room: stillMissingSpace.name,
-          reason: `The ${stillMissingSpace.name} is listed, but its entrance was not clearly captured.`,
-          instructions: `Record one slow, 15-second video from the living room through the ${stillMissingSpace.name.toLowerCase()} doorway. Finish after showing the full space.`,
-          estimatedTime: '15 seconds',
-          recipientName: 'David Sterling',
-          recipientPhone: '+1 (555) 234-5678',
-          recipientEmail: 'david@openhouse.app',
-          status: 'awaiting_capture'
-        });
+
+        if (typeof addCaptureRequest === 'function') {
+          addCaptureRequest({
+            propertyId,
+            propertyTitle: propToCheck.title,
+            room: stillMissingSpace.name,
+            reason: 'Insufficient coverage',
+            instructions: `Please provide a 360 panorama or clear photos of the ${stillMissingSpace.name}`,
+            estimatedTime: '5 mins',
+            recipientName: 'Property Manager',
+            status: 'sent',
+          });
+        }
       } else {
         startPreparing(propertyId);
       }
@@ -102,31 +95,23 @@ function startPreparing(propertyId: string) {
   addTimelineEvent(propertyId, {
     type: 'reconstruction',
     event: 'Evidence requirements satisfied',
-    detail: 'All advertised rooms confirmed with sufficient trajectory overlap. Estimating camera poses and starting Gaussian Splat training.',
-    agentDecision: 'Execute Colmap camera alignment & Splatfacto 3D reconstruction.',
-    evidence: '100% room coverage verified across all spaces.',
-    toolUsed: 'SplatfactoPipelineWorker'
+    detail: 'Building interactive experience',
   });
 
-  setWorkflowTimer(propertyId, 7000, () => {
+  setWorkflowTimer(propertyId, 8000, () => {
     updatePropertyStatus(propertyId, 'quality_check');
     addTimelineEvent(propertyId, {
       type: 'verification',
-      event: 'Reconstruction complete · Quality checking',
-      detail: 'Generated spatial representation rendered at 12 verification viewpoints. Checking for visual floaters, lighting fidelity, and mobile optimization.',
-      agentDecision: 'Compare rendered viewpoints against original reference frames.',
-      evidence: '12 verification viewpoints evaluated (0 structural contradictions found).',
-      toolUsed: 'ExperienceQualityVerifier'
+      event: 'Reconstruction complete',
+      detail: 'Comparing result against source evidence',
     });
 
-    setWorkflowTimer(propertyId, 4500, () => {
+    setWorkflowTimer(propertyId, 5000, () => {
       updatePropertyStatus(propertyId, 'ready_for_review');
       addTimelineEvent(propertyId, {
         type: 'approval',
-        event: 'Quality verification passed · Awaiting approval',
-        detail: '6 of 6 spaces represented. Mobile WebGL bundle compressed (12.4 MB). Ready for realtor inspection and publishing.',
-        agentDecision: 'Notify realtor that interactive experience is ready for review.',
-        toolUsed: 'ApprovalNotificationService'
+        event: 'Quality verification passed',
+        detail: 'Publication approval requested',
       });
     });
   });
@@ -142,28 +127,36 @@ export function resumePropertyWorkflow(propertyId: string): void {
 
   updatePropertyStatus(propertyId, 'checking_media');
   addTimelineEvent(propertyId, {
-    type: 'capture_received',
-    event: 'Recapture footage received',
-    detail: 'New mobile capture received. Analyzing motion blur, doorway visibility, and scene trajectory.',
-    agentDecision: 'Validate newly uploaded capture against missing space requirements.',
-    evidence: '15-second mobile video upload',
-    toolUsed: 'CaptureQualityInspector'
+    type: 'analysis',
+    event: 'Checking media quality and coverage',
+    detail: 'Evaluating newly uploaded media',
   });
 
-  setWorkflowTimer(propertyId, 3500, () => {
+  setWorkflowTimer(propertyId, 4000, () => {
     const currentProp = getProperty(propertyId);
     if (!currentProp) return;
 
-    const missingSpace = currentProp.spaces.find(s => s.captured === false);
+    const missingSpace = currentProp.spaces.find((s) => s.captured === false);
     if (missingSpace) {
       updatePropertyStatus(propertyId, 'needs_recapture');
       addTimelineEvent(propertyId, {
         type: 'capture_request',
-        event: `Coverage still incomplete for ${missingSpace.name}`,
-        detail: `The ${missingSpace.name} still requires additional footage.`,
-        agentDecision: 'Re-request capture.',
-        toolUsed: 'CaptureRequestDispatcher'
+        event: `Coverage insufficient for ${missingSpace.name}`,
+        detail: 'Capture request sent to Property Manager',
       });
+
+      if (typeof addCaptureRequest === 'function') {
+        addCaptureRequest({
+          propertyId,
+          propertyTitle: currentProp.title,
+          room: missingSpace.name,
+          reason: 'Insufficient coverage',
+          instructions: `Please provide a 360 panorama or clear photos of the ${missingSpace.name}`,
+          estimatedTime: '5 mins',
+          recipientName: 'Property Manager',
+          status: 'sent',
+        });
+      }
     } else {
       startPreparing(propertyId);
     }
@@ -179,10 +172,8 @@ export function approveProperty(propertyId: string): void {
   updatePropertyStatus(propertyId, 'live');
   addTimelineEvent(propertyId, {
     type: 'publication',
-    event: 'Publication approved · Experience is Live',
-    detail: 'Interactive 3D tour published to public viewer. Shareable links and WhatsApp booking cards activated.',
-    agentDecision: 'Deploy public viewer bundle and generate unlisted access link.',
-    toolUsed: 'ExperiencePublisher'
+    event: 'Publication approved by Agent',
+    detail: 'Experience is now live',
   });
 }
 
@@ -191,35 +182,28 @@ export function approveProperty(propertyId: string): void {
  * This is called from the Demo Portal when a realtor publishes a listing.
  */
 export function handleNewListing(listing: {
-  title: string
-  address: string
-  type: string
-  bedrooms: number
-  bathrooms: number
-  price: string
-  description: string
-  coverImage?: string
-  spaces?: Array<{ name: string; captured?: boolean }>
+  title: string;
+  address: string;
+  type: string;
+  bedrooms: number;
+  bathrooms: number;
+  price: string;
+  description: string;
+  coverImage?: string;
+  spaces?: Array<{ name: string; captured?: boolean }>;
 }): string {
-  const spaces: Space[] = (listing.spaces && listing.spaces.length > 0)
-    ? listing.spaces.map((s, idx) => ({
-        id: `space-${Date.now()}-${idx}`,
-        name: s.name,
-        captured: s.captured ?? true,
-        verified: s.captured ?? false,
-        issues: s.captured === false ? ['Doorway connection missing'] : []
-      }))
-    : [
-        { id: `sp-1`, name: 'Living Room', captured: true, verified: true, issues: [] },
-        { id: `sp-2`, name: 'Kitchen', captured: true, verified: true, issues: [] },
-        { id: `sp-3`, name: 'Main Bedroom', captured: true, verified: true, issues: [] },
-        { id: `sp-4`, name: 'Bedroom 2', captured: true, verified: true, issues: [] },
-        { id: `sp-5`, name: 'Bedroom 3', captured: true, verified: true, issues: [] },
-        { id: `sp-6`, name: 'Bathroom', captured: true, verified: true, issues: [] },
-        { id: `sp-7`, name: 'Balcony', captured: false, verified: false, issues: ['Connection from living room missing'] }
-      ];
+  const propertyId = 'prop-' + Math.random().toString(36).substring(2, 11);
 
-  const created = addProperty({
+  const spaces: Space[] = (listing.spaces || []).map((s, idx) => ({
+    id: `space-${Date.now()}-${idx}`,
+    name: s.name,
+    captured: s.captured ?? true,
+    verified: false,
+    issues: [],
+  }));
+
+  const newProperty: Property = {
+    id: propertyId,
     title: listing.title,
     address: listing.address,
     type: listing.type,
@@ -232,10 +216,18 @@ export function handleNewListing(listing: {
     sourceMedia: [],
     timeline: [],
     coverImage: listing.coverImage,
-    workspaceId: 'ws-default'
-  });
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    workspaceId: 'default',
+  };
 
-  startPropertyWorkflow(created.id);
-  return created.id;
+  if (typeof addProperty === 'function') {
+    addProperty(newProperty);
+  } else {
+    console.warn('addProperty not found in store, could not save new property state.');
+  }
+
+  startPropertyWorkflow(propertyId);
+  return propertyId;
 }
 

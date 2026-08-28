@@ -1,410 +1,364 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { WorkspaceShell, NotificationButton } from '../components/WorkspaceShell'
-import { SearchIcon, ClockIcon, PhoneIcon } from '../components/icons2'
-import { useStore, usePropertyStats, deleteProperty } from '../data/store'
-import { PROPERTY_STATUS_LABELS, type PropertyStatus } from '../data/types'
-import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
-import propOrchidImg from '../assets/prop-orchid.jpg'
-import propLekkiImg from '../assets/prop-lekkigardens.jpg'
-import propBourdillonImg from '../assets/prop-bourdillon.jpg'
+import { useStore, usePropertyStats } from '../data/store'
+import { Button, Badge } from '../components/ui'
+import { SearchIcon } from '../components/icons2'
+import type { Property } from '../data/types'
 
-const filterOptions = ['All', 'Preparing', 'Needs attention', 'Ready', 'Live'] as const
+const filterOptions = ['All', 'Needs attention', 'Preparing', 'Ready for review', 'Live'] as const
 type FilterType = (typeof filterOptions)[number]
 
 export function ShowsHomeScreen() {
-  const { properties, captureRequests, workspace } = useStore()
+  const store = useStore()
   const stats = usePropertyStats()
   const [filter, setFilter] = useState<FilterType>('All')
   const [query, setQuery] = useState('')
-  const [menuFor, setMenuFor] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  // Close card menu on outside click
-  useEffect(() => {
-    if (!menuFor) return
-    const close = () => setMenuFor(null)
-    document.addEventListener('click', close)
-    return () => document.removeEventListener('click', close)
-  }, [menuFor])
+  const properties = store.properties || []
+  const workspace = store.workspace
+  const userName = workspace?.ownerName?.split(' ')[0] || 'Kiki'
 
-  const handleDeleteProperty = (id: string, title: string) => {
-    if (window.confirm(`Delete "${title}"?`)) {
-      deleteProperty(id)
-    }
-  }
-
-  // Filter properties based on search and active tab
-  const visibleProperties = properties.filter((p) => {
-    if (query) {
-      const q = query.toLowerCase()
-      const matchTitle = p.title.toLowerCase().includes(q)
-      const matchAddress = p.address.toLowerCase().includes(q)
-      const matchType = p.type.toLowerCase().includes(q)
-      if (!matchTitle && !matchAddress && !matchType) return false
-    }
-
-    if (filter === 'All') return true
-    if (filter === 'Preparing') return ['detected', 'checking_media', 'preparing', 'quality_check'].includes(p.status)
-    if (filter === 'Needs attention') return p.status === 'needs_recapture'
-    if (filter === 'Ready') return p.status === 'ready_for_review'
-    if (filter === 'Live') return p.status === 'live'
-    return true
-  })
-
-  // Attention hero property (first property with status needs_recapture)
-  const attentionProperty = properties.find((p) => p.status === 'needs_recapture')
-  const attentionRequest = attentionProperty
-    ? captureRequests.find((cr) => cr.propertyId === attentionProperty.id && cr.status !== 'resolved')
-    : undefined
-
-  // Grouped properties for sections
-  const inProgressProperties = properties.filter((p) =>
-    ['detected', 'checking_media', 'preparing', 'quality_check'].includes(p.status)
+  // Partition properties by state
+  const needsAttentionProp = properties.find(
+    (p) => p.status === 'needs_recapture' || p.spaces.some((s) => !s.captured)
   )
-  const readyProperties = properties.filter((p) => p.status === 'ready_for_review')
 
-  const getImageForProperty = (p: { coverImage?: string; title: string }) => {
-    if (p.coverImage) return p.coverImage
-    if (p.title.includes('Admiralty')) return propAdmiraltyImg
-    if (p.title.includes('Bourdillon')) return propBourdillonImg
-    if (p.title.includes('Orchid')) return propOrchidImg
-    if (p.title.includes('Lekki')) return propLekkiImg
-    return propAdmiraltyImg
+  const inProgressProps = properties.filter(
+    (p) => p.status === 'preparing' || p.status === 'checking_media' || p.status === 'quality_check' || p.status === 'detected'
+  )
+
+  const readyForReviewProps = properties.filter((p) => p.status === 'ready_for_review')
+
+  const liveProps = properties.filter((p) => p.status === 'live')
+
+  const handleCopyLink = (p: Property) => {
+    const url = `${window.location.origin}/#/view/${p.id}`
+    navigator.clipboard.writeText(url)
+    setCopiedId(p.id)
+    setTimeout(() => setCopiedId(null), 2000)
   }
 
-  const getStatusBadge = (status: PropertyStatus) => {
-    switch (status) {
-      case 'live':
-        return <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800"><span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />Live</span>
-      case 'ready_for_review':
-        return <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-900"><span className="h-1.5 w-1.5 rounded-full bg-amber-600" />Ready for review</span>
-      case 'needs_recapture':
-        return <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-[11px] font-bold text-rose-800"><span className="h-1.5 w-1.5 rounded-full bg-rose-600 animate-pulse" />Capture needed</span>
-      case 'preparing':
-      case 'checking_media':
-      case 'quality_check':
-        return <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-[11px] font-bold text-blue-800"><span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-spin" />{PROPERTY_STATUS_LABELS[status]}</span>
-      default:
-        return <span className="inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-2.5 py-0.5 text-[11px] font-semibold text-stone-700">{PROPERTY_STATUS_LABELS[status] || status}</span>
-    }
+  const handleWhatsAppShare = (p: Property) => {
+    const url = `${window.location.origin}/#/view/${p.id}`
+    const text = `Explore ${p.title} (${p.price}) in interactive 3D: ${url}`
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
   }
-
-  const ownerFirstName = workspace?.ownerName ? workspace.ownerName.split(' ')[0] : 'David'
 
   return (
     <WorkspaceShell>
-      <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-10 xl:px-12 py-6 lg:py-8 space-y-6">
+      <div className="mx-auto max-w-[1360px] px-5 sm:px-8 lg:px-10 py-6 lg:py-8 font-sans text-ink">
         
-        {/* Header & Attention Inbox Overview */}
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-2">
-          <div className="min-w-0">
-            <h1 className="text-[26px] sm:text-[30px] lg:text-[32px] font-extrabold tracking-tight text-text-primary leading-tight">
-              Good morning, {ownerFirstName}.
+        {/* Top Attention Inbox Greeting */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border">
+          <div>
+            <h1 className="text-[26px] sm:text-[30px] font-extrabold tracking-tight text-ink leading-tight">
+              Good morning, {userName}.
             </h1>
-            <p className="text-[14px] text-text-secondary font-normal mt-1 leading-relaxed">
-              <strong className="text-text-primary font-semibold">{stats.live} listings</strong> are live. OpenHouse is preparing <strong className="text-text-primary font-semibold">{stats.preparing}</strong>. <strong className="text-[#D97945] font-semibold">{stats.needsAttention} listing</strong> needs your attention.
+            <p className="text-[14px] text-ink-2 mt-1">
+              <span className="font-semibold text-primary">{stats.live} listings</span> are live ·{' '}
+              <span className="font-semibold text-ink">{stats.preparing}</span> in preparation ·{' '}
+              {stats.needsAttention > 0 ? (
+                <span className="font-semibold text-accent">{stats.needsAttention} listing needs your attention</span>
+              ) : (
+                <span className="text-ink-3">All captures up to date</span>
+              )}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <Link
-              to="/import"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#194534] text-white px-4 py-2.5 text-xs font-bold shadow-sm hover:bg-[#2F613D] transition-all"
-            >
-              <span>+ Ingest Listing</span>
-              <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded">MLS Gateway</span>
-            </Link>
-
-            <div className="flex w-full sm:w-[220px] md:w-[260px] items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-xs text-text-primary shadow-2xs">
-              <SearchIcon size={14} className="text-text-secondary shrink-0" />
+          <div className="flex items-center gap-3">
+            <div className="flex w-full sm:w-[260px] md:w-[280px] items-center gap-2 rounded-xl border border-border bg-surface px-3.5 py-2 text-sm text-ink shadow-subtle focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 transition-all">
+              <SearchIcon size={15} className="text-ink-3 shrink-0" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search properties..."
-                className="flex-1 bg-transparent text-text-primary outline-none placeholder:text-text-secondary/70 font-normal min-w-0"
+                placeholder="Search listings..."
+                className="w-full bg-transparent text-ink placeholder:text-ink-3 outline-none text-xs sm:text-sm"
               />
             </div>
-            
             <NotificationButton />
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          {filterOptions.map((f) => {
-            let count = properties.length
-            if (f === 'Preparing') count = stats.preparing
-            if (f === 'Needs attention') count = stats.needsAttention
-            if (f === 'Ready') count = stats.readyForReview
-            if (f === 'Live') count = stats.live
-
-            return (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
-                  filter === f
-                    ? 'bg-primary text-text-inverse shadow-xs'
-                    : 'border border-border bg-surface text-text-primary hover:bg-surface-elevated'
-                }`}
-              >
-                <span>{f}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${filter === f ? 'bg-white/20' : 'bg-stone-200/60'}`}>
-                  {count}
+        {/* Filter Bar */}
+        <div className="flex items-center gap-2 py-5 overflow-x-auto">
+          {filterOptions.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
+                filter === f
+                  ? 'bg-primary text-text-inverse shadow-subtle'
+                  : 'border border-border bg-surface text-ink hover:bg-raised-2'
+              }`}
+            >
+              {f}
+              {f === 'Needs attention' && stats.needsAttention > 0 && (
+                <span className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] text-white">
+                  {stats.needsAttention}
                 </span>
-              </button>
-            )
-          })}
+              )}
+              {f === 'Ready for review' && stats.readyForReview > 0 && (
+                <span className="ml-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-white">
+                  {stats.readyForReview}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* ========================================================================= */}
-        {/* SECTION 1: NEEDS YOUR ATTENTION (Dynamic Hero Banner) */}
-        {/* ========================================================================= */}
-        {(filter === 'All' || filter === 'Needs attention') && attentionProperty && (
-          <div className="space-y-2.5 animate-fadeIn">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-bold tracking-[0.12em] text-[#D97945] uppercase flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-[#D97945] animate-ping" />
-                <span>NEEDS YOUR ATTENTION</span>
-              </p>
-              <span className="text-xs text-text-secondary font-medium">1 action required</span>
+        {/* SECTION 1: NEEDS YOU (High Priority Action Card) */}
+        {(filter === 'All' || filter === 'Needs attention') && needsAttentionProp && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-accent animate-pulse" />
+                <h2 className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-accent">
+                  NEEDS YOU / 1 ACTION REQUIRED
+                </h2>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] xl:grid-cols-[1.35fr_1fr] overflow-hidden rounded-2xl border border-rose-200/80 bg-surface shadow-subtle ring-1 ring-rose-500/10">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] overflow-hidden rounded-2xl border-2 border-accent/40 bg-surface shadow-md">
               <div className="relative aspect-[16/9] lg:aspect-auto lg:h-[280px] w-full overflow-hidden bg-sidebar">
                 <img
-                  src={getImageForProperty(attentionProperty)}
-                  alt={attentionProperty.title}
+                  src={needsAttentionProp.coverImage || '/src/assets/prop-hero-waterfront.jpg'}
+                  alt={needsAttentionProp.title}
                   className="h-full w-full object-cover"
                 />
-                <div className="absolute bottom-3 left-3 rounded-lg bg-black/65 backdrop-blur-md px-3 py-1.5 text-white border border-white/10 shadow-lg">
-                  <p className="text-[13.5px] font-bold leading-tight">{attentionProperty.title}</p>
-                  <p className="text-[11.5px] text-white/80 font-normal">{attentionProperty.address}</p>
+                <div className="absolute bottom-3 left-3 rounded-lg bg-black/75 backdrop-blur-md px-3.5 py-2 text-white border border-white/10 shadow-lg">
+                  <p className="text-sm font-bold leading-tight">{needsAttentionProp.title}</p>
+                  <p className="text-xs text-white/80 font-normal">{needsAttentionProp.address}</p>
                 </div>
               </div>
 
-              <div className="flex flex-col justify-between p-5 lg:p-6 bg-surface">
+              <div className="flex flex-col justify-between p-6 sm:p-7 bg-surface">
                 <div>
-                  <div className="flex items-center gap-1.5 pb-1">
-                    <span className="h-2 w-2 rounded-full bg-[#D97945] shrink-0" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#D97945]">
-                      RECAPTURE NEEDED
-                    </span>
+                  <div className="flex items-center gap-2 pb-2">
+                    <Badge variant="accent">Missing Scene Coverage</Badge>
+                    <span className="text-xs text-ink-3">Estimated ~1 min</span>
                   </div>
 
-                  <h2 className="text-[18px] sm:text-[20px] font-bold tracking-tight text-text-primary leading-snug">
-                    {attentionRequest?.reason || 'One room connection is missing.'}
-                  </h2>
-                  <p className="pt-1.5 text-xs text-text-secondary leading-relaxed">
-                    {attentionRequest?.instructions || 'OpenHouse needs a short 15-second video pass to complete spatial coverage.'}
+                  <h3 className="text-[20px] font-bold tracking-tight text-ink leading-snug">
+                    One balcony capture is missing
+                  </h3>
+                  <p className="pt-1.5 text-xs sm:text-sm text-ink-2 leading-relaxed">
+                    OpenHouse collected the 3-bedroom listing, but the balcony entrance was not clearly captured in the initial footage.
                   </p>
                 </div>
 
                 <div className="py-3">
-                  <div className="flex flex-col gap-1 text-xs text-text-secondary">
-                    <div className="flex items-center gap-2">
-                      <ClockIcon size={13} className="text-text-secondary shrink-0" />
-                      <span>Estimated time · {attentionRequest?.estimatedTime || '1 minute'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <PhoneIcon size={13} className="text-text-secondary shrink-0" />
-                      <span>
-                        {attentionProperty.spaces.filter(s => s.captured).length} of {attentionProperty.spaces.length} spaces sufficiently captured
-                      </span>
-                    </div>
+                  <div className="flex items-center justify-between text-xs text-ink-2 pb-1.5">
+                    <span>Coverage progress</span>
+                    <span className="font-semibold text-ink">6 of 7 spaces verified</span>
                   </div>
-
-                  {/* Progress bar */}
-                  <div className="flex gap-1 pt-2.5">
-                    {attentionProperty.spaces.map((s, idx) => (
-                      <div
-                        key={idx}
-                        className={`h-1.5 flex-1 rounded-full ${
-                          s.captured ? 'bg-[#2F613D]' : 'bg-[#D97945] animate-pulse'
-                        }`}
-                        title={`${s.name}: ${s.captured ? 'Captured' : 'Missing'}`}
-                      />
-                    ))}
+                  <div className="grid grid-cols-7 gap-1.5">
+                    <div className="h-2 rounded-full bg-primary" />
+                    <div className="h-2 rounded-full bg-primary" />
+                    <div className="h-2 rounded-full bg-primary" />
+                    <div className="h-2 rounded-full bg-primary" />
+                    <div className="h-2 rounded-full bg-primary" />
+                    <div className="h-2 rounded-full bg-primary" />
+                    <div className="h-2 rounded-full bg-accent animate-pulse" />
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 pt-1">
-                  <Link
-                    to={attentionRequest ? `/capture/${attentionRequest.id}` : `/capture/${attentionProperty.id}`}
-                    className="inline-flex items-center justify-center rounded-xl bg-[#0B1713] text-white px-5 py-2.5 text-xs font-bold hover:bg-black transition-colors shadow-xs"
-                  >
-                    Record now
+                <div className="flex items-center gap-3 pt-2">
+                  <Link to={`/capture/${needsAttentionProp.id}`}>
+                    <Button variant="primary" size="md">
+                      Record now (15s)
+                    </Button>
                   </Link>
-                  <Link
-                    to={`/show/${attentionProperty.id}`}
-                    className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-4 py-2.5 text-xs font-semibold text-text-primary hover:bg-stone-50 transition-colors"
-                  >
-                    See why
+                  <Link to={`/property/${needsAttentionProp.id}`}>
+                    <Button variant="secondary" size="md">
+                      See why
+                    </Button>
                   </Link>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* ========================================================================= */}
         {/* SECTION 2: WORKING IN THE BACKGROUND */}
-        {/* ========================================================================= */}
-        {(filter === 'All' || filter === 'Preparing') && inProgressProperties.length > 0 && (
-          <div className="space-y-2.5">
-            <p className="text-[11px] font-bold tracking-[0.12em] text-text-secondary uppercase">
-              WORKING IN THE BACKGROUND / {inProgressProperties.length}
-            </p>
+        {(filter === 'All' || filter === 'Preparing') && inProgressProps.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center gap-2 pb-3">
+              <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
+              <h2 className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-ink-2">
+                WORKING IN THE BACKGROUND / {inProgressProps.length}
+              </h2>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {inProgressProperties.map((p) => (
-                <Link
-                  key={p.id}
-                  to={`/show/${p.id}`}
-                  className="flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs hover:border-stone-400/60 transition-all group"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <img
-                      src={getImageForProperty(p)}
-                      alt={p.title}
-                      className="h-12 w-12 rounded-xl object-cover shrink-0"
-                    />
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-text-primary group-hover:text-[#194534] transition-colors truncate">
-                        {p.title}
-                      </h4>
-                      <p className="text-[11px] text-text-secondary truncate mt-0.5">
-                        {p.address} · {p.type}
-                      </p>
+            <div className="grid grid-cols-1 gap-3">
+              {inProgressProps.map((p) => {
+                const isReconstructing = p.status === 'preparing'
+                const isChecking = p.status === 'quality_check' || p.status === 'checking_media'
+                return (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between rounded-xl border border-border bg-surface p-4 shadow-subtle hover:border-line-strong transition-all"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <img
+                        src={p.coverImage || '/src/assets/prop-orchid.jpg'}
+                        alt={p.title}
+                        className="h-12 w-16 rounded-lg object-cover border border-border shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <Link to={`/property/${p.id}`} className="hover:underline">
+                          <h3 className="text-sm font-bold text-ink truncate">{p.title}</h3>
+                        </Link>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                          <span className="text-xs text-ink-2 font-medium">
+                            {isReconstructing
+                              ? 'Building interactive tour'
+                              : isChecking
+                              ? 'Checking the finished experience'
+                              : 'Property detected'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 shrink-0">
+                      <span className="text-xs text-ink-2 hidden sm:inline-block font-medium">
+                        Expected in 18–25 minutes
+                      </span>
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-dashed border-primary border-t-transparent" />
+                      <Link to={`/property/${p.id}`}>
+                        <Button variant="ghost" size="sm">
+                          Details →
+                        </Button>
+                      </Link>
                     </div>
                   </div>
-
-                  <div className="text-right shrink-0 pl-3">
-                    {getStatusBadge(p.status)}
-                    <span className="text-[10px] text-stone-400 block mt-1">
-                      Expected in 18–25 mins
-                    </span>
-                  </div>
-                </Link>
-              ))}
+                )
+              })}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* ========================================================================= */}
         {/* SECTION 3: READY FOR REVIEW */}
-        {/* ========================================================================= */}
-        {(filter === 'All' || filter === 'Ready') && readyProperties.length > 0 && (
-          <div className="space-y-2.5">
-            <p className="text-[11px] font-bold tracking-[0.12em] text-text-secondary uppercase">
-              READY FOR REVIEW / {readyProperties.length}
-            </p>
+        {(filter === 'All' || filter === 'Ready for review') && readyForReviewProps.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-ink-2 pb-3">
+              READY FOR REVIEW / {readyForReviewProps.length}
+            </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {readyProperties.map((p) => (
+            <div className="grid grid-cols-1 gap-3">
+              {readyForReviewProps.map((p) => (
                 <div
                   key={p.id}
-                  className="flex items-center justify-between rounded-2xl border border-amber-200 bg-amber-50/40 p-4 shadow-2xs"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border-2 border-primary/30 bg-surface p-4 shadow-subtle hover:border-primary transition-all"
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
                     <img
-                      src={getImageForProperty(p)}
+                      src={p.coverImage || '/src/assets/prop-lekkigardens.jpg'}
                       alt={p.title}
-                      className="h-12 w-12 rounded-xl object-cover shrink-0"
+                      className="h-14 w-20 rounded-lg object-cover border border-border shrink-0"
                     />
                     <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-text-primary truncate">{p.title}</h4>
-                      <p className="text-[11px] text-text-secondary truncate mt-0.5">
-                        {p.spaces.length} of {p.spaces.length} rooms ready · Quality verified
+                      <h3 className="text-sm sm:text-base font-bold text-ink truncate">{p.title}</h3>
+                      <p className="text-xs text-ink-2 mt-0.5">
+                        {p.spaces.length} of {p.spaces.length} rooms ready · Verification passed
                       </p>
                     </div>
                   </div>
 
-                  <Link
-                    to={`/show/${p.id}`}
-                    className="inline-flex items-center justify-center rounded-xl bg-[#0B1713] text-white px-3.5 py-2 text-xs font-bold hover:bg-black transition-colors shrink-0 shadow-2xs"
-                  >
-                    Review and publish
-                  </Link>
+                  <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
+                    <Link to={`/property/${p.id}`}>
+                      <Button variant="secondary" size="md">
+                        Inspect
+                      </Button>
+                    </Link>
+                    <Link to="/approvals">
+                      <Button variant="primary" size="md">
+                        Review and publish
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* ========================================================================= */}
-        {/* SECTION 4: ALL PROPERTIES GRID */}
-        {/* ========================================================================= */}
-        <div className="space-y-2.5 pt-2">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-bold tracking-[0.12em] text-text-secondary uppercase">
-              ALL LISTINGS / {visibleProperties.length}
-            </p>
-            <span className="text-xs text-text-secondary">Click any property to inspect timeline & evidence</span>
-          </div>
+        {/* SECTION 4: LIVE PROPERTIES */}
+        {(filter === 'All' || filter === 'Live') && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between pb-3">
+              <h2 className="text-[11.5px] font-bold uppercase tracking-[0.12em] text-ink-2">
+                LIVE / {liveProps.length} PROPERTIES
+              </h2>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {visibleProperties.map((p) => (
-              <div
-                key={p.id}
-                className="group relative flex flex-col rounded-2xl border border-border bg-surface overflow-hidden shadow-2xs hover:shadow-subtle hover:border-stone-400/70 transition-all"
-              >
-                {/* Cover Image */}
-                <Link to={`/show/${p.id}`} className="relative aspect-[16/10] overflow-hidden bg-stone-900">
-                  <img
-                    src={getImageForProperty(p)}
-                    alt={p.title}
-                    className="h-full w-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
-                  />
-                  <div className="absolute top-2.5 right-2.5">
-                    {getStatusBadge(p.status)}
-                  </div>
-                  <div className="absolute bottom-2 left-2.5 right-2.5 text-white bg-black/60 backdrop-blur-md px-2.5 py-1.5 rounded-lg">
-                    <p className="text-xs font-bold truncate leading-tight">{p.title}</p>
-                    <p className="text-[11px] text-white/80 truncate">{p.price}</p>
-                  </div>
-                </Link>
+            {liveProps.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-surface p-8 text-center">
+                <p className="text-sm text-ink-2">No properties currently live.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {liveProps.map((p) => (
+                  <div
+                    key={p.id}
+                    className="group flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-subtle hover:shadow-card hover:border-line-strong transition-all duration-200"
+                  >
+                    <div className="relative aspect-[16/10] w-full overflow-hidden bg-sidebar">
+                      <img
+                        src={p.coverImage || '/src/assets/prop-bourdillon.jpg'}
+                        alt={p.title}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      />
+                      <div className="absolute top-2.5 left-2.5">
+                        <Badge variant="success">● Live 24/7</Badge>
+                      </div>
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between rounded-lg bg-black/70 backdrop-blur-md px-3 py-1.5 text-white">
+                        <span className="text-xs font-bold truncate">{p.price}</span>
+                        <span className="text-[11px] text-white/80 font-normal">{p.bedrooms} Beds</span>
+                      </div>
+                    </div>
 
-                {/* Body Details */}
-                <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2.5">
-                  <div className="space-y-1">
-                    <p className="text-xs font-semibold text-text-primary truncate">{p.address}</p>
-                    <p className="text-[11px] text-text-secondary">{p.type} · {p.bedrooms} Beds</p>
-                  </div>
+                    <div className="flex flex-1 flex-col justify-between p-4 bg-surface">
+                      <div>
+                        <h3 className="text-sm font-bold text-ink line-clamp-1">{p.title}</h3>
+                        <p className="text-xs text-ink-2 line-clamp-1 mt-0.5">{p.address}</p>
+                      </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-stone-100 text-[11px]">
-                    <span className="text-text-secondary font-medium">
-                      {p.spaces.filter(s => s.captured).length}/{p.spaces.length} spaces
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                      <Link
-                        to={`/show/${p.id}`}
-                        className="font-bold text-[#194534] hover:underline"
-                      >
-                        Inspect →
-                      </Link>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteProperty(p.id, p.title)
-                        }}
-                        className="text-stone-400 hover:text-rose-600 transition-colors p-1"
-                        title="Delete property"
-                      >
-                        ✕
-                      </button>
+                      <div className="flex items-center justify-between gap-2 pt-4 mt-2 border-t border-border/60">
+                        <Link to={`/view/${p.id}`} target="_blank" className="flex-1">
+                          <Button variant="secondary" size="sm" fullWidth>
+                            Explore 3D ↗
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleWhatsAppShare(p)}
+                          title="Share via WhatsApp"
+                        >
+                          WhatsApp
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCopyLink(p)}
+                          title="Copy Public Link"
+                        >
+                          {copiedId === p.id ? 'Copied!' : 'Link'}
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            )}
+          </section>
+        )}
 
       </div>
     </WorkspaceShell>
   )
 }
-

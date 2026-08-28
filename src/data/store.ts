@@ -8,15 +8,20 @@ import type {
   PropertyStatus,
   TimelineEvent,
   MediaItem,
-  Space,
 } from './types';
 import { getSeedData } from './seed';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import {
+  fetchCloudStoreState,
+  syncPropertyToCloud,
+  deletePropertyFromCloud,
+  syncCaptureRequestToCloud,
+  syncBookingToCloud,
+  syncWorkspaceToCloud,
+} from './supabaseStore';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 const STORAGE_KEY = 'openhouse.store';
-const db = supabase as any;
 
-// In-memory single source of truth
 let state: StoreState = {
   workspace: null,
   properties: [],
@@ -26,289 +31,105 @@ let state: StoreState = {
 };
 
 const listeners = new Set<(state: StoreState) => void>();
-let realtimeInitialized = false;
 
-export function generateId(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
-}
+// --- Core Store Functions ---
 
 function notify() {
-  listeners.forEach((listener) => {
-    try {
-      listener(state);
-    } catch (e) {
-      console.error('Error in store listener:', e);
-    }
-  });
+  listeners.forEach((listener) => listener(state));
 }
 
-function persistLocal() {
+function persist() {
   try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-  } catch (e) {
-    console.error('Failed to persist store locally:', e);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error('Failed to save state to localStorage:', error);
   }
 }
 
-// Transform DB row (snake_case) to Frontend Property (camelCase)
-function transformDbProperty(row: any, spaces: Space[] = [], timeline: TimelineEvent[] = []): Property {
-  return {
-    id: row.id,
-    workspaceId: row.workspace_id || '00000000-0000-0000-0000-000000000001',
-    title: row.title,
-    address: row.address,
-    type: row.type,
-    bedrooms: row.bedrooms ?? 1,
-    bathrooms: row.bathrooms ?? 1,
-    price: row.price,
-    description: row.description || '',
-    status: row.status as PropertyStatus,
-    experienceUrl: row.experience_url || undefined,
-    coverImage: row.cover_image || undefined,
-    createdAt: new Date(row.created_at).getTime(),
-    updatedAt: new Date(row.updated_at).getTime(),
-    spaces,
-    sourceMedia: [],
-    timeline,
-  };
+export function generateId(): string {
+  return Math.random().toString(36).substring(2, 9);
 }
 
-// Transform DB row to Frontend CaptureRequest
-function transformDbCaptureRequest(row: any): CaptureRequest {
-  return {
-    id: row.id,
-    propertyId: row.property_id,
-    propertyTitle: row.property_title,
-    room: row.room,
-    reason: row.reason,
-    instructions: row.instructions,
-    estimatedTime: row.estimated_time || '1 minute',
-    status: row.status,
-    recipientName: row.recipient_name || 'David Olabowale',
-    recipientPhone: row.recipient_phone || undefined,
-    recipientEmail: row.recipient_email || undefined,
-    captureUrl: row.capture_url || `/capture/${row.id}`,
-    uploadedMedia: row.uploaded_media || [],
-    createdAt: new Date(row.created_at).getTime(),
-    updatedAt: new Date(row.updated_at).getTime(),
-  };
-}
-
-// Transform DB row to Frontend Booking
-function transformDbBooking(row: any): Booking {
-  return {
-    id: row.id,
-    propertyId: row.property_id,
-    propertyTitle: row.property_title,
-    renterName: row.renter_name,
-    renterPhone: row.renter_phone,
-    renterEmail: row.renter_email,
-    preferredDate: row.preferred_date,
-    preferredTime: row.preferred_time,
-    message: row.message || undefined,
-    status: row.status || 'requested',
-    createdAt: new Date(row.created_at).getTime(),
-  };
-}
-
-// Transform DB row to Frontend Workspace
-function transformDbWorkspace(row: any): Workspace {
-  return {
-    id: row.id,
-    name: row.name,
-    ownerName: row.owner_name,
-    ownerEmail: row.owner_email,
-    workType: row.work_type,
-    portfolioSize: row.portfolio_size || '11–50 active properties',
-    primaryMarket: row.primary_market || 'Lagos, Nigeria',
-    teamSize: row.team_size || '2–5 people',
-    listingSource: row.listing_source || 'demo',
-    requireApproval: row.require_approval ?? true,
-    defaultVisibility: row.default_visibility || 'unlisted',
-    notificationPreferences: row.notification_preferences || {
-      captureRequired: true,
-      reviewReady: true,
-      published: true,
-      processingFailed: true,
-      everyUpdate: false,
-      channels: ['email', 'whatsapp', 'in_app'],
-    },
-    branding: row.branding || undefined,
-    createdAt: new Date(row.created_at).getTime(),
-  };
-}
-
-/**
- * Fetch latest remote data from Supabase and synchronize local state.
- */
-export async function syncWithSupabase() {
-  if (!isSupabaseConfigured) return;
-
-  try {
-    const [wsRes, propRes, spacesRes, timelineRes, reqRes, bookRes] = await Promise.all([
-      db.from('workspaces').select('*').limit(1).maybeSingle(),
-      db.from('properties').select('*').order('created_at', { ascending: false }),
-      db.from('spaces').select('*'),
-      db.from('timeline_events').select('*').order('timestamp', { ascending: false }),
-      db.from('capture_requests').select('*').order('created_at', { ascending: false }),
-      db.from('bookings').select('*').order('created_at', { ascending: false }),
-    ]);
-
-    const spacesByProp = new Map<string, Space[]>();
-    (spacesRes?.data || []).forEach((s: any) => {
-      const arr = spacesByProp.get(s.property_id) || [];
-      arr.push({
-        id: s.id,
-        name: s.name,
-        captured: s.captured,
-        verified: s.verified,
-        issues: s.issues || [],
-        captureRequestId: s.capture_request_id || undefined,
-        thumbnailUrl: s.thumbnail_url || undefined,
-      });
-      spacesByProp.set(s.property_id, arr);
-    });
-
-    const timelineByProp = new Map<string, TimelineEvent[]>();
-    (timelineRes?.data || []).forEach((t: any) => {
-      const arr = timelineByProp.get(t.property_id) || [];
-      arr.push({
-        id: t.id,
-        timestamp: new Date(t.timestamp).getTime(),
-        event: t.event,
-        detail: t.detail || undefined,
-        type: t.type,
-        agentDecision: t.agent_decision || undefined,
-        evidence: t.evidence || undefined,
-        toolUsed: t.tool_used || undefined,
-      });
-      timelineByProp.set(t.property_id, arr);
-    });
-
-    const properties: Property[] = (propRes?.data || []).map((p: any) =>
-      transformDbProperty(p, spacesByProp.get(p.id) || [], timelineByProp.get(p.id) || [])
-    );
-
-    const captureRequests: CaptureRequest[] = (reqRes?.data || []).map(transformDbCaptureRequest);
-    const bookings: Booking[] = (bookRes?.data || []).map(transformDbBooking);
-    const workspace: Workspace | null = wsRes?.data ? transformDbWorkspace(wsRes.data) : state.workspace;
-
-    if (properties.length > 0 || captureRequests.length > 0) {
-      state = {
-        workspace,
-        properties,
-        captureRequests,
-        bookings,
-        initialized: true,
-      };
-      persistLocal();
-      notify();
-    }
-  } catch (err) {
-    console.error('Failed to synchronize store with Supabase:', err);
-  }
-}
-
-/**
- * Setup Supabase Realtime Channels for instant multi-user reactivity.
- */
-function setupRealtimeSubscriptions() {
-  if (!isSupabaseConfigured || realtimeInitialized) return;
-  realtimeInitialized = true;
-
-  db
-    .channel('openhouse_realtime_sync')
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'properties' },
-      () => {
-        syncWithSupabase();
-      }
-    )
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'spaces' },
-      () => {
-        syncWithSupabase();
-      }
-    )
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'timeline_events' },
-      () => {
-        syncWithSupabase();
-      }
-    )
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'capture_requests' },
-      () => {
-        syncWithSupabase();
-      }
-    )
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'bookings' },
-      () => {
-        syncWithSupabase();
-      }
-    )
-    .subscribe();
-}
-
-/**
- * Initialize Store with fallback to LocalStorage/Seed data and Supabase sync.
- */
-export function initStore(): void {
+export function initStore() {
   if (state.initialized) return;
 
+  // 1. Initial synchronous hydration from localStorage
   try {
-    const raw = typeof window !== 'undefined' && window.localStorage ? window.localStorage.getItem(STORAGE_KEY) : null;
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.properties)) {
-        state = { ...parsed, initialized: true };
-      } else {
-        state = { ...getSeedData(), initialized: true };
-      }
-    } else {
-      state = { ...getSeedData(), initialized: true };
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      state = { ...JSON.parse(saved), initialized: true };
     }
-  } catch (e) {
-    console.error('Failed to load local store:', e);
-    state = { ...getSeedData(), initialized: true };
+  } catch (error) {
+    console.error('Failed to load state from localStorage:', error);
   }
 
-  persistLocal();
+  // 2. Fallback to seed data if empty
+  if (!state.properties || state.properties.length === 0) {
+    let seed: StoreState | null = null;
+    try {
+      seed = getSeedData();
+    } catch (error) {
+      console.warn('Seed data not available', error);
+    }
+
+    if (seed) {
+      state = { ...seed, initialized: true };
+    } else {
+      state.initialized = true;
+    }
+    persist();
+  } else {
+    state.initialized = true;
+  }
+
   notify();
 
-  // If Supabase is available, sync and setup realtime listeners
+  // 3. Asynchronous cloud hydration if Supabase is configured
   if (isSupabaseConfigured) {
-    syncWithSupabase();
-    setupRealtimeSubscriptions();
+    fetchCloudStoreState().then((cloudData) => {
+      if (cloudData && cloudData.properties && cloudData.properties.length > 0) {
+        state = {
+          ...state,
+          workspace: cloudData.workspace || state.workspace,
+          properties: cloudData.properties,
+          captureRequests: cloudData.captureRequests || state.captureRequests,
+          bookings: cloudData.bookings || state.bookings,
+        };
+        persist();
+        notify();
+      }
+    });
   }
 }
 
-// Auto-initialize store on module import
-initStore();
-
-export function resetStore(): void {
-  const seed = getSeedData();
-  state = {
-    ...seed,
-    initialized: true,
-  };
-  persistLocal();
-  notify();
-
-  if (isSupabaseConfigured) {
-    syncWithSupabase();
+export function resetStore() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.error('Failed to clear localStorage:', error);
   }
+  
+  let seed: StoreState | null = null;
+  try {
+    seed = getSeedData();
+  } catch (error) {
+    console.warn('Seed data not available', error);
+  }
+
+  if (seed) {
+    state = { ...seed, initialized: true };
+  } else {
+    state = {
+      workspace: null,
+      properties: [],
+      captureRequests: [],
+      bookings: [],
+      initialized: true,
+    };
+  }
+  
+  persist();
+  notify();
 }
 
 export function getState(): StoreState {
@@ -333,61 +154,21 @@ export function getProperty(id: string): Property | undefined {
 }
 
 export function addProperty(property: Omit<Property, 'id' | 'createdAt' | 'updatedAt'>): Property {
-  const newId = generateId();
-  const now = Date.now();
   const newProperty: Property = {
     ...property,
-    id: newId,
-    createdAt: now,
-    updatedAt: now,
+    id: generateId(),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   };
-
-  // Optimistic update
   state = {
     ...state,
     properties: [newProperty, ...state.properties],
   };
-  persistLocal();
+  persist();
   notify();
 
-  // Background Supabase Sync
-  if (isSupabaseConfigured) {
-    const workspaceId = property.workspaceId || '00000000-0000-0000-0000-000000000001';
-    db
-      .from('properties')
-      .insert({
-        id: newId,
-        workspace_id: workspaceId,
-        title: property.title,
-        address: property.address,
-        type: property.type,
-        bedrooms: property.bedrooms,
-        bathrooms: property.bathrooms,
-        price: property.price,
-        description: property.description,
-        status: property.status,
-        cover_image: property.coverImage || null,
-        experience_url: property.experienceUrl || null,
-      })
-      .then(async (res: any) => {
-        if (res?.error) {
-          console.error('Supabase property insert error:', res.error);
-          return;
-        }
-        // Insert spaces
-        if (property.spaces && property.spaces.length > 0) {
-          const spaceRows = property.spaces.map((s) => ({
-            id: s.id.includes('-') && s.id.length > 20 ? s.id : generateId(),
-            property_id: newId,
-            name: s.name,
-            captured: s.captured,
-            verified: s.verified,
-            issues: s.issues || [],
-          }));
-          await db.from('spaces').insert(spaceRows);
-        }
-      });
-  }
+  // Background Cloud Sync
+  syncPropertyToCloud(newProperty);
 
   return newProperty;
 }
@@ -404,25 +185,10 @@ export function updateProperty(id: string, updates: Partial<Property>): Property
       return p;
     }),
   };
-
   if (updatedProperty) {
-    persistLocal();
+    persist();
     notify();
-
-    if (isSupabaseConfigured) {
-      const dbUpdates: any = {
-        updated_at: new Date().toISOString(),
-      };
-      if (updates.title !== undefined) dbUpdates.title = updates.title;
-      if (updates.address !== undefined) dbUpdates.address = updates.address;
-      if (updates.price !== undefined) dbUpdates.price = updates.price;
-      if (updates.description !== undefined) dbUpdates.description = updates.description;
-      if (updates.status !== undefined) dbUpdates.status = updates.status;
-      if (updates.coverImage !== undefined) dbUpdates.cover_image = updates.coverImage;
-      if (updates.experienceUrl !== undefined) dbUpdates.experience_url = updates.experienceUrl;
-
-      db.from('properties').update(dbUpdates).eq('id', id);
-    }
+    syncPropertyToCloud(updatedProperty);
   }
   return updatedProperty;
 }
@@ -433,89 +199,59 @@ export function updatePropertyStatus(
   timelineEvent?: Omit<TimelineEvent, 'id' | 'timestamp'>
 ): Property | undefined {
   let updatedProperty: Property | undefined;
-  const eventId = generateId();
-  const now = Date.now();
-
   state = {
     ...state,
     properties: state.properties.map((p) => {
       if (p.id === id) {
         const updatedTimeline = timelineEvent
-          ? [{ ...timelineEvent, id: eventId, timestamp: now }, ...p.timeline]
+          ? [
+              { ...timelineEvent, id: generateId(), timestamp: Date.now() },
+              ...p.timeline,
+            ]
           : p.timeline;
-
+        
         updatedProperty = {
           ...p,
           status,
           timeline: updatedTimeline,
-          updatedAt: now,
+          updatedAt: Date.now(),
         };
         return updatedProperty;
       }
       return p;
     }),
   };
-
   if (updatedProperty) {
-    persistLocal();
+    persist();
     notify();
-
-    if (isSupabaseConfigured) {
-      db.from('properties').update({ status, updated_at: new Date().toISOString() }).eq('id', id).then();
-      if (timelineEvent) {
-        db
-          .from('timeline_events')
-          .insert({
-            id: eventId,
-            property_id: id,
-            event: timelineEvent.event,
-            detail: timelineEvent.detail || null,
-            type: timelineEvent.type,
-            agent_decision: timelineEvent.agentDecision || null,
-            evidence: timelineEvent.evidence || null,
-            tool_used: timelineEvent.toolUsed || null,
-          })
-          .then();
-      }
-    }
+    syncPropertyToCloud(updatedProperty);
   }
   return updatedProperty;
 }
 
 export function addTimelineEvent(propertyId: string, event: Omit<TimelineEvent, 'id' | 'timestamp'>): void {
-  const eventId = generateId();
-  const now = Date.now();
-
+  let updatedProperty: Property | undefined;
   state = {
     ...state,
     properties: state.properties.map((p) => {
       if (p.id === propertyId) {
-        return {
+        updatedProperty = {
           ...p,
-          timeline: [{ ...event, id: eventId, timestamp: now }, ...p.timeline],
-          updatedAt: now,
+          timeline: [
+            { ...event, id: generateId(), timestamp: Date.now() },
+            ...p.timeline,
+          ],
+          updatedAt: Date.now(),
         };
+        return updatedProperty;
       }
       return p;
     }),
   };
-  persistLocal();
+  persist();
   notify();
-
-  if (isSupabaseConfigured) {
-    db
-      .from('timeline_events')
-      .insert({
-        id: eventId,
-        property_id: propertyId,
-        event: event.event,
-        detail: event.detail || null,
-        type: event.type,
-        agent_decision: event.agentDecision || null,
-        evidence: event.evidence || null,
-        tool_used: event.toolUsed || null,
-      })
-      .then();
+  if (updatedProperty) {
+    syncPropertyToCloud(updatedProperty);
   }
 }
 
@@ -524,12 +260,9 @@ export function deleteProperty(id: string): void {
     ...state,
     properties: state.properties.filter((p) => p.id !== id),
   };
-  persistLocal();
+  persist();
   notify();
-
-  if (isSupabaseConfigured) {
-    db.from('properties').delete().eq('id', id).then();
-  }
+  deletePropertyFromCloud(id);
 }
 
 export function getPropertiesByStatus(status: PropertyStatus): Property[] {
@@ -566,42 +299,21 @@ export function addCaptureRequest(
   request: Omit<CaptureRequest, 'id' | 'createdAt' | 'updatedAt' | 'captureUrl'>
 ): CaptureRequest {
   const id = generateId();
-  const now = Date.now();
   const newRequest: CaptureRequest = {
     ...request,
     id,
     captureUrl: `/capture/${id}`,
-    createdAt: now,
-    updatedAt: now,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   };
-
   state = {
     ...state,
     captureRequests: [newRequest, ...state.captureRequests],
   };
-  persistLocal();
+  persist();
   notify();
 
-  if (isSupabaseConfigured) {
-    db
-      .from('capture_requests')
-      .insert({
-        id,
-        property_id: request.propertyId,
-        property_title: request.propertyTitle,
-        room: request.room,
-        reason: request.reason,
-        instructions: request.instructions,
-        estimated_time: request.estimatedTime || '1 minute',
-        status: request.status,
-        recipient_name: request.recipientName,
-        recipient_phone: request.recipientPhone || null,
-        recipient_email: request.recipientEmail || null,
-        capture_url: `/capture/${id}`,
-        uploaded_media: [],
-      })
-      .then();
-  }
+  syncCaptureRequestToCloud(newRequest);
 
   return newRequest;
 }
@@ -618,17 +330,10 @@ export function updateCaptureRequest(id: string, updates: Partial<CaptureRequest
       return cr;
     }),
   };
-
   if (updatedRequest) {
-    persistLocal();
+    persist();
     notify();
-
-    if (isSupabaseConfigured) {
-      const dbUpdates: any = { updated_at: new Date().toISOString() };
-      if (updates.status !== undefined) dbUpdates.status = updates.status;
-      if (updates.uploadedMedia !== undefined) dbUpdates.uploaded_media = updates.uploadedMedia;
-      db.from('capture_requests').update(dbUpdates).eq('id', id).then();
-    }
+    syncCaptureRequestToCloud(updatedRequest);
   }
   return updatedRequest;
 }
@@ -637,24 +342,27 @@ export function resolveCaptureRequest(id: string, media?: MediaItem[]): void {
   const request = getCaptureRequest(id);
   if (!request) return;
 
-  // 1. Update capture request
+  // Update capture request
   updateCaptureRequest(id, {
     status: 'resolved',
     uploadedMedia: media || [],
   });
 
-  // 2. Update associated property and space
+  // Update associated property and space
+  let modifiedProperty: Property | undefined;
   state = {
     ...state,
     properties: state.properties.map((p) => {
       if (p.id === request.propertyId) {
+        // Find if there are other pending requests for this property
         const otherPendingRequests = state.captureRequests.filter(
           (cr) => cr.propertyId === p.id && cr.id !== id && cr.status !== 'resolved' && cr.status !== 'failed'
         );
-
+        
+        // Update space
         const updatedSpaces = p.spaces.map((space) => {
           if (space.name === request.room || space.captureRequestId === id) {
-            return { ...space, captured: true, verified: true };
+            return { ...space, captured: true };
           }
           return space;
         });
@@ -664,38 +372,23 @@ export function resolveCaptureRequest(id: string, media?: MediaItem[]): void {
             ? 'checking_media'
             : p.status;
 
-        return {
+        modifiedProperty = {
           ...p,
           spaces: updatedSpaces,
           status: newStatus,
           updatedAt: Date.now(),
         };
+        return modifiedProperty;
       }
       return p;
     }),
   };
-
-  persistLocal();
+  
+  persist();
   notify();
 
-  if (isSupabaseConfigured) {
-    // Update Space in Supabase
-    db
-      .from('spaces')
-      .update({ captured: true, verified: true })
-      .eq('property_id', request.propertyId)
-      .eq('name', request.room)
-      .then();
-
-    // Conditionally restore property status
-    const property = getProperty(request.propertyId);
-    if (property && property.status === 'checking_media') {
-      db
-        .from('properties')
-        .update({ status: 'checking_media', updated_at: new Date().toISOString() })
-        .eq('id', request.propertyId)
-        .then();
-    }
+  if (modifiedProperty) {
+    syncPropertyToCloud(modifiedProperty);
   }
 }
 
@@ -706,38 +399,19 @@ export function getBookings(): Booking[] {
 }
 
 export function addBooking(booking: Omit<Booking, 'id' | 'createdAt'>): Booking {
-  const id = generateId();
-  const now = Date.now();
   const newBooking: Booking = {
     ...booking,
-    id,
-    createdAt: now,
+    id: generateId(),
+    createdAt: Date.now(),
   };
-
   state = {
     ...state,
     bookings: [newBooking, ...state.bookings],
   };
-  persistLocal();
+  persist();
   notify();
 
-  if (isSupabaseConfigured) {
-    db
-      .from('bookings')
-      .insert({
-        id,
-        property_id: booking.propertyId,
-        property_title: booking.propertyTitle,
-        renter_name: booking.renterName,
-        renter_phone: booking.renterPhone,
-        renter_email: booking.renterEmail,
-        preferred_date: booking.preferredDate,
-        preferred_time: booking.preferredTime,
-        message: booking.message || null,
-        status: booking.status || 'requested',
-      })
-      .then();
-  }
+  syncBookingToCloud(newBooking);
 
   return newBooking;
 }
@@ -753,29 +427,10 @@ export function setWorkspace(workspace: Workspace): void {
     ...state,
     workspace,
   };
-  persistLocal();
+  persist();
   notify();
 
-  if (isSupabaseConfigured) {
-    db
-      .from('workspaces')
-      .upsert({
-        id: workspace.id,
-        name: workspace.name,
-        owner_name: workspace.ownerName,
-        owner_email: workspace.ownerEmail,
-        work_type: workspace.workType,
-        portfolio_size: workspace.portfolioSize,
-        primary_market: workspace.primaryMarket,
-        team_size: workspace.teamSize,
-        listing_source: workspace.listingSource,
-        require_approval: workspace.requireApproval,
-        default_visibility: workspace.defaultVisibility,
-        notification_preferences: workspace.notificationPreferences as any,
-        branding: workspace.branding as any,
-      })
-      .then();
-  }
+  syncWorkspaceToCloud(workspace);
 }
 
 // --- React Hooks ---

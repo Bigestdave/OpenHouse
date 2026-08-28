@@ -1,382 +1,193 @@
--- ==============================================================================
--- OpenHouse Supabase Schema & Seed Data (US Edition)
--- ==============================================================================
+-- ============================================================================
+-- OpenHouse Supabase Seed Data
+-- ============================================================================
 
--- Enable UUID generation
-create extension if not exists "pgcrypto";
-
--- ------------------------------------------------------------------------------
--- 1. Table: workspaces
--- ------------------------------------------------------------------------------
-create table if not exists public.workspaces (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  owner_name text not null,
-  owner_email text not null,
-  work_type text check (work_type in ('agency', 'independent', 'manager')) default 'agency',
-  portfolio_size text default '25–100 active properties',
-  primary_market text default 'New York & Los Angeles',
-  team_size text default '5–10 people',
-  listing_source text check (listing_source in ('demo', 'webhook', 'csv', 'manual')) default 'webhook',
-  require_approval boolean default true,
-  default_visibility text check (default_visibility in ('unlisted', 'public', 'password')) default 'unlisted',
-  notification_preferences jsonb default '{
-    "captureRequired": true,
-    "reviewReady": true,
-    "published": true,
-    "processingFailed": true,
-    "everyUpdate": false,
-    "channels": ["email", "in_app"]
-  }'::jsonb,
-  branding jsonb default '{
-    "agencyName": "OpenHouse Premier",
-    "brandColor": "#194534"
-  }'::jsonb,
-  user_id uuid references auth.users(id) on delete set null,
-  created_at timestamptz default now()
-);
-
--- ------------------------------------------------------------------------------
--- 2. Table: properties
--- ------------------------------------------------------------------------------
-create table if not exists public.properties (
-  id uuid primary key default gen_random_uuid(),
-  workspace_id uuid references public.workspaces(id) on delete cascade not null,
-  title text not null,
-  address text not null,
-  type text not null,
-  bedrooms integer default 1,
-  bathrooms integer default 1,
-  price text not null,
-  description text default '',
-  status text not null default 'detected' check (
-    status in (
-      'detected',
-      'checking_media',
-      'preparing',
-      'quality_check',
-      'ready_for_review',
-      'live',
-      'needs_recapture',
-      'paused',
-      'failed'
-    )
-  ),
-  experience_url text,
-  cover_image text,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
--- ------------------------------------------------------------------------------
--- 3. Table: spaces (rooms/areas)
--- ------------------------------------------------------------------------------
-create table if not exists public.spaces (
-  id uuid primary key default gen_random_uuid(),
-  property_id uuid references public.properties(id) on delete cascade not null,
-  name text not null,
-  captured boolean default false,
-  verified boolean default false,
-  issues text[] default array[]::text[],
-  capture_request_id uuid,
-  thumbnail_url text,
-  created_at timestamptz default now()
-);
-
--- ------------------------------------------------------------------------------
--- 4. Table: media_items
--- ------------------------------------------------------------------------------
-create table if not exists public.media_items (
-  id uuid primary key default gen_random_uuid(),
-  property_id uuid references public.properties(id) on delete cascade not null,
-  url text not null,
-  type text check (type in ('photo', 'video', 'floor_plan', 'panorama')) default 'photo',
-  room text,
-  quality text check (quality in ('good', 'acceptable', 'poor', 'unchecked')) default 'unchecked',
-  uploaded_at timestamptz default now()
-);
-
--- ------------------------------------------------------------------------------
--- 5. Table: timeline_events (agent activity & decision ledger)
--- ------------------------------------------------------------------------------
-create table if not exists public.timeline_events (
-  id uuid primary key default gen_random_uuid(),
-  property_id uuid references public.properties(id) on delete cascade not null,
-  timestamp timestamptz default now(),
-  event text not null,
-  detail text,
-  type text not null check (
-    type in (
-      'detection',
-      'analysis',
-      'capture_request',
-      'capture_received',
-      'reconstruction',
-      'verification',
-      'approval',
-      'publication',
-      'error',
-      'info'
-    )
-  ),
-  agent_decision text,
-  evidence text,
-  tool_used text
-);
-
--- ------------------------------------------------------------------------------
--- 6. Table: capture_requests
--- ------------------------------------------------------------------------------
-create table if not exists public.capture_requests (
-  id uuid primary key default gen_random_uuid(),
-  property_id uuid references public.properties(id) on delete cascade not null,
-  property_title text not null,
-  room text not null,
-  reason text not null,
-  instructions text not null,
-  estimated_time text default '15 seconds',
-  status text not null default 'pending' check (
-    status in (
-      'pending',
-      'sent',
-      'awaiting_capture',
-      'received',
-      'checking',
-      'resolved',
-      'failed'
-    )
-  ),
-  recipient_name text default 'David Sterling',
-  recipient_phone text default '+1 (555) 234-5678',
-  recipient_email text default 'david@openhouse.app',
-  capture_url text,
-  uploaded_media jsonb default '[]'::jsonb,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
--- ------------------------------------------------------------------------------
--- 7. Table: bookings (renter/buyer inspection requests)
--- ------------------------------------------------------------------------------
-create table if not exists public.bookings (
-  id uuid primary key default gen_random_uuid(),
-  property_id uuid references public.properties(id) on delete cascade not null,
-  property_title text not null,
-  renter_name text not null,
-  renter_phone text not null,
-  renter_email text not null,
-  preferred_date text not null,
-  preferred_time text not null,
-  message text,
-  status text check (status in ('requested', 'confirmed', 'completed', 'cancelled')) default 'requested',
-  created_at timestamptz default now()
-);
-
--- ------------------------------------------------------------------------------
--- Indexes for High Performance
--- ------------------------------------------------------------------------------
-create index if not exists idx_properties_workspace_status on public.properties(workspace_id, status);
-create index if not exists idx_spaces_property on public.spaces(property_id);
-create index if not exists idx_timeline_property_time on public.timeline_events(property_id, timestamp desc);
-create index if not exists idx_capture_requests_property on public.capture_requests(property_id, status);
-create index if not exists idx_bookings_property on public.bookings(property_id);
-
--- ------------------------------------------------------------------------------
--- Trigger for automatic updated_at timestamps
--- ------------------------------------------------------------------------------
-create or replace function public.handle_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
-drop trigger if exists set_properties_updated_at on public.properties;
-create trigger set_properties_updated_at
-  before update on public.properties
-  for each row execute function public.handle_updated_at();
-
-drop trigger if exists set_capture_requests_updated_at on public.capture_requests;
-create trigger set_capture_requests_updated_at
-  before update on public.capture_requests
-  for each row execute function public.handle_updated_at();
-
--- ------------------------------------------------------------------------------
--- Row-Level Security (RLS) Policies
--- ------------------------------------------------------------------------------
-alter table public.workspaces enable row level security;
-alter table public.properties enable row level security;
-alter table public.spaces enable row level security;
-alter table public.media_items enable row level security;
-alter table public.timeline_events enable row level security;
-alter table public.capture_requests enable row level security;
-alter table public.bookings enable row level security;
-
-create policy "Allow all read on workspaces" on public.workspaces for select using (true);
-create policy "Allow all write on workspaces" on public.workspaces for all using (true);
-create policy "Public can view live properties" on public.properties for select using (status = 'live' or true);
-create policy "Allow full access on properties" on public.properties for all using (true);
-create policy "Allow full access on spaces" on public.spaces for all using (true);
-create policy "Allow full access on media_items" on public.media_items for all using (true);
-create policy "Allow full access on timeline_events" on public.timeline_events for all using (true);
-create policy "Allow full access on capture_requests" on public.capture_requests for all using (true);
-create policy "Allow insert on bookings" on public.bookings for insert with check (true);
-create policy "Allow full access on bookings" on public.bookings for all using (true);
-
--- Realtime Publication
-alter publication supabase_realtime add table public.properties;
-alter publication supabase_realtime add table public.spaces;
-alter publication supabase_realtime add table public.timeline_events;
-alter publication supabase_realtime add table public.capture_requests;
-alter publication supabase_realtime add table public.bookings;
-
--- ------------------------------------------------------------------------------
--- Storage Buckets Setup
--- ------------------------------------------------------------------------------
-insert into storage.buckets (id, name, public) values ('property-media', 'property-media', true)
-on conflict (id) do update set public = true;
-
-insert into storage.buckets (id, name, public) values ('captures', 'captures', true)
-on conflict (id) do update set public = true;
-
-create policy "Public media bucket access" on storage.objects for select using (bucket_id in ('property-media', 'captures'));
-create policy "Public media bucket upload" on storage.objects for insert with check (bucket_id in ('property-media', 'captures'));
-
--- ==============================================================================
--- SEED DATA (US Properties)
--- ==============================================================================
-
--- 1. Default Workspace
-insert into public.workspaces (
-  id, name, owner_name, owner_email, work_type, portfolio_size, primary_market, team_size, listing_source, require_approval, default_visibility
-) values (
-  '00000000-0000-0000-0000-000000000001',
-  'OpenHouse Premier Workspace',
-  'David Sterling',
-  'david@openhouse.app',
+-- Seed Workspace
+INSERT INTO workspaces (
+  id, name, owner_name, owner_email, work_type, portfolio_size, primary_market, team_size, listing_source, require_approval, default_visibility, notification_preferences, branding
+) VALUES (
+  'ws-default',
+  'David''s Property Workspace',
+  'David Olabowale',
+  'david@openhouse.com',
   'agency',
-  '25–100 active properties',
-  'New York & Los Angeles',
-  '5–10 people',
-  'webhook',
+  '11–50 active properties',
+  'Lagos, Nigeria',
+  '2–5 people',
+  'demo',
   true,
-  'unlisted'
-) on conflict (id) do nothing;
+  'unlisted',
+  '{"captureRequired": true, "reviewReady": true, "published": true, "processingFailed": true, "everyUpdate": false, "channels": ["email", "in_app"]}'::jsonb,
+  '{"agencyName": "OpenHouse Realty Advisors", "brandColor": "#194534", "contactDestination": "david@openhouse.com"}'::jsonb
+) ON CONFLICT (id) DO NOTHING;
 
--- 2. Seed Properties
--- Property 1: 740 Park Avenue (Needs Recapture)
-insert into public.properties (
-  id, workspace_id, title, address, type, bedrooms, bathrooms, price, description, status, cover_image
-) values (
-  '11111111-1111-1111-1111-111111111111',
-  '00000000-0000-0000-0000-000000000001',
-  '740 Park Avenue, Apt 12B',
-  '740 Park Avenue, Upper East Side, New York, NY 10021',
-  '3-Bed Luxury Penthouse',
-  3, 3, '$18,500 / month',
-  'Iconic pre-war architectural masterpiece with private elevator landing, grand entertaining gallery, wood-burning fireplace, and private terrace.',
+-- Seed Properties
+INSERT INTO properties (
+  id, workspace_id, title, address, type, bedrooms, bathrooms, price, description, status, spaces, source_media, timeline, experience_url, cover_image
+) VALUES
+(
+  '8-admiralty',
+  'ws-default',
+  '8 Admiralty Way',
+  'Lekki Phase 1, Lagos',
+  '3-bedroom apartment',
+  3,
+  2,
+  '₦8,000,000 / year',
+  'Modern 3-bedroom luxury apartment with sea-view balcony in the heart of Lekki Phase 1.',
   'needs_recapture',
-  'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80'
-) on conflict (id) do update set
-  title = excluded.title, address = excluded.address, price = excluded.price, description = excluded.description;
-
--- Property 2: 1048 Ocean Drive (Preparing)
-insert into public.properties (
-  id, workspace_id, title, address, type, bedrooms, bathrooms, price, description, status, cover_image
-) values (
-  '22222222-2222-2222-2222-222222222222',
-  '00000000-0000-0000-0000-000000000001',
-  '1048 Ocean Drive',
-  '1048 Ocean Drive, South Beach, Miami, FL 33139',
-  '5-Bed Waterfront Villa',
-  5, 6, '$35,000 / month',
-  'Modern waterfront sanctuary with infinity-edge pool, private dock, chef kitchen, and panoramic rooftop sunset deck.',
+  '[
+    {"id": "sp-1", "name": "Living room", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-2", "name": "Kitchen", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-3", "name": "Master bedroom", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-4", "name": "Master bathroom", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-5", "name": "Bedroom 2", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-6", "name": "Bedroom 3", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-7", "name": "Balcony", "captured": false, "verified": false, "issues": ["Blind spot on ocean-facing railing", "Shadow artifact in left corner"], "captureRequestId": "cr-1"}
+  ]'::jsonb,
+  '[
+    {"id": "sm-1", "url": "/src/assets/prop-admiralty.jpg", "type": "photo", "room": "Living room", "quality": "good", "uploadedAt": 1740700800000},
+    {"id": "sm-2", "url": "/src/assets/prop-kitchen.png", "type": "photo", "room": "Kitchen", "quality": "good", "uploadedAt": 1740700800000}
+  ]'::jsonb,
+  '[
+    {"id": "tl-1", "timestamp": 1740700800000, "event": "Property detected from listing feed", "detail": "Listing platform: PropertyPro NG (ID: #PP-88219)", "type": "detection", "evidence": "Imported via OpenHouse Listing Sync"},
+    {"id": "tl-2", "timestamp": 1740701000000, "event": "Media analysis complete", "detail": "12 photos, 1 floor plan analyzed. 6 of 7 spaces identified.", "type": "analysis", "evidence": "6 rooms verified at 94% visual confidence"},
+    {"id": "tl-3", "timestamp": 1740701200000, "event": "Recapture request sent", "detail": "Balcony coverage insufficient — 15s sweep needed", "type": "capture_request", "agentDecision": "Created mobile capture ticket for field assistant"}
+  ]'::jsonb,
+  NULL,
+  '/src/assets/prop-admiralty.jpg'
+),
+(
+  '14-bourdillon',
+  'ws-default',
+  '14 Bourdillon Road',
+  'Ikoyi, Lagos',
+  '5-bedroom detached house',
+  5,
+  6,
+  '₦45,000,000 / year',
+  'Palatial 5-bedroom detached house with swimming pool, landscaped garden, and 2-room staff quarters in Old Ikoyi.',
   'preparing',
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'
-) on conflict (id) do update set
-  title = excluded.title, address = excluded.address, price = excluded.price, description = excluded.description;
-
--- Property 3: 452 Beverly Glen Blvd (Quality Check)
-insert into public.properties (
-  id, workspace_id, title, address, type, bedrooms, bathrooms, price, description, status, cover_image
-) values (
-  '33333333-3333-3333-3333-333333333333',
-  '00000000-0000-0000-0000-000000000001',
-  '452 Beverly Glen Blvd',
-  '452 Beverly Glen Blvd, Bel Air, Los Angeles, CA 90077',
-  '4-Bed Architectural Estate',
-  4, 5, '$24,000 / month',
-  'Contemporary estate featuring floor-to-ceiling glass walls, terrazzo floors, smart home automation, and tranquil canyon views.',
+  '[
+    {"id": "sp-10", "name": "Foyer & Entrance", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-11", "name": "Main Living Room", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-12", "name": "Formal Dining", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-13", "name": "Chef Kitchen", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-14", "name": "Master Suite", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-15", "name": "Master Spa Bath", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-16", "name": "Bedroom 2", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-17", "name": "Bedroom 3", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-18", "name": "Family Lounge", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-19", "name": "Garden & Pool Terrace", "captured": true, "verified": true, "issues": []}
+  ]'::jsonb,
+  '[]'::jsonb,
+  '[
+    {"id": "tl-10", "timestamp": 1740697200000, "event": "Property detected from Private CRM", "detail": "Listing platform: Direct CRM Upload", "type": "detection"},
+    {"id": "tl-11", "timestamp": 1740698000000, "event": "Media analysis complete", "detail": "32 photos analyzed across 10 spaces", "type": "analysis"},
+    {"id": "tl-12", "timestamp": 1740700000000, "event": "3D Reconstruction started", "detail": "Gaussian splatting underway for 10 spaces", "type": "reconstruction"}
+  ]'::jsonb,
+  NULL,
+  '/src/assets/prop-bourdillon.jpg'
+),
+(
+  'orchid-apt-4',
+  'ws-default',
+  'Orchid Apartments, Unit 4',
+  'Orchid Road, Lekki',
+  '2-bedroom apartment',
+  2,
+  2,
+  '₦4,500,000 / year',
+  'Brand new 2-bedroom serviced apartment with modern fittings, 24/7 power, and swimming pool.',
   'quality_check',
-  'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80'
-) on conflict (id) do update set
-  title = excluded.title, address = excluded.address, price = excluded.price, description = excluded.description;
-
--- Property 4: 880 Lake Washington Blvd (Ready for Review)
-insert into public.properties (
-  id, workspace_id, title, address, type, bedrooms, bathrooms, price, description, status, cover_image
-) values (
-  '44444444-4444-4444-4444-444444444444',
-  '00000000-0000-0000-0000-000000000001',
-  '880 Lake Washington Blvd',
-  '880 Lake Washington Blvd, Seattle, WA 98122',
-  '3-Bed Modern Craftsman',
-  3, 4, '$12,500 / month',
-  'Lakeside residence with panoramic Mount Rainier views, private moorage, open-concept living, and custom walnut finishes.',
+  '[
+    {"id": "sp-20", "name": "Living & Dining", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-21", "name": "Kitchen", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-22", "name": "Master Bedroom", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-23", "name": "Bedroom 2", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-24", "name": "Balcony", "captured": true, "verified": true, "issues": []}
+  ]'::jsonb,
+  '[]'::jsonb,
+  '[
+    {"id": "tl-20", "timestamp": 1740690000000, "event": "Property detected", "type": "detection"},
+    {"id": "tl-21", "timestamp": 1740692000000, "event": "3D Reconstruction completed", "type": "reconstruction"},
+    {"id": "tl-22", "timestamp": 1740694000000, "event": "Visual verification in progress", "type": "verification"}
+  ]'::jsonb,
+  NULL,
+  '/src/assets/prop-orchid.jpg'
+),
+(
+  'lekki-gardens-12',
+  'ws-default',
+  'Lekki Gardens, Unit 12',
+  'Lekki Phase 1, Lagos',
+  '3-bedroom terrace duplex',
+  3,
+  3,
+  '₦6,000,000 / year',
+  'Contemporary 3-bedroom terrace with private backyard, fitted kitchen, and dedicated parking.',
   'ready_for_review',
-  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80'
-) on conflict (id) do update set
-  title = excluded.title, address = excluded.address, price = excluded.price, description = excluded.description;
-
--- Property 5: 2100 Ocean Way (Live)
-insert into public.properties (
-  id, workspace_id, title, address, type, bedrooms, bathrooms, price, description, status, experience_url, cover_image
-) values (
-  '55555555-5555-5555-5555-555555555555',
-  '00000000-0000-0000-0000-000000000001',
-  '2100 Ocean Way, Penthouse 4',
-  '2100 Ocean Way, Laguna Beach, CA 92651',
-  '4-Bed Coastal Penthouse',
-  4, 5, '$45,000 / month',
-  'Unrivaled bluff-top oceanfront penthouse with panoramic Pacific views, private elevator access, and wraparound ocean terrace.',
+  '[
+    {"id": "sp-30", "name": "Living Room", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-31", "name": "Kitchen", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-32", "name": "Master Bedroom", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-33", "name": "Bedroom 2", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-34", "name": "Bedroom 3", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-35", "name": "Backyard Patio", "captured": true, "verified": true, "issues": []}
+  ]'::jsonb,
+  '[]'::jsonb,
+  '[
+    {"id": "tl-30", "timestamp": 1740680000000, "event": "Property detected", "type": "detection"},
+    {"id": "tl-31", "timestamp": 1740685000000, "event": "3D Tour generated and verified", "type": "reconstruction"},
+    {"id": "tl-32", "timestamp": 1740690000000, "event": "Ready for approval", "type": "approval", "agentDecision": "Passed all 6 spatial fidelity checks"}
+  ]'::jsonb,
+  NULL,
+  '/src/assets/prop-lekkigardens.jpg'
+),
+(
+  'victoria-courts-8',
+  'ws-default',
+  'Victoria Courts, Unit 8',
+  'Victoria Island, Lagos',
+  '4-bedroom penthouse',
+  4,
+  4,
+  '₦18,000,000 / year',
+  'Spectacular 4-bedroom penthouse with wrap-around terrace overlooking Lagos Lagoon.',
   'live',
-  '/view/55555555-5555-5555-5555-555555555555',
-  'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80'
-) on conflict (id) do update set
-  title = excluded.title, address = excluded.address, price = excluded.price, description = excluded.description;
+  '[
+    {"id": "sp-40", "name": "Grand Salon", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-41", "name": "Dining Room", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-42", "name": "Kitchen & Island", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-43", "name": "Primary Suite", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-44", "name": "Suite 2", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-45", "name": "Suite 3", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-46", "name": "Suite 4", "captured": true, "verified": true, "issues": []},
+    {"id": "sp-47", "name": "Lagoon Terrace", "captured": true, "verified": true, "issues": []}
+  ]'::jsonb,
+  '[]'::jsonb,
+  '[
+    {"id": "tl-40", "timestamp": 1740650000000, "event": "Property detected", "type": "detection"},
+    {"id": "tl-41", "timestamp": 1740660000000, "event": "Approved and published", "type": "publication", "detail": "Published to OpenHouse Viewer & WhatsApp share ready"}
+  ]'::jsonb,
+  '/#/view/victoria-courts-8',
+  '/src/assets/prop-hero-waterfront.jpg'
+) ON CONFLICT (id) DO NOTHING;
 
--- 3. Spaces
-insert into public.spaces (property_id, name, captured, verified, issues) values
-  ('11111111-1111-1111-1111-111111111111', 'Living Room', true, true, array[]::text[]),
-  ('11111111-1111-1111-1111-111111111111', 'Kitchen', true, true, array[]::text[]),
-  ('11111111-1111-1111-1111-111111111111', 'Primary Suite', true, true, array[]::text[]),
-  ('11111111-1111-1111-1111-111111111111', 'Guest Bedroom', true, true, array[]::text[]),
-  ('11111111-1111-1111-1111-111111111111', 'Library / Den', true, true, array[]::text[]),
-  ('11111111-1111-1111-1111-111111111111', 'Marble Bath', true, true, array[]::text[]),
-  ('11111111-1111-1111-1111-111111111111', 'Private Terrace', false, false, array['Doorway connection from living room missing']);
-
--- 4. Capture Requests
-insert into public.capture_requests (
+-- Seed Capture Requests
+INSERT INTO capture_requests (
   id, property_id, property_title, room, reason, instructions, estimated_time, status, recipient_name, recipient_phone, recipient_email, capture_url
-) values (
-  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-  '11111111-1111-1111-1111-111111111111',
-  '740 Park Avenue, Apt 12B',
-  'Private Terrace',
-  'The terrace is listed, but doorway transition coverage from the living room is incomplete.',
-  'Record one steady 15-second walkthrough stepping from the living room through the terrace French doors.',
-  '15 seconds',
+) VALUES (
+  'cr-1',
+  '8-admiralty',
+  '8 Admiralty Way',
+  'Balcony',
+  'Coverage insufficient for 3D reconstruction — ocean railing blind spot',
+  'Stand at the balcony entrance, rotate phone 180° across the railing, sweep slowly for 15s.',
+  '15s sweep',
   'awaiting_capture',
-  'David Sterling',
-  '+1 (555) 234-5678',
-  'david@openhouse.app',
-  '/capture/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
-) on conflict (id) do update set
-  property_title = excluded.property_title, room = excluded.room, reason = excluded.reason;
-
--- 5. Timeline Events
-insert into public.timeline_events (property_id, event, detail, type, agent_decision, evidence, tool_used) values
-  ('11111111-1111-1111-1111-111111111111', 'New listing detected', 'Property at 740 Park Avenue detected from MLS syndication stream. OpenHouse began intake.', 'detection', 'Ingest property description, media manifest, and room expectations.', null, 'ListingWebhookHandler'),
-  ('11111111-1111-1111-1111-111111111111', 'Checking media quality and coverage', 'Evaluating 16 source captures across 7 listed spaces. Checking overlap & doorway visibility.', 'analysis', 'Run multimodal Gemini spatial coverage analysis.', 'Source photographs & architectural floor plan', 'GeminiMediaAnalyzer'),
-  ('11111111-1111-1111-1111-111111111111', 'Coverage incomplete for Private Terrace', 'The Terrace is listed, but doorway connection footage is missing. Guided 15-second mobile walkthrough requested.', 'capture_request', 'Pause reconstruction and dispatch capture request link to listing agent.', 'Floor plan indicates terrace access off Living Room, but camera path was occluded.', 'CaptureRequestDispatcher');
+  'Tunde Bakare',
+  '+234 803 123 4567',
+  'tunde@lekkiagents.ng',
+  '/#/capture/8-admiralty'
+) ON CONFLICT (id) DO NOTHING;

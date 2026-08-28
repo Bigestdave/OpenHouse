@@ -1,3 +1,13 @@
+import type {
+  Space,
+  MediaItem,
+  TimelineEvent,
+  NotificationPreferences,
+  BrandingConfig,
+  PropertyStatus,
+  CaptureRequestStatus,
+} from '../data/types'
+
 export type Json =
   | string
   | number
@@ -16,33 +26,33 @@ export interface Database {
           owner_name: string
           owner_email: string
           work_type: string
-          portfolio_size: string | null
-          primary_market: string | null
-          team_size: string | null
+          portfolio_size: string
+          primary_market: string
+          team_size: string
           listing_source: string
           require_approval: boolean
           default_visibility: string
-          notification_preferences: Json
-          branding: Json | null
-          user_id: string | null
-          created_at: string
+          notification_preferences: NotificationPreferences
+          branding: BrandingConfig | null
+          created_at: number
+          updated_at: number
         }
         Insert: {
-          id?: string
+          id: string
           name: string
           owner_name: string
           owner_email: string
           work_type?: string
-          portfolio_size?: string | null
-          primary_market?: string | null
-          team_size?: string | null
+          portfolio_size?: string
+          primary_market?: string
+          team_size?: string
           listing_source?: string
           require_approval?: boolean
           default_visibility?: string
-          notification_preferences?: Json
-          branding?: Json | null
-          user_id?: string | null
-          created_at?: string
+          notification_preferences?: NotificationPreferences
+          branding?: BrandingConfig | null
+          created_at?: number
+          updated_at?: number
         }
         Update: {
           id?: string
@@ -50,18 +60,17 @@ export interface Database {
           owner_name?: string
           owner_email?: string
           work_type?: string
-          portfolio_size?: string | null
-          primary_market?: string | null
-          team_size?: string | null
+          portfolio_size?: string
+          primary_market?: string
+          team_size?: string
           listing_source?: string
           require_approval?: boolean
           default_visibility?: string
-          notification_preferences?: Json
-          branding?: Json | null
-          user_id?: string | null
-          created_at?: string
+          notification_preferences?: NotificationPreferences
+          branding?: BrandingConfig | null
+          created_at?: number
+          updated_at?: number
         }
-        Relationships: []
       }
       properties: {
         Row: {
@@ -74,14 +83,17 @@ export interface Database {
           bathrooms: number
           price: string
           description: string
-          status: string
+          status: PropertyStatus
+          spaces: Space[]
+          source_media: MediaItem[]
+          timeline: TimelineEvent[]
           experience_url: string | null
           cover_image: string | null
-          created_at: string
-          updated_at: string
+          created_at: number
+          updated_at: number
         }
         Insert: {
-          id?: string
+          id: string
           workspace_id: string
           title: string
           address: string
@@ -90,11 +102,14 @@ export interface Database {
           bathrooms?: number
           price: string
           description?: string
-          status?: string
+          status?: PropertyStatus
+          spaces?: Space[]
+          source_media?: MediaItem[]
+          timeline?: TimelineEvent[]
           experience_url?: string | null
           cover_image?: string | null
-          created_at?: string
-          updated_at?: string
+          created_at?: number
+          updated_at?: number
         }
         Update: {
           id?: string
@@ -106,115 +121,15 @@ export interface Database {
           bathrooms?: number
           price?: string
           description?: string
-          status?: string
+          status?: PropertyStatus
+          spaces?: Space[]
+          source_media?: MediaItem[]
+          timeline?: TimelineEvent[]
           experience_url?: string | null
           cover_image?: string | null
-          created_at?: string
-          updated_at?: string
+          created_at?: number
+          updated_at?: number
         }
-        Relationships: []
-      }
-      spaces: {
-        Row: {
-          id: string
-          property_id: string
-          name: string
-          captured: boolean
-          verified: boolean
-          issues: string[]
-          capture_request_id: string | null
-          thumbnail_url: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          property_id: string
-          name: string
-          captured?: boolean
-          verified?: boolean
-          issues?: string[]
-          capture_request_id?: string | null
-          thumbnail_url?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          property_id?: string
-          name?: string
-          captured?: boolean
-          verified?: boolean
-          issues?: string[]
-          capture_request_id?: string | null
-          thumbnail_url?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      media_items: {
-        Row: {
-          id: string
-          property_id: string
-          url: string
-          type: string
-          room: string | null
-          quality: string
-          uploaded_at: string
-        }
-        Insert: {
-          id?: string
-          property_id: string
-          url: string
-          type?: string
-          room?: string | null
-          quality?: string
-          uploaded_at?: string
-        }
-        Update: {
-          id?: string
-          property_id?: string
-          url?: string
-          type?: string
-          room?: string | null
-          quality?: string
-          uploaded_at?: string
-        }
-        Relationships: []
-      }
-      timeline_events: {
-        Row: {
-          id: string
-          property_id: string
-          timestamp: string
-          event: string
-          detail: string | null
-          type: string
-          agent_decision: string | null
-          evidence: string | null
-          tool_used: string | null
-        }
-        Insert: {
-          id?: string
-          property_id: string
-          timestamp?: string
-          event: string
-          detail?: string | null
-          type: string
-          agent_decision?: string | null
-          evidence?: string | null
-          tool_used?: string | null
-        }
-        Update: {
-          id?: string
-          property_id?: string
-          timestamp?: string
-          event?: string
-          detail?: string | null
-          type?: string
-          agent_decision?: string | null
-          evidence?: string | null
-          tool_used?: string | null
-        }
-        Relationships: []
       }
       capture_requests: {
         Row: {
@@ -225,31 +140,31 @@ export interface Database {
           reason: string
           instructions: string
           estimated_time: string
-          status: string
+          status: CaptureRequestStatus
           recipient_name: string
           recipient_phone: string | null
           recipient_email: string | null
-          capture_url: string | null
-          uploaded_media: Json
-          created_at: string
-          updated_at: string
+          capture_url: string
+          uploaded_media: MediaItem[] | null
+          created_at: number
+          updated_at: number
         }
         Insert: {
-          id?: string
+          id: string
           property_id: string
           property_title: string
           room: string
           reason: string
           instructions: string
           estimated_time?: string
-          status?: string
-          recipient_name?: string
+          status?: CaptureRequestStatus
+          recipient_name: string
           recipient_phone?: string | null
           recipient_email?: string | null
-          capture_url?: string | null
-          uploaded_media?: Json
-          created_at?: string
-          updated_at?: string
+          capture_url: string
+          uploaded_media?: MediaItem[] | null
+          created_at?: number
+          updated_at?: number
         }
         Update: {
           id?: string
@@ -259,16 +174,15 @@ export interface Database {
           reason?: string
           instructions?: string
           estimated_time?: string
-          status?: string
+          status?: CaptureRequestStatus
           recipient_name?: string
           recipient_phone?: string | null
           recipient_email?: string | null
-          capture_url?: string | null
-          uploaded_media?: Json
-          created_at?: string
-          updated_at?: string
+          capture_url?: string
+          uploaded_media?: MediaItem[] | null
+          created_at?: number
+          updated_at?: number
         }
-        Relationships: []
       }
       bookings: {
         Row: {
@@ -281,11 +195,11 @@ export interface Database {
           preferred_date: string
           preferred_time: string
           message: string | null
-          status: string
-          created_at: string
+          status: 'requested' | 'confirmed' | 'completed' | 'cancelled'
+          created_at: number
         }
         Insert: {
-          id?: string
+          id: string
           property_id: string
           property_title: string
           renter_name: string
@@ -294,8 +208,8 @@ export interface Database {
           preferred_date: string
           preferred_time: string
           message?: string | null
-          status?: string
-          created_at?: string
+          status?: 'requested' | 'confirmed' | 'completed' | 'cancelled'
+          created_at?: number
         }
         Update: {
           id?: string
@@ -307,23 +221,10 @@ export interface Database {
           preferred_date?: string
           preferred_time?: string
           message?: string | null
-          status?: string
-          created_at?: string
+          status?: 'requested' | 'confirmed' | 'completed' | 'cancelled'
+          created_at?: number
         }
-        Relationships: []
       }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
     }
   }
 }

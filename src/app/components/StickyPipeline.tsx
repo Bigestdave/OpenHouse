@@ -14,33 +14,39 @@ import { crossfade } from "../lib/motion";
 const STAGES = [
   {
     n: "01",
-    title: "Intake & media check",
-    sub: "Triggered automatically when a listing is published.",
-    desc: "OpenHouse analyzes listing photos and video footage, identifies all advertised rooms, and checks camera angles and spatial coverage."
+    title: "Plan",
+    sub: "The showrunner plans before it generates.",
+    desc: "Cre8Motion breaks the episode into scenes and shots, estimates production cost, and identifies every character, location, and prop required."
   },
   {
     n: "02",
-    title: "15-second mobile recapture",
-    sub: "Reaches out only if missing footage blocks the experience.",
-    desc: "If a crucial room or doorway connection is missing, OpenHouse sends a single-link mobile capture request with exact walking instructions."
+    title: "Lock references",
+    sub: "Characters stay themselves. Worlds stay consistent.",
+    desc: "Approved character, location, and prop references become the source of truth for every shot."
   },
   {
     n: "03",
-    title: "Spatial reconstruction",
-    sub: "Builds connected 3D open houses from everyday video.",
-    desc: "Aligns camera poses, reconstructs 3D spatial geometry, and establishes seamless navigation between every room."
+    title: "Build storyboard",
+    sub: "See the episode before spending the video budget.",
+    desc: "Cre8Motion plans and reviews the complete visual sequence before generating final frames."
   },
   {
     n: "04",
-    title: "Disciplined QA & verification",
-    sub: "Never hallucinates. Grounded in source evidence.",
-    desc: "Cross-checks room counts, dimensions, and floor plan orientation against source listing data with strict confidence auditing."
+    title: "Animate shots",
+    sub: "Approved frames become controlled motion.",
+    desc: "Each shot is animated from an approved keyframe with explicit character, camera, and continuity constraints."
   },
   {
     n: "05",
-    title: "Approve & publish",
-    sub: "Realtor reviews in one click. Renters explore 24/7.",
-    desc: "Once approved, the virtual open house is live—ready to share via WhatsApp, embed in listing portals, and receive live inspection bookings."
+    title: "Review and repair",
+    sub: "The system checks its own work.",
+    desc: "Cre8Motion identifies failed details and selectively repairs the affected shot instead of restarting the episode."
+  },
+  {
+    n: "06",
+    title: "Assemble episode",
+    sub: "One production. One finished episode.",
+    desc: "Cre8Motion combines approved shots, sound, music, and effects into a final vertical episode ready to review and export."
   }
 ];
 
@@ -59,16 +65,16 @@ export function StickyPipeline() {
     setActive(idx);
   });
 
-  const ActivePanel = PIPELINE_PANELS[active] || PIPELINE_PANELS[0];
+  const ActivePanel = PIPELINE_PANELS[active];
 
   return (
     <section className="relative">
       <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
         <MotionReveal className="pt-16 md:pt-20">
           <EditorialHeading size="section">
-            One listing.
+            One brief.
             <br />
-            Builds the entire open house.
+            Builds the whole production.
           </EditorialHeading>
         </MotionReveal>
       </div>

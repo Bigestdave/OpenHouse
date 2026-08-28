@@ -74,16 +74,17 @@ export function OneShot() {
     <section className="bg-app">
       <div className="mx-auto w-full max-w-[1536px] px-6 pb-10 pt-14 md:px-10 md:pt-16">
         <motion.div {...reveal} className="flex flex-col gap-5">
-          <p className="text-[14px] uppercase tracking-[1.5px] text-emerald-400 font-bold">
-            Virtual Open House Experience
+          <p className="text-[14px] uppercase tracking-[1.5px] text-accent">
+            Watch the showrunner work
           </p>
           <h2 className="text-[clamp(40px,6vw,74px)] font-semibold leading-[1.02] tracking-[-1.5px] text-ink">
-            One listing.
+            One shot.
             <br />
-            Every room connected.
+            Every stage of production.
           </h2>
           <p className="max-w-[560px] text-[20px] leading-[1.4] text-ink-3">
-            Explore freely between rooms, navigate seamless spatial hotspots, and ask grounded questions verified directly against source evidence.
+            Follow the same character and scene from approved reference to finished
+            animation.
           </p>
         </motion.div>
 
@@ -95,16 +96,16 @@ export function OneShot() {
           {/* Top bar */}
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-line px-7 py-5 lg:pr-[40%]">
             <div className="flex items-center gap-3.5 text-[16px]">
-              <span className="text-ink-2 font-bold">8 Admiralty Way</span>
+              <span className="text-ink-2">Fruitful Secrets</span>
               <span className="text-ink-5">/</span>
-              <span className="text-emerald-400 font-semibold">Live 3D Tour</span>
+              <span className="text-ink-2">Episode 05</span>
             </div>
-            <a
-              href="#/view/8-admiralty-way"
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-950/60 border border-emerald-500/30 px-3.5 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-900/60 transition-colors"
-            >
-              <span>Launch Full Viewer ↗</span>
-            </a>
+            <div className="flex items-center gap-2.5 text-[15px]">
+              <span className="size-2.5 rounded-full bg-accent" />
+              <span className="text-ink">Ready for review</span>
+              <span className="text-ink-5">|</span>
+              <span className="text-ink-4">Saved just now</span>
+            </div>
           </div>
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-stretch lg:pr-[38%]">

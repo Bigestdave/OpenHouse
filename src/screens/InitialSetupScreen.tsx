@@ -1,6 +1,18 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { OpenHouseLogoMark } from '../components/WorkspaceShell'
+import {
+  Button,
+  Input,
+  Select,
+  Checkbox,
+  Radio,
+  ToggleSwitch,
+  SelectableCard,
+  Badge,
+  Callout,
+  Stepper,
+} from '../components/ui'
 
 // Custom SVGs matching the reference UI
 function BuildingIcon({ className = 'h-5 w-5' }: { className?: string }) {
@@ -91,6 +103,8 @@ function HomeHeartIcon({ className = 'h-5 w-5' }: { className?: string }) {
   )
 }
 
+const STEPS = ['Workspace', 'Listings', 'Preferences'] as const
+
 export function InitialSetupScreen() {
   const navigate = useNavigate()
   const [step, setStep] = useState<1 | 2 | 3>(1)
@@ -113,7 +127,7 @@ export function InitialSetupScreen() {
   const [sendWhatsapp, setSendWhatsapp] = useState(true)
   const [sendEmail, setSendEmail] = useState(true)
   const [primaryRecipient, setPrimaryRecipient] = useState('David Olabowale')
-  
+
   // Notification checkboxes
   const [notifyCaptureRequired, setNotifyCaptureRequired] = useState(true)
   const [notifyReviewReady, setNotifyReviewReady] = useState(true)
@@ -126,90 +140,29 @@ export function InitialSetupScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] font-sans text-stone-900 antialiased flex flex-col justify-between selection:bg-stone-200">
-      
+    <div className="min-h-screen bg-canvas font-sans text-ink antialiased flex flex-col justify-between selection:bg-selected">
       {/* TOP BAR */}
-      <header className="px-8 py-5 flex items-center justify-between border-b border-stone-100">
-        <Link to="/" className="flex items-center gap-2">
+      <header className="px-8 py-4.5 flex items-center justify-between border-b border-border bg-surface">
+        <Link to="/" className="flex items-center gap-2.5">
           <OpenHouseLogoMark className="h-6 w-6 object-contain" />
-          <span className="text-[17px] font-extrabold tracking-tight text-[#0B1713]">
+          <span className="text-[18px] font-extrabold tracking-tight text-ink">
             OpenHouse
           </span>
         </Link>
-        <span className="text-xs font-semibold text-stone-500">
+        <span className="text-xs font-bold uppercase tracking-wider text-ink-2">
           Step {step} of 3
         </span>
       </header>
 
       {/* MAIN WIZARD BODY */}
-      <main className="flex-1 px-6 sm:px-8 max-w-[1100px] w-full mx-auto pt-6 pb-12">
-        
+      <main className="flex-1 px-6 sm:px-8 max-w-[1120px] w-full mx-auto pt-8 pb-16">
         {/* STEPPER BAR */}
-        <div className="flex items-center justify-center mb-8">
-          <div className="flex items-center">
-            
-            {/* Step 1 Node */}
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => setStep(1)}
-                className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  step === 1
-                    ? 'bg-[#194534] text-white shadow-xs'
-                    : step > 1
-                    ? 'bg-[#194534] text-white'
-                    : 'border border-stone-300 text-stone-400 bg-white'
-                }`}
-              >
-                {step > 1 ? '✓' : '1'}
-              </button>
-              <span className={`text-xs mt-1.5 ${step === 1 ? 'font-bold text-stone-900' : 'font-medium text-stone-500'}`}>
-                Workspace
-              </span>
-            </div>
-
-            {/* Line 1 -> 2 */}
-            <div className={`h-px w-16 sm:w-24 mb-5 mx-2 transition-colors ${step > 1 ? 'bg-[#194534]' : 'bg-stone-300'}`} />
-
-            {/* Step 2 Node */}
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => setStep(2)}
-                className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  step === 2
-                    ? 'bg-[#194534] text-white shadow-xs'
-                    : step > 2
-                    ? 'bg-[#194534] text-white'
-                    : 'border border-stone-300 text-stone-400 bg-white'
-                }`}
-              >
-                {step > 2 ? '✓' : '2'}
-              </button>
-              <span className={`text-xs mt-1.5 ${step === 2 ? 'font-bold text-stone-900' : 'font-medium text-stone-500'}`}>
-                Listings
-              </span>
-            </div>
-
-            {/* Line 2 -> 3 */}
-            <div className={`h-px w-16 sm:w-24 mb-5 mx-2 transition-colors ${step > 2 ? 'bg-[#194534]' : 'bg-stone-300'}`} />
-
-            {/* Step 3 Node */}
-            <div className="flex flex-col items-center">
-              <button
-                onClick={() => setStep(3)}
-                className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  step === 3
-                    ? 'bg-[#194534] text-white shadow-xs'
-                    : 'border border-stone-300 text-stone-400 bg-white'
-                }`}
-              >
-                3
-              </button>
-              <span className={`text-xs mt-1.5 ${step === 3 ? 'font-bold text-stone-900' : 'font-medium text-stone-500'}`}>
-                Preferences
-              </span>
-            </div>
-
-          </div>
+        <div className="mb-8">
+          <Stepper
+            steps={STEPS}
+            currentStep={step}
+            onStepClick={(s) => setStep(s as 1 | 2 | 3)}
+          />
         </div>
 
         {/* ========================================================================= */}
@@ -217,202 +170,128 @@ export function InitialSetupScreen() {
         {/* ========================================================================= */}
         {step === 1 && (
           <div className="max-w-[760px] mx-auto space-y-6 animate-fadeIn">
-            
             {/* Title & Subtitle */}
             <div className="text-center space-y-1.5 mb-8">
-              <h1 className="text-[32px] sm:text-[36px] font-bold text-stone-900 tracking-tight leading-tight">
+              <h1 className="text-[32px] sm:text-[36px] font-bold text-ink tracking-tight leading-tight">
                 Set up your workspace
               </h1>
-              <p className="text-sm text-stone-500 max-w-lg mx-auto leading-relaxed">
+              <p className="text-sm text-ink-2 max-w-lg mx-auto leading-relaxed">
                 Tell us how you manage properties so OpenHouse can prepare the right workflow.
               </p>
             </div>
 
             {/* Workspace Name Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-stone-800 block">
-                Workspace name
-              </label>
-              <input
-                type="text"
+            <div>
+              <Input
+                label="Workspace name"
                 value={workspaceName}
                 onChange={(e) => setWorkspaceName(e.target.value)}
                 placeholder="e.g. David's Property Workspace"
-                className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#194534]/15 focus:border-[#194534] shadow-2xs"
               />
             </div>
 
             {/* How do you work? Selectable Cards */}
             <div className="space-y-2 pt-1">
-              <label className="text-xs font-semibold text-stone-800 block">
+              <label className="text-xs font-semibold text-ink block">
                 How do you work?
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                
-                {/* Option 1: Property Agency */}
-                <div
+                <SelectableCard
+                  selected={workType === 'agency'}
                   onClick={() => setWorkType('agency')}
-                  className={`rounded-2xl p-4 relative cursor-pointer transition-all ${
-                    workType === 'agency'
-                      ? 'border-2 border-[#2F613D] bg-[#F9FAF8] shadow-xs'
-                      : 'border border-stone-200 bg-white hover:border-stone-300 shadow-2xs'
-                  }`}
-                >
-                  {workType === 'agency' && (
-                    <span className="h-5 w-5 rounded-full bg-[#2F613D] text-white flex items-center justify-center text-[10px] font-bold absolute top-3.5 right-3.5 shadow-xs">
-                      ✓
-                    </span>
-                  )}
-                  <BuildingIcon className="h-6 w-6 text-stone-700 mb-3" />
-                  <h3 className="text-sm font-bold text-stone-900">Property agency</h3>
-                  <p className="text-xs text-stone-500 mt-1 leading-relaxed">
-                    I represent clients and manage property listings.
-                  </p>
-                </div>
+                  icon={<BuildingIcon className="h-5 w-5" />}
+                  title="Property agency"
+                  description="I represent clients and manage property listings."
+                />
 
-                {/* Option 2: Independent property professional */}
-                <div
+                <SelectableCard
+                  selected={workType === 'independent'}
                   onClick={() => setWorkType('independent')}
-                  className={`rounded-2xl p-4 relative cursor-pointer transition-all ${
-                    workType === 'independent'
-                      ? 'border-2 border-[#2F613D] bg-[#F9FAF8] shadow-xs'
-                      : 'border border-stone-200 bg-white hover:border-stone-300 shadow-2xs'
-                  }`}
-                >
-                  {workType === 'independent' && (
-                    <span className="h-5 w-5 rounded-full bg-[#2F613D] text-white flex items-center justify-center text-[10px] font-bold absolute top-3.5 right-3.5 shadow-xs">
-                      ✓
-                    </span>
-                  )}
-                  <UserProfileIcon className="h-6 w-6 text-stone-700 mb-3" />
-                  <h3 className="text-sm font-bold text-stone-900">Independent property professional</h3>
-                  <p className="text-xs text-stone-500 mt-1 leading-relaxed">
-                    I work independently with clients on property projects.
-                  </p>
-                </div>
+                  icon={<UserProfileIcon className="h-5 w-5" />}
+                  title="Independent property professional"
+                  description="I work independently with clients on property projects."
+                />
 
-                {/* Option 3: Property manager or operator */}
-                <div
+                <SelectableCard
+                  selected={workType === 'manager'}
                   onClick={() => setWorkType('manager')}
-                  className={`rounded-2xl p-4 relative cursor-pointer transition-all ${
-                    workType === 'manager'
-                      ? 'border-2 border-[#2F613D] bg-[#F9FAF8] shadow-xs'
-                      : 'border border-stone-200 bg-white hover:border-stone-300 shadow-2xs'
-                  }`}
-                >
-                  {workType === 'manager' && (
-                    <span className="h-5 w-5 rounded-full bg-[#2F613D] text-white flex items-center justify-center text-[10px] font-bold absolute top-3.5 right-3.5 shadow-xs">
-                      ✓
-                    </span>
-                  )}
-                  <BriefcaseIcon className="h-6 w-6 text-stone-700 mb-3" />
-                  <h3 className="text-sm font-bold text-stone-900">Property manager or operator</h3>
-                  <p className="text-xs text-stone-500 mt-1 leading-relaxed">
-                    I manage and operate properties on behalf of owners.
-                  </p>
-                </div>
-
+                  icon={<BriefcaseIcon className="h-5 w-5" />}
+                  title="Property manager or operator"
+                  description="I manage and operate properties on behalf of owners."
+                />
               </div>
             </div>
 
             {/* 3-Column Meta Row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-              
-              {/* Portfolio Size */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-stone-800 block">
-                  Portfolio size
-                </label>
-                <select
-                  value={portfolioSize}
-                  onChange={(e) => setPortfolioSize(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#194534]/15 focus:border-[#194534] shadow-2xs"
-                >
-                  <option value="1–10 active properties">1–10 active properties</option>
-                  <option value="11–50 active properties">11–50 active properties</option>
-                  <option value="51–200 active properties">51–200 active properties</option>
-                  <option value="200+ active properties">200+ active properties</option>
-                </select>
-              </div>
+              <Select
+                label="Portfolio size"
+                value={portfolioSize}
+                onChange={(e) => setPortfolioSize(e.target.value)}
+                options={[
+                  '1–10 active properties',
+                  '11–50 active properties',
+                  '51–200 active properties',
+                  '200+ active properties',
+                ]}
+              />
 
-              {/* Primary Market */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-stone-800 block">
-                  Primary market
-                </label>
-                <input
-                  type="text"
-                  value={primaryMarket}
-                  onChange={(e) => setPrimaryMarket(e.target.value)}
-                  placeholder="e.g. Lagos, Nigeria"
-                  className="w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#194534]/15 focus:border-[#194534] shadow-2xs"
-                />
-              </div>
+              <Input
+                label="Primary market"
+                value={primaryMarket}
+                onChange={(e) => setPrimaryMarket(e.target.value)}
+                placeholder="e.g. Lagos, Nigeria"
+              />
 
-              {/* Team Size */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-stone-800 block">
-                  Team size
-                </label>
-                <select
-                  value={teamSize}
-                  onChange={(e) => setTeamSize(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#194534]/15 focus:border-[#194534] shadow-2xs"
-                >
-                  <option value="Just me">Just me</option>
-                  <option value="2–5 people">2–5 people</option>
-                  <option value="6–20 people">6–20 people</option>
-                  <option value="20+ people">20+ people</option>
-                </select>
-              </div>
-
+              <Select
+                label="Team size"
+                value={teamSize}
+                onChange={(e) => setTeamSize(e.target.value)}
+                options={['Just me', '2–5 people', '6–20 people', '20+ people']}
+              />
             </div>
 
             {/* Contact Section */}
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-semibold text-stone-800 block">
+              <label className="text-xs font-semibold text-ink block">
                 Contact
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <span className="text-[11px] text-stone-500 block">Your name</span>
-                  <input
-                    type="text"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    placeholder="Full name"
-                    className="w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#194534]/15 focus:border-[#194534] shadow-2xs"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[11px] text-stone-500 block">Work email</span>
-                  <input
-                    type="email"
-                    value={workEmail}
-                    onChange={(e) => setWorkEmail(e.target.value)}
-                    placeholder="email@company.com"
-                    className="w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#194534]/15 focus:border-[#194534] shadow-2xs"
-                  />
-                </div>
+                <Input
+                  label="Your name"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  placeholder="Full name"
+                />
+                <Input
+                  label="Work email"
+                  type="email"
+                  value={workEmail}
+                  onChange={(e) => setWorkEmail(e.target.value)}
+                  placeholder="email@company.com"
+                />
               </div>
             </div>
 
             {/* Bottom Buttons */}
-            <div className="flex items-center justify-center gap-3 pt-6">
-              <button
+            <div className="flex items-center justify-center gap-3.5 pt-6">
+              <Button
+                variant="dark"
+                size="lg"
                 onClick={() => setStep(2)}
-                className="bg-[#0B1713] text-white rounded-xl font-semibold text-xs px-12 py-3.5 hover:bg-black active:scale-[0.99] transition-all shadow-sm"
+                className="px-14 py-3.5 text-sm"
               >
                 Continue
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
+                size="lg"
                 onClick={() => navigate('/properties')}
-                className="bg-white border border-stone-200 text-stone-700 rounded-xl font-semibold text-xs px-7 py-3.5 hover:bg-stone-50 transition-all shadow-2xs"
+                className="px-8 py-3.5 text-sm"
               >
                 I'll finish this later
-              </button>
+              </Button>
             </div>
-
           </div>
         )}
 
@@ -420,214 +299,138 @@ export function InitialSetupScreen() {
         {/* STEP 2: HOW SHOULD PROPERTIES ENTER OPENHOUSE? */}
         {/* ========================================================================= */}
         {step === 2 && (
-          <div className="max-w-[1040px] mx-auto space-y-6 animate-fadeIn">
-            
+          <div className="max-w-[1060px] mx-auto space-y-6 animate-fadeIn">
             {/* Title & Subtitle */}
             <div className="text-center space-y-1.5 mb-8">
-              <h1 className="text-[32px] sm:text-[36px] font-bold text-stone-900 tracking-tight leading-tight">
+              <h1 className="text-[32px] sm:text-[36px] font-bold text-ink tracking-tight leading-tight">
                 How should properties enter OpenHouse?
               </h1>
-              <p className="text-sm text-stone-500 max-w-lg mx-auto leading-relaxed">
+              <p className="text-sm text-ink-2 max-w-lg mx-auto leading-relaxed">
                 Connect a listing source now, or begin by adding properties manually.
               </p>
             </div>
 
             {/* 4 Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              
               {/* Card 1: OpenHouse Demo Listings */}
-              <div
+              <SelectableCard
+                selected={listingSource === 'demo'}
                 onClick={() => setListingSource('demo')}
-                className={`rounded-2xl p-5 relative flex flex-col justify-between cursor-pointer transition-all min-h-[350px] ${
-                  listingSource === 'demo'
-                    ? 'border-2 border-[#2F613D] bg-[#F9FAF8] shadow-xs'
-                    : 'border border-stone-200 bg-white hover:border-stone-300 shadow-2xs'
-                }`}
-              >
-                {listingSource === 'demo' && (
-                  <span className="h-5 w-5 rounded-full bg-[#2F613D] text-white flex items-center justify-center text-[10px] font-bold absolute top-3.5 right-3.5 shadow-xs">
-                    ✓
-                  </span>
-                )}
-                <div>
-                  <div className="h-11 w-11 rounded-full bg-[#EBF2EC] text-[#2F613D] flex items-center justify-center mb-3">
-                    <HomeHeartIcon className="h-5 w-5" />
-                  </div>
-                  <h3 className="text-[15px] font-bold text-stone-900">OpenHouse Demo Listings</h3>
-                  <span className="inline-block bg-[#E8F0EA] text-[#2F613D] text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-md uppercase my-2">
-                    RECOMMENDED FOR DEMO
-                  </span>
-                  <p className="text-xs text-stone-600 leading-relaxed mt-1">
-                    Detect new properties and listing updates automatically from the OpenHouse demo portal.
-                  </p>
-                  
-                  {/* Checklist */}
-                  <div className="space-y-1.5 text-xs text-stone-700 font-medium pt-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#2F613D] font-bold">✓</span>
-                      <span>New listing events</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#2F613D] font-bold">✓</span>
-                      <span>Updated media</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#2F613D] font-bold">✓</span>
-                      <span>Property status changes</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setListingSource('demo')
-                    setStep(3)
-                  }}
-                  className="w-full bg-[#0B1713] text-white rounded-xl py-2.5 font-semibold text-xs text-center mt-4 hover:bg-black shadow-2xs transition-colors"
-                >
-                  Connect demo source
-                </button>
-              </div>
+                icon={<HomeHeartIcon className="h-5 w-5" />}
+                title="OpenHouse Demo Listings"
+                badge={<Badge variant="success">Recommended for demo</Badge>}
+                description="Detect new properties and listing updates automatically from the OpenHouse demo portal."
+                checklist={['New listing events', 'Updated media', 'Property status changes']}
+                footerAction={
+                  <Button
+                    variant="dark"
+                    size="sm"
+                    fullWidth
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setListingSource('demo')
+                      setStep(3)
+                    }}
+                  >
+                    Connect demo source
+                  </Button>
+                }
+              />
 
               {/* Card 2: Custom Webhook */}
-              <div
+              <SelectableCard
+                selected={listingSource === 'webhook'}
                 onClick={() => setListingSource('webhook')}
-                className={`rounded-2xl p-5 relative flex flex-col justify-between cursor-pointer transition-all min-h-[350px] ${
-                  listingSource === 'webhook'
-                    ? 'border-2 border-[#2F613D] bg-[#F9FAF8] shadow-xs'
-                    : 'border border-stone-200 bg-white hover:border-stone-300 shadow-2xs'
-                }`}
-              >
-                {listingSource === 'webhook' && (
-                  <span className="h-5 w-5 rounded-full bg-[#2F613D] text-white flex items-center justify-center text-[10px] font-bold absolute top-3.5 right-3.5 shadow-xs">
-                    ✓
-                  </span>
-                )}
-                <div>
-                  <div className="h-11 w-11 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center mb-3">
-                    <WebhookIcon className="h-5 w-5" />
-                  </div>
-                  <h3 className="text-[15px] font-bold text-stone-900">Custom webhook</h3>
-                  <p className="text-xs text-stone-500 leading-relaxed mt-2">
-                    Send <code className="text-[11px] bg-stone-100 px-1 py-0.5 rounded text-stone-700">listing.created</code> and <code className="text-[11px] bg-stone-100 px-1 py-0.5 rounded text-stone-700">listing.updated</code> events from an existing system.
-                  </p>
-                </div>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setListingSource('webhook')
-                    setStep(3)
-                  }}
-                  className="w-full bg-white border border-stone-200 text-stone-800 rounded-xl py-2.5 font-semibold text-xs text-center mt-auto hover:bg-stone-50 shadow-2xs transition-colors"
-                >
-                  Configure webhook
-                </button>
-              </div>
+                icon={<WebhookIcon className="h-5 w-5" />}
+                title="Custom webhook"
+                description="Send listing.created and listing.updated events from an existing system."
+                footerAction={
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    fullWidth
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setListingSource('webhook')
+                      setStep(3)
+                    }}
+                  >
+                    Configure webhook
+                  </Button>
+                }
+              />
 
               {/* Card 3: CSV Import */}
-              <div
+              <SelectableCard
+                selected={listingSource === 'csv'}
                 onClick={() => setListingSource('csv')}
-                className={`rounded-2xl p-5 relative flex flex-col justify-between cursor-pointer transition-all min-h-[350px] ${
-                  listingSource === 'csv'
-                    ? 'border-2 border-[#2F613D] bg-[#F9FAF8] shadow-xs'
-                    : 'border border-stone-200 bg-white hover:border-stone-300 shadow-2xs'
-                }`}
-              >
-                {listingSource === 'csv' && (
-                  <span className="h-5 w-5 rounded-full bg-[#2F613D] text-white flex items-center justify-center text-[10px] font-bold absolute top-3.5 right-3.5 shadow-xs">
-                    ✓
-                  </span>
-                )}
-                <div>
-                  <div className="h-11 w-11 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center mb-3">
-                    <CsvDocumentIcon className="h-5 w-5" />
-                  </div>
-                  <h3 className="text-[15px] font-bold text-stone-900">CSV import</h3>
-                  <p className="text-xs text-stone-500 leading-relaxed mt-2">
-                    Import multiple property records from a structured CSV file.
-                  </p>
-                </div>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setListingSource('csv')
-                    setStep(3)
-                  }}
-                  className="w-full bg-white border border-stone-200 text-stone-800 rounded-xl py-2.5 font-semibold text-xs text-center mt-auto hover:bg-stone-50 shadow-2xs transition-colors"
-                >
-                  Import file
-                </button>
-              </div>
+                icon={<CsvDocumentIcon className="h-5 w-5" />}
+                title="CSV import"
+                description="Import multiple property records from a structured CSV file."
+                footerAction={
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    fullWidth
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setListingSource('csv')
+                      setStep(3)
+                    }}
+                  >
+                    Import file
+                  </Button>
+                }
+              />
 
               {/* Card 4: Add Manually */}
-              <div
+              <SelectableCard
+                selected={listingSource === 'manual'}
                 onClick={() => setListingSource('manual')}
-                className={`rounded-2xl p-5 relative flex flex-col justify-between cursor-pointer transition-all min-h-[350px] ${
-                  listingSource === 'manual'
-                    ? 'border-2 border-[#2F613D] bg-[#F9FAF8] shadow-xs'
-                    : 'border border-stone-200 bg-white hover:border-stone-300 shadow-2xs'
-                }`}
-              >
-                {listingSource === 'manual' && (
-                  <span className="h-5 w-5 rounded-full bg-[#2F613D] text-white flex items-center justify-center text-[10px] font-bold absolute top-3.5 right-3.5 shadow-xs">
-                    ✓
-                  </span>
-                )}
-                <div>
-                  <div className="h-11 w-11 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center mb-3 text-lg font-light">
-                    +
-                  </div>
-                  <h3 className="text-[15px] font-bold text-stone-900">Add manually</h3>
-                  <p className="text-xs text-stone-500 leading-relaxed mt-2">
-                    Create each property through the OpenHouse add-property workflow.
-                  </p>
-                </div>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setListingSource('manual')
-                    setStep(3)
-                  }}
-                  className="w-full bg-white border border-stone-200 text-stone-800 rounded-xl py-2.5 font-semibold text-xs text-center mt-auto hover:bg-stone-50 shadow-2xs transition-colors"
-                >
-                  Continue manually
-                </button>
-              </div>
-
+                icon={<span className="text-lg font-light">+</span>}
+                title="Add manually"
+                description="Create each property through the OpenHouse add-property workflow."
+                footerAction={
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    fullWidth
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setListingSource('manual')
+                      setStep(3)
+                    }}
+                  >
+                    Continue manually
+                  </Button>
+                }
+              />
             </div>
 
             {/* Bottom Info Banner */}
-            <div className="bg-[#F7F6F2] border border-stone-200/80 rounded-2xl p-3.5 flex items-center gap-3 text-xs text-stone-600 font-medium">
-              <span className="h-6 w-6 rounded-full bg-stone-200/70 text-stone-700 flex items-center justify-center font-serif italic text-xs shrink-0">
-                i
-              </span>
-              <span>
-                OpenHouse imports only the property information and media needed to prepare the experience.
-              </span>
-            </div>
+            <Callout>
+              OpenHouse imports only the property information and media needed to prepare the experience.
+            </Callout>
 
             {/* Navigation Footer */}
-            <div className="flex items-center justify-between pt-6 border-t border-stone-100">
-              <button
+            <div className="flex items-center justify-between pt-6 border-t border-border">
+              <Button
+                variant="secondary"
+                size="md"
                 onClick={() => setStep(1)}
-                className="bg-white border border-stone-200 rounded-xl px-6 py-2.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-all shadow-2xs"
               >
                 ← Back
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="dark"
+                size="md"
+                trailingIcon={<span>→</span>}
                 onClick={() => setStep(3)}
-                className="bg-[#0B1713] text-white rounded-xl px-7 py-2.5 text-xs font-semibold hover:bg-black transition-all shadow-sm flex items-center gap-1.5"
               >
-                <span>Continue</span>
-                <span>→</span>
-              </button>
+                Continue
+              </Button>
             </div>
-
           </div>
         )}
 
@@ -635,368 +438,286 @@ export function InitialSetupScreen() {
         {/* STEP 3: CHOOSE WHEN OPENHOUSE SHOULD INVOLVE YOU */}
         {/* ========================================================================= */}
         {step === 3 && (
-          <div className="max-w-[1060px] mx-auto space-y-6 animate-fadeIn">
-            
+          <div className="max-w-[1080px] mx-auto space-y-6 animate-fadeIn">
             {/* Title & Subtitle */}
             <div className="text-center space-y-1.5 mb-8">
-              <h1 className="text-[32px] sm:text-[36px] font-bold text-stone-900 tracking-tight leading-tight">
+              <h1 className="text-[32px] sm:text-[36px] font-bold text-ink tracking-tight leading-tight">
                 Choose when OpenHouse should involve you
               </h1>
-              <p className="text-sm text-stone-500 max-w-lg mx-auto leading-relaxed">
+              <p className="text-sm text-ink-2 max-w-lg mx-auto leading-relaxed">
                 Set the default decisions that require your approval.
               </p>
             </div>
 
             {/* 2-Column Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
               {/* Left Column: Form Settings Cards */}
               <div className="lg:col-span-8 space-y-4">
-                
                 {/* Section 1: Publication Card */}
-                <div className="border border-stone-200/90 bg-[#FDFDFD] rounded-2xl p-5 shadow-2xs space-y-3">
-                  <span className="text-[10px] font-bold text-stone-400 tracking-wider uppercase block">
+                <div className="border border-border bg-surface rounded-2xl p-5 shadow-card space-y-3">
+                  <span className="text-[10px] font-bold text-ink-3 tracking-wider uppercase block">
                     PUBLICATION
                   </span>
-                  
-                  <div className="flex items-start gap-3.5">
-                    {/* Toggle Switch */}
-                    <button
-                      type="button"
-                      onClick={() => setRequireApproval(!requireApproval)}
-                      className={`w-11 h-6 rounded-full p-1 transition-colors flex items-center shrink-0 mt-0.5 ${
-                        requireApproval ? 'bg-[#194534]' : 'bg-stone-300'
-                      }`}
-                    >
-                      <div
-                        className={`h-4 w-4 rounded-full bg-white transition-transform ${
-                          requireApproval ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                    <div>
-                      <h4 className="text-xs font-bold text-stone-900">
-                        Require approval before publishing
-                      </h4>
-                      <p className="text-xs text-stone-500 mt-0.5 leading-relaxed">
-                        OpenHouse will prepare and verify each experience, then ask you to review it.
-                      </p>
-                    </div>
-                  </div>
+
+                  <ToggleSwitch
+                    checked={requireApproval}
+                    onChange={setRequireApproval}
+                    label="Require approval before publishing"
+                    description="OpenHouse will prepare and verify each experience, then ask you to review it."
+                  />
                 </div>
 
                 {/* Section 2: Visibility Card */}
-                <div className="border border-stone-200/90 bg-[#FDFDFD] rounded-2xl p-5 shadow-2xs space-y-3">
-                  <span className="text-[10px] font-bold text-stone-400 tracking-wider uppercase block">
+                <div className="border border-border bg-surface rounded-2xl p-5 shadow-card space-y-3">
+                  <span className="text-[10px] font-bold text-ink-3 tracking-wider uppercase block">
                     VISIBILITY
                   </span>
-                  
-                  <div>
-                    <span className="text-xs text-stone-700 font-medium block mb-2">
+
+                  <div className="space-y-3">
+                    <span className="text-xs text-ink-2 font-medium block">
                       Default visibility
                     </span>
 
                     <div className="space-y-2.5">
-                      {/* Option A: Unlisted */}
-                      <label className="flex items-start gap-2.5 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="visibility"
-                          checked={visibility === 'unlisted'}
-                          onChange={() => setVisibility('unlisted')}
-                          className="mt-0.5 text-[#194534] focus:ring-[#194534]"
-                        />
-                        <div>
-                          <span className="text-xs font-bold text-stone-900 block">Unlisted link</span>
-                          <span className="text-xs text-stone-500 block">Anyone with the link can view, but it won't appear in search.</span>
-                        </div>
-                      </label>
+                      <Radio
+                        name="visibility"
+                        checked={visibility === 'unlisted'}
+                        onChange={() => setVisibility('unlisted')}
+                        label="Unlisted link"
+                        description="Anyone with the link can view, but it won't appear in search."
+                      />
 
-                      {/* Option B: Public */}
-                      <label className="flex items-start gap-2.5 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="visibility"
-                          checked={visibility === 'public'}
-                          onChange={() => setVisibility('public')}
-                          className="mt-0.5 text-[#194534] focus:ring-[#194534]"
-                        />
-                        <div>
-                          <span className="text-xs font-bold text-stone-900 block">Public</span>
-                          <span className="text-xs text-stone-500 block">Anyone can find and view the experience.</span>
-                        </div>
-                      </label>
+                      <Radio
+                        name="visibility"
+                        checked={visibility === 'public'}
+                        onChange={() => setVisibility('public')}
+                        label="Public"
+                        description="Anyone can find and view the experience."
+                      />
 
-                      {/* Option C: Password */}
-                      <label className="flex items-start gap-2.5 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="visibility"
-                          checked={visibility === 'password'}
-                          onChange={() => setVisibility('password')}
-                          className="mt-0.5 text-[#194534] focus:ring-[#194534]"
-                        />
-                        <div>
-                          <span className="text-xs font-bold text-stone-900 block">Password protected</span>
-                          <span className="text-xs text-stone-500 block">Viewers must enter a password to access the experience.</span>
-                        </div>
-                      </label>
+                      <Radio
+                        name="visibility"
+                        checked={visibility === 'password'}
+                        onChange={() => setVisibility('password')}
+                        label="Password protected"
+                        description="Viewers must enter a password to access the experience."
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 3: Capture Requests Card */}
-                <div className="border border-stone-200/90 bg-[#FDFDFD] rounded-2xl p-5 shadow-2xs space-y-3">
-                  <span className="text-[10px] font-bold text-stone-400 tracking-wider uppercase block">
+                <div className="border border-border bg-surface rounded-2xl p-5 shadow-card space-y-3">
+                  <span className="text-[10px] font-bold text-ink-3 tracking-wider uppercase block">
                     CAPTURE REQUESTS
                   </span>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={sendWhatsapp}
-                          onChange={(e) => setSendWhatsapp(e.target.checked)}
-                          className="rounded text-[#194534] focus:ring-[#194534]"
-                        />
-                        <span className="text-xs font-semibold text-stone-800">Send capture requests by WhatsApp</span>
-                      </label>
 
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={sendEmail}
-                          onChange={(e) => setSendEmail(e.target.checked)}
-                          className="rounded text-[#194534] focus:ring-[#194534]"
-                        />
-                        <span className="text-xs font-semibold text-stone-800">Send capture requests by email</span>
-                      </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+                    <div className="space-y-2.5">
+                      <Checkbox
+                        checked={sendWhatsapp}
+                        onChange={(e) => setSendWhatsapp(e.target.checked)}
+                        label="Send capture requests by WhatsApp"
+                      />
+
+                      <Checkbox
+                        checked={sendEmail}
+                        onChange={(e) => setSendEmail(e.target.checked)}
+                        label="Send capture requests by email"
+                      />
                     </div>
 
-                    <div className="space-y-1">
-                      <span className="text-[11px] text-stone-500 font-medium block">Primary recipient</span>
-                      <select
+                    <div>
+                      <Select
+                        label="Primary recipient"
                         value={primaryRecipient}
                         onChange={(e) => setPrimaryRecipient(e.target.value)}
-                        className="w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#194534]/15 focus:border-[#194534] shadow-2xs"
-                      >
-                        <option value={userName}>{userName}</option>
-                        <option value="Team Admin">Team Admin</option>
-                      </select>
+                        options={[userName, 'Team Admin']}
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 4: Notifications Card */}
-                <div className="border border-stone-200/90 bg-[#FDFDFD] rounded-2xl p-5 shadow-2xs space-y-3.5">
-                  <span className="text-[10px] font-bold text-stone-400 tracking-wider uppercase block">
+                <div className="border border-border bg-surface rounded-2xl p-5 shadow-card space-y-3.5">
+                  <span className="text-[10px] font-bold text-ink-3 tracking-wider uppercase block">
                     NOTIFICATIONS
                   </span>
-                  
-                  <p className="text-xs text-stone-500">
+
+                  <p className="text-xs text-ink-2">
                     We'll notify you only about the decisions and exceptions that matter.
                   </p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-                    
-                    {/* Checkbox 1 */}
-                    <label className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={notifyCaptureRequired}
-                        onChange={(e) => setNotifyCaptureRequired(e.target.checked)}
-                        className="mt-0.5 rounded text-[#194534] focus:ring-[#194534]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-stone-900 block">Capture required</span>
-                        <span className="text-[11px] text-stone-500 block">We need new photos or a video for a property.</span>
-                      </div>
-                    </label>
+                    <Checkbox
+                      checked={notifyCaptureRequired}
+                      onChange={(e) => setNotifyCaptureRequired(e.target.checked)}
+                      label="Capture required"
+                      description="We need new photos or a video for a property."
+                    />
 
-                    {/* Checkbox 2 */}
-                    <label className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={notifyProcessingFailed}
-                        onChange={(e) => setNotifyProcessingFailed(e.target.checked)}
-                        className="mt-0.5 rounded text-[#194534] focus:ring-[#194534]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-stone-900 block">Processing failed</span>
-                        <span className="text-[11px] text-stone-500 block">Something stopped OpenHouse from completing a task.</span>
-                      </div>
-                    </label>
+                    <Checkbox
+                      checked={notifyProcessingFailed}
+                      onChange={(e) => setNotifyProcessingFailed(e.target.checked)}
+                      label="Processing failed"
+                      description="Something stopped OpenHouse from completing a task."
+                    />
 
-                    {/* Checkbox 3 */}
-                    <label className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={notifyReviewReady}
-                        onChange={(e) => setNotifyReviewReady(e.target.checked)}
-                        className="mt-0.5 rounded text-[#194534] focus:ring-[#194534]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-stone-900 block">Experience ready for review</span>
-                        <span className="text-[11px] text-stone-500 block">An experience is prepared and ready for your review.</span>
-                      </div>
-                    </label>
+                    <Checkbox
+                      checked={notifyReviewReady}
+                      onChange={(e) => setNotifyReviewReady(e.target.checked)}
+                      label="Experience ready for review"
+                      description="An experience is prepared and ready for your review."
+                    />
 
-                    {/* Checkbox 4 */}
-                    <label className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={notifyEveryUpdate}
-                        onChange={(e) => setNotifyEveryUpdate(e.target.checked)}
-                        className="mt-0.5 rounded text-[#194534] focus:ring-[#194534]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-stone-900 block">Every processing update</span>
-                        <span className="text-[11px] text-stone-500 block">Get notified about every step in the background.</span>
-                      </div>
-                    </label>
+                    <Checkbox
+                      checked={notifyEveryUpdate}
+                      onChange={(e) => setNotifyEveryUpdate(e.target.checked)}
+                      label="Every processing update"
+                      description="Get notified about every step in the background."
+                    />
 
-                    {/* Checkbox 5 */}
-                    <label className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={notifyPublished}
-                        onChange={(e) => setNotifyPublished(e.target.checked)}
-                        className="mt-0.5 rounded text-[#194534] focus:ring-[#194534]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-stone-900 block">Publication completed</span>
-                        <span className="text-[11px] text-stone-500 block">An experience has been published.</span>
-                      </div>
-                    </label>
-
+                    <Checkbox
+                      checked={notifyPublished}
+                      onChange={(e) => setNotifyPublished(e.target.checked)}
+                      label="Publication completed"
+                      description="An experience has been published."
+                    />
                   </div>
 
-                  {/* Info Pill */}
-                  <div className="bg-[#F7F6F2] border border-stone-200/60 rounded-xl p-3 flex items-center gap-2.5 text-xs text-stone-600 font-medium mt-3">
-                    <span className="h-5 w-5 rounded-full bg-stone-200 text-stone-700 flex items-center justify-center font-serif italic text-xs shrink-0">
-                      i
-                    </span>
-                    <span>OpenHouse will avoid notifying you about routine background work.</span>
-                  </div>
-
+                  {/* Info Callout */}
+                  <Callout>
+                    OpenHouse will avoid notifying you about routine background work.
+                  </Callout>
                 </div>
-
               </div>
 
               {/* Right Column: Setup Summary Card */}
               <div className="lg:col-span-4">
-                <div className="border border-stone-200/90 bg-[#FDFDFD] rounded-2xl p-5 shadow-xs space-y-4 sticky top-6">
-                  <h3 className="text-sm font-bold text-stone-900">Your setup summary</h3>
-                  
+                <div className="border border-border bg-surface rounded-2xl p-5 shadow-card space-y-4 sticky top-6">
+                  <h3 className="text-sm font-bold text-ink">Your setup summary</h3>
+
                   <div className="space-y-4 pt-1">
-                    
                     {/* Item 1: Workspace */}
                     <div className="flex items-start gap-3">
-                      <div className="h-9 w-9 rounded-full bg-[#EBF2EC] text-[#2F613D] flex items-center justify-center shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <BuildingIcon className="h-4 w-4" />
                       </div>
                       <div>
-                        <span className="text-[11px] font-semibold text-stone-400 block">Workspace</span>
-                        <span className="text-xs font-bold text-stone-900 block">{workspaceName}</span>
+                        <span className="text-[11px] font-semibold text-ink-3 block">Workspace</span>
+                        <span className="text-xs font-bold text-ink block">{workspaceName}</span>
                       </div>
                     </div>
 
-                    <div className="h-px bg-stone-100" />
+                    <div className="h-px bg-border" />
 
                     {/* Item 2: Listing Source */}
                     <div className="flex items-start gap-3">
-                      <div className="h-9 w-9 rounded-full bg-[#EBF2EC] text-[#2F613D] flex items-center justify-center shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <HomeHeartIcon className="h-4 w-4" />
                       </div>
                       <div>
-                        <span className="text-[11px] font-semibold text-stone-400 block">Listing source</span>
-                        <span className="text-xs font-bold text-stone-900 block">
-                          {listingSource === 'demo' ? 'OpenHouse Demo Listings' : listingSource === 'webhook' ? 'Custom webhook' : listingSource === 'csv' ? 'CSV Import' : 'Manual Entry'}
+                        <span className="text-[11px] font-semibold text-ink-3 block">Listing source</span>
+                        <span className="text-xs font-bold text-ink block">
+                          {listingSource === 'demo'
+                            ? 'OpenHouse Demo Listings'
+                            : listingSource === 'webhook'
+                            ? 'Custom webhook'
+                            : listingSource === 'csv'
+                            ? 'CSV Import'
+                            : 'Manual Entry'}
                         </span>
                       </div>
                     </div>
 
-                    <div className="h-px bg-stone-100" />
+                    <div className="h-px bg-border" />
 
                     {/* Item 3: Publication */}
                     <div className="flex items-start gap-3">
-                      <div className="h-9 w-9 rounded-full bg-[#EBF2EC] text-[#2F613D] flex items-center justify-center shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <ShieldCheckBadgeIcon className="h-4 w-4" />
                       </div>
                       <div>
-                        <span className="text-[11px] font-semibold text-stone-400 block">Publication</span>
-                        <span className="text-xs font-bold text-stone-900 block">
+                        <span className="text-[11px] font-semibold text-ink-3 block">Publication</span>
+                        <span className="text-xs font-bold text-ink block">
                           {requireApproval ? 'Approval required' : 'Automatic publishing'}
                         </span>
-                        <span className="text-[11px] text-stone-500 block leading-tight mt-0.5">
-                          {requireApproval ? "You'll review before anything is published." : "Experiences go live immediately when verified."}
+                        <span className="text-[11px] text-ink-2 block leading-tight mt-0.5">
+                          {requireApproval
+                            ? "You'll review before anything is published."
+                            : 'Experiences go live immediately when verified.'}
                         </span>
                       </div>
                     </div>
 
-                    <div className="h-px bg-stone-100" />
+                    <div className="h-px bg-border" />
 
                     {/* Item 4: Visibility */}
                     <div className="flex items-start gap-3">
-                      <div className="h-9 w-9 rounded-full bg-[#EBF2EC] text-[#2F613D] flex items-center justify-center shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <LinkChainIcon className="h-4 w-4" />
                       </div>
                       <div>
-                        <span className="text-[11px] font-semibold text-stone-400 block">Visibility</span>
-                        <span className="text-xs font-bold text-stone-900 block capitalize">
-                          {visibility === 'unlisted' ? 'Unlisted link' : visibility === 'public' ? 'Public' : 'Password protected'}
+                        <span className="text-[11px] font-semibold text-ink-3 block">Visibility</span>
+                        <span className="text-xs font-bold text-ink block capitalize">
+                          {visibility === 'unlisted'
+                            ? 'Unlisted link'
+                            : visibility === 'public'
+                            ? 'Public'
+                            : 'Password protected'}
                         </span>
-                        <span className="text-[11px] text-stone-500 block leading-tight mt-0.5">
-                          {visibility === 'unlisted' ? 'Anyone with the link can view.' : visibility === 'public' ? 'Anyone can find and view.' : 'Password required for access.'}
+                        <span className="text-[11px] text-ink-2 block leading-tight mt-0.5">
+                          {visibility === 'unlisted'
+                            ? 'Anyone with the link can view.'
+                            : visibility === 'public'
+                            ? 'Anyone can find and view.'
+                            : 'Password required for access.'}
                         </span>
                       </div>
                     </div>
 
-                    <div className="h-px bg-stone-100" />
+                    <div className="h-px bg-border" />
 
                     {/* Item 5: Notifications */}
                     <div className="flex items-start gap-3">
-                      <div className="h-9 w-9 rounded-full bg-[#EBF2EC] text-[#2F613D] flex items-center justify-center shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <BellNotificationIcon className="h-4 w-4" />
                       </div>
                       <div>
-                        <span className="text-[11px] font-semibold text-stone-400 block">Notifications</span>
-                        <span className="text-xs font-bold text-stone-900 block">Decisions and exceptions only</span>
-                        <span className="text-[11px] text-stone-500 block leading-tight mt-0.5">
+                        <span className="text-[11px] font-semibold text-ink-3 block">Notifications</span>
+                        <span className="text-xs font-bold text-ink block">Decisions and exceptions only</span>
+                        <span className="text-[11px] text-ink-2 block leading-tight mt-0.5">
                           You'll be notified about important events that need your attention.
                         </span>
                       </div>
                     </div>
-
                   </div>
                 </div>
               </div>
-
             </div>
 
             {/* Navigation Footer */}
-            <div className="flex items-center justify-between pt-6 border-t border-stone-100">
-              <button
+            <div className="flex items-center justify-between pt-6 border-t border-border">
+              <Button
+                variant="secondary"
+                size="md"
                 onClick={() => setStep(2)}
-                className="bg-white border border-stone-200 rounded-xl px-6 py-2.5 text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-all shadow-2xs"
               >
                 ← Back
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="dark"
+                size="md"
                 onClick={handleFinish}
-                className="bg-[#0B1713] text-white rounded-xl px-8 py-2.5 text-xs font-semibold hover:bg-black active:scale-[0.98] transition-all shadow-sm"
+                className="px-8"
               >
                 Finish setup
-              </button>
+              </Button>
             </div>
-
           </div>
         )}
-
       </main>
-
     </div>
   )
 }

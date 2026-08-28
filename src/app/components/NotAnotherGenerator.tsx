@@ -42,6 +42,7 @@ const STATS = [
   { icon: RefreshCw, label: "Retry reserve", value: "12%" },
 ];
 
+const STEPS = ["Plan", "References", "Storyboard", "Keyframes", "Animate", "Assembly"];
 
 function DiscoveryPopover() {
   const rows = [
@@ -72,8 +73,6 @@ function DiscoveryPopover() {
   );
 }
 
-const REAL_ESTATE_STEPS = ["Listing Ingestion", "Media Analysis", "15s Recapture", "Spatial Splatting", "Human Review"];
-
 export function NotAnotherGenerator() {
   return (
     <Section spacing="none" className="pt-16 pb-28 md:pt-20 md:pb-36">
@@ -81,33 +80,34 @@ export function NotAnotherGenerator() {
         {/* Editorial column */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           <MotionReveal>
-            <EditorialHeading eyebrow="Disciplined Autonomous Agent" size="section">
-              The realtor never
+            <EditorialHeading eyebrow="A complete production system" size="section">
+              Not another
               <br />
-              operates an AI
+              prompt-to-video
               <br />
-              or 3D tool.
+              generator.
             </EditorialHeading>
           </MotionReveal>
           <MotionReveal variants={fadeUpSmall} delay={0.05}>
             <p className="mt-8 max-w-md text-[1rem] leading-[1.65] text-ink-2">
-              The listing is the trigger. OpenHouse starts because a property was published—evaluating footage, synthesizing missing doorways, and asking for human attention only when an exact angle is missing.
+              Cre8Motion plans the episode, establishes visual truth, reviews every result,
+              and selectively repairs what fails.
             </p>
           </MotionReveal>
 
           <MotionReveal variants={fadeUpSmall} delay={0.1}>
             <div className="mt-12 flex flex-wrap items-center gap-x-2 gap-y-3 text-[0.9rem]">
-              {REAL_ESTATE_STEPS.map((step, i) => (
+              {STEPS.map((step, i) => (
                 <div key={step} className="flex items-center gap-2">
                   {i === 0 ? (
-                    <span className="flex items-center gap-2 text-emerald-400 font-semibold">
-                      <span className="size-[9px] rounded-sm bg-emerald-500" />
+                    <span className="flex items-center gap-2 text-accent">
+                      <span className="size-[9px] rounded-sm bg-accent" />
                       {step}
                     </span>
                   ) : (
                     <span className="text-ink-3">{step}</span>
                   )}
-                  {i < REAL_ESTATE_STEPS.length - 1 && <ArrowRight className="size-3.5 text-ink-4" />}
+                  {i < STEPS.length - 1 && <ArrowRight className="size-3.5 text-ink-4" />}
                 </div>
               ))}
             </div>
@@ -117,11 +117,11 @@ export function NotAnotherGenerator() {
         {/* Production plan card */}
         <MotionReveal variants={fadeUpSmall} delay={0.05}>
           <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
-            <p className="text-[0.8rem] uppercase tracking-[0.18em] text-emerald-400 font-bold">
-              Autonomous Property Intake
+            <p className="text-[0.8rem] uppercase tracking-[0.18em] text-accent">
+              Production plan
             </p>
             <h3 className="mt-3 text-[clamp(1.4rem,2.5vw,2rem)] tracking-[-0.01em] text-ink">
-              8 Admiralty Way · Lekki Phase 1
+              Fruitful Secrets · Episode 05
             </h3>
 
             {/* Stats row */}

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { CTAButton } from "./primitives/CTAButton";
-import { OpenHouseLogoMark } from "../../components/WorkspaceShell";
+import logoUrl from "../../assets/logo.png";
 
 const LINKS: Array<{ label: string; target: string }> = [
   { label: "Product", target: "product" },
   { label: "How it works", target: "how-it-works" },
-  { label: "Virtual Tour", target: "examples" },
-  { label: "Spatial QA", target: "technology" },
+  { label: "Examples", target: "examples" },
+  { label: "Technology", target: "technology" },
 ];
 
 function scrollToSection(id: string) {
@@ -32,7 +32,7 @@ export function Nav() {
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
         scrolled
-          ? "border-b border-line bg-[#050505]/85 backdrop-blur-xl"
+          ? "border-b border-line bg-[#050505]/80 backdrop-blur-xl"
           : "border-b border-transparent"
       }`}
     >
@@ -42,8 +42,8 @@ export function Nav() {
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className="flex items-center gap-2.5 text-[1.05rem] font-semibold tracking-[-0.02em] text-ink"
         >
-          <OpenHouseLogoMark className="h-7 w-7 object-contain" />
-          <span>Open<span className="text-emerald-400">House</span></span>
+          <img src={logoUrl} alt="" className="h-7 w-7 rounded-md" />
+          <span>Cre<span className="text-accent">8</span>Motion</span>
         </button>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -61,12 +61,12 @@ export function Nav() {
 
         <div className="flex items-center gap-3">
           <a
-            href="#/import"
-            className="hidden text-[0.9rem] text-ink-2 transition-colors duration-150 hover:text-ink sm:inline"
+            href="#/login"
+            className="hidden text-[0.9rem] text-ink-2 transition-colors duration-150 hover:text-ink sm:inline font-medium"
           >
-            MLS Intake Feed
+            Sign in
           </a>
-          <CTAButton size="md" href="#/properties">Realtor Workspace</CTAButton>
+          <CTAButton size="md" href="#/signup">Get Started</CTAButton>
         </div>
       </div>
     </motion.header>
