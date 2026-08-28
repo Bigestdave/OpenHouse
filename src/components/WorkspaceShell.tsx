@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import {
   GridIcon,
@@ -13,12 +13,6 @@ import {
   PlusIcon,
 } from './icons2'
 import { ArrowLeft, ChevronDown } from './icons'
-import { getRecentEvents, getShows, type WorkflowEventItem } from '../data/api'
-
-function prettyEventType(t?: string): string {
-  if (!t) return 'Event'
-  return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase().replace(/_/g, ' ')
-}
 
 function eventTimeAgo(iso?: string | null): string {
   if (!iso) return ''
@@ -32,6 +26,7 @@ function eventTimeAgo(iso?: string | null): string {
   return `${Math.round(hours / 24)}d ago`
 }
 
+import { useStore } from '../data/store'
 import logoMarkUrl from '../assets/logo-mark.png'
 
 export function OpenHouseLogoMark({ className = 'h-6 w-6' }: { className?: string }) {
@@ -44,64 +39,72 @@ export function OpenHouseLogoMark({ className = 'h-6 w-6' }: { className?: strin
   )
 }
 
-/** Reusable Header Notification Button & Popover */
 export function NotificationButton() {
   const [showNotifications, setShowNotifications] = useState(false)
-  const [events, setEvents] = useState<WorkflowEventItem[]>([])
-  const [eventsLoading, setEventsLoading] = useState(false)
+  const { properties, captureRequests } = useStore()
+
+  // Collect recent events across properties
+  const allEvents = properties.flatMap((p) =>
+    (p.timeline || []).map((t) => ({
+      id: t.id,
+      title: t.event,
+      detail: t.detail || p.title,
+      type: t.type,
+      time: t.timestamp,
+      propertyId: p.id,
+    }))
+  ).sort((a, b) => b.time - a.time).slice(0, 10)
+
+  const pendingRequestsCount = captureRequests.filter((cr) => cr.status === 'awaiting_capture').length
 
   return (
     <div className="relative">
       <button
-        onClick={() => {
-          const next = !showNotifications
-          setShowNotifications(next)
-          if (next) {
-            setEventsLoading(true)
-            getRecentEvents()
-              .then(setEvents)
-              .catch(() => setEvents([]))
-              .finally(() => setEventsLoading(false))
-          }
-        }}
-        className="relative flex h-11 w-11 items-center justify-center rounded-[12px] border border-border bg-surface text-text-secondary transition-all hover:border-line-strong hover:bg-surface-elevated hover:text-text-primary shadow-subtle"
+        onClick={() => setShowNotifications(!showNotifications)}
+        className="relative flex h-11 w-11 items-center justify-center rounded-[12px] border border-border bg-surface text-text-secondary transition-all hover:border-line-strong hover:bg-surface-elevated hover:text-text-primary shadow-subtle cursor-pointer"
         aria-label="Notifications"
       >
         <BellIcon />
-        <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-accent" />
+        {pendingRequestsCount > 0 && (
+          <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-accent animate-ping" />
+        )}
       </button>
 
       {showNotifications && (
         <div className="absolute right-0 top-full mt-3 w-[360px] rounded-2xl border border-border bg-surface shadow-overlay z-50 overflow-hidden">
           <div className="flex items-center justify-between border-b border-border p-4 bg-surface-elevated">
-            <span className="font-bold text-text-primary text-[15px]">Property Notifications</span>
+            <span className="font-bold text-text-primary text-[15px]">Property Activity & Alerts</span>
+            {pendingRequestsCount > 0 && (
+              <span className="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
+                {pendingRequestsCount} action required
+              </span>
+            )}
           </div>
           <div className="max-h-[380px] overflow-y-auto divide-y divide-border/60">
-            {eventsLoading && (
-              <div className="p-6 text-center text-[13.5px] text-text-secondary">Loading updates…</div>
-            )}
-            {!eventsLoading && events.length === 0 && (
+            {allEvents.length === 0 && (
               <div className="p-6 text-center text-[13.5px] text-text-secondary">
                 No notifications yet — property events will appear here.
               </div>
             )}
-            {!eventsLoading &&
-              events.map((e) => (
-                <div key={e.id} className="p-4 flex items-start gap-3 hover:bg-surface-elevated transition-colors">
-                  <span
-                    className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                      e.severity === 'error' ? 'bg-danger' : e.severity === 'warning' ? 'bg-accent' : 'bg-success'
-                    }`}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-semibold text-text-primary">{prettyEventType(e.event_type)}</h3>
-                    {typeof e.payload?.message === 'string' && (
-                      <p className="text-[13px] text-text-secondary mt-0.5 leading-snug">{e.payload.message}</p>
-                    )}
-                    <span className="text-[11.5px] text-text-secondary/80 block mt-1.5">{eventTimeAgo(e.created_at)}</span>
-                  </div>
+            {allEvents.map((e) => (
+              <Link
+                key={e.id}
+                to={`/property/${e.propertyId}`}
+                onClick={() => setShowNotifications(false)}
+                className="p-4 flex items-start gap-3 hover:bg-surface-elevated transition-colors block text-left"
+              >
+                <span
+                  className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                    e.type === 'capture_request' ? 'bg-amber-500' : e.type === 'publication' ? 'bg-emerald-500' : 'bg-blue-500'
+                  }`}
+                />
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[13.5px] font-semibold text-text-primary">{e.title}</h3>
+                  <p className="text-[12px] text-text-secondary mt-0.5 line-clamp-2">{e.detail}</p>
+                  <span className="text-[11px] text-text-secondary/70 block mt-1.5">{eventTimeAgo(new Date(e.time).toISOString())}</span>
                 </div>
-              ))}
+              </Link>
+            ))}
           </div>
         </div>
       )}
@@ -129,16 +132,9 @@ interface WorkspaceShellProps {
   backTo?: string
 }
 
-export function WorkspaceShell({ children, breadcrumb, backTo = '/shows' }: WorkspaceShellProps) {
-  const [userName, setUserName] = useState(() => localStorage.getItem('openhouse.userName') || 'Kiki Casa')
-  const userEmail = localStorage.getItem('openhouse.userEmail') || 'kiki@citeable.dev'
-
-  useEffect(() => {
-    getShows()
-      .catch(() => {
-        /* offline */
-      })
-  }, [])
+export function WorkspaceShell({ children, breadcrumb, backTo = '/properties' }: WorkspaceShellProps) {
+  const [userName, setUserName] = useState(() => localStorage.getItem('openhouse.userName') || 'David Sterling')
+  const userEmail = localStorage.getItem('openhouse.userEmail') || 'david@openhouse.app'
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-canvas font-sans text-text-primary">
@@ -146,7 +142,7 @@ export function WorkspaceShell({ children, breadcrumb, backTo = '/shows' }: Work
       <aside className="flex w-[248px] xl:w-[260px] shrink-0 flex-col bg-sidebar border-r border-border-dark select-none h-full z-20 transition-all">
         {/* Brand Header */}
         <div className="px-4 pt-5 pb-3">
-          <Link to="/shows" className="flex items-center gap-2.5 group">
+          <Link to="/properties" className="flex items-center gap-2.5 group">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sidebar-active border border-border-dark shadow-subtle group-hover:border-accent/50 transition-colors">
               <OpenHouseLogoMark className="h-4.5 w-4.5" />
             </div>
@@ -156,14 +152,14 @@ export function WorkspaceShell({ children, breadcrumb, backTo = '/shows' }: Work
           </Link>
         </div>
 
-        {/* Top + Add Property Button CTA */}
+        {/* Top + Import Listing Button CTA */}
         <div className="px-3.5 pb-3">
           <Link
-            to="/create-show"
+            to="/import"
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-surface px-3.5 py-2 text-[13.5px] font-semibold text-text-primary shadow-subtle transition-all duration-200 hover:bg-surface-elevated hover:shadow-card active:translate-y-0 whitespace-nowrap"
           >
             <PlusIcon size={14} strokeWidth={2} />
-            <span>Add property</span>
+            <span>Ingest listing</span>
           </Link>
         </div>
 

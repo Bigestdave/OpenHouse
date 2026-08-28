@@ -98,12 +98,12 @@ const FOOTER_COLS: Array<{ title: string; links: Array<{ label: string; href?: s
     ],
   },
   {
-    title: "Demo Experience",
+    title: "Featured Tours",
     links: [
-      { label: "8 Admiralty Way (Balcony Missing)", href: "#/show/8-admiralty-way" },
-      { label: "14 Bourdillon Road (Happy Path)", href: "#/show/14-bourdillon-road" },
-      { label: "Public 3D Viewer", href: "#/view/8-admiralty-way" },
-      { label: "Simulate Listing Trigger", href: "#/demo-portal" },
+      { label: "740 Park Avenue (Upper East Side)", href: "#/property/11111111-1111-1111-1111-111111111111" },
+      { label: "1048 Ocean Drive (Miami Beach)", href: "#/property/22222222-2222-2222-2222-222222222222" },
+      { label: "Public 3D Virtual Tour", href: "#/view/55555555-5555-5555-5555-555555555555" },
+      { label: "MLS Ingestion Gateway", href: "#/import" },
     ],
   },
   {

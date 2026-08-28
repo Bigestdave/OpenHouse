@@ -84,11 +84,11 @@ export function Hero() {
               <CTAButton size="lg" href="#/properties">
                 Open Realtor Workspace
               </CTAButton>
-              <CTAButton variant="secondary" size="lg" href="#/demo-portal">
+              <CTAButton variant="secondary" size="lg" href="#/import">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-white/[0.04]">
                   <Play className="h-2.5 w-2.5 fill-current text-ink" />
                 </span>
-                Simulate Listing Trigger
+                MLS Intake Gateway
               </CTAButton>
             </motion.div>
 

@@ -56,10 +56,10 @@ export function ProductionsScreen() {
           </div>
 
           <Link
-            to="/demo-portal"
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#0B1713] text-white px-4 py-2.5 text-xs font-bold shadow-2xs hover:bg-black transition-colors shrink-0 whitespace-nowrap"
+            to="/import"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#194534] text-white px-4 py-2.5 text-xs font-bold shadow-2xs hover:bg-[#2F613D] transition-colors shrink-0 whitespace-nowrap"
           >
-            <span>Simulate Listing Portal ➔</span>
+            <span>Ingest New Listing ➔</span>
           </Link>
         </div>
 

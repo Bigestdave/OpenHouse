@@ -61,10 +61,10 @@ export function Nav() {
 
         <div className="flex items-center gap-3">
           <a
-            href="#/demo-portal"
+            href="#/import"
             className="hidden text-[0.9rem] text-ink-2 transition-colors duration-150 hover:text-ink sm:inline"
           >
-            Demo Listing Portal
+            MLS Intake Feed
           </a>
           <CTAButton size="md" href="#/properties">Realtor Workspace</CTAButton>
         </div>

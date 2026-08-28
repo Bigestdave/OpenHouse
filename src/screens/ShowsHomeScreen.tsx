@@ -108,11 +108,11 @@ export function ShowsHomeScreen() {
 
           <div className="flex items-center gap-3 shrink-0">
             <Link
-              to="/demo-portal"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#0B1713] text-white px-4 py-2.5 text-xs font-bold shadow-sm hover:bg-black transition-all"
+              to="/import"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#194534] text-white px-4 py-2.5 text-xs font-bold shadow-sm hover:bg-[#2F613D] transition-all"
             >
-              <span>+ Simulate New Listing</span>
-              <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded">Demo Trigger</span>
+              <span>+ Ingest Listing</span>
+              <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded">MLS Gateway</span>
             </Link>
 
             <div className="flex w-full sm:w-[220px] md:w-[260px] items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-xs text-text-primary shadow-2xs">

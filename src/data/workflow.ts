@@ -84,10 +84,10 @@ export function startPropertyWorkflow(propertyId: string): void {
           room: stillMissingSpace.name,
           reason: `The ${stillMissingSpace.name} is listed, but its entrance was not clearly captured.`,
           instructions: `Record one slow, 15-second video from the living room through the ${stillMissingSpace.name.toLowerCase()} doorway. Finish after showing the full space.`,
-          estimatedTime: '1 minute',
-          recipientName: 'David Olabowale',
-          recipientPhone: '+234 800 000 0000',
-          recipientEmail: 'david@openhouse.com',
+          estimatedTime: '15 seconds',
+          recipientName: 'David Sterling',
+          recipientPhone: '+1 (555) 234-5678',
+          recipientEmail: 'david@openhouse.app',
           status: 'awaiting_capture'
         });
       } else {
