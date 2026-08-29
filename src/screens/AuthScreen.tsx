@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { signIn, signUp } from '../lib/auth'
 import { Input, Callout, Button } from '../components/ui'
 import { BoltIcon } from '../components/icons'
@@ -7,7 +7,6 @@ import { OpenHouseLogoMark } from '../components/WorkspaceShell'
 import imgPointCloudDoorway from '../assets/openhouse-pointcloud-doorway.png'
 
 export function AuthScreen() {
-  const navigate = useNavigate()
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,9 +19,10 @@ export function AuthScreen() {
     setLoading(true)
     setError(null)
     const res = await signIn('david@openhouse.com', 'demo1234')
-    setLoading(false)
     if (res.user) {
-      navigate('/properties')
+      window.location.href = '/#/properties'
+    } else {
+      setLoading(false)
     }
   }
 
@@ -43,7 +43,7 @@ export function AuthScreen() {
       if (res.error) {
         setError(res.error)
       } else {
-        navigate('/properties')
+        window.location.href = '/#/properties'
       }
     } else {
       if (!fullName.trim()) {
@@ -57,7 +57,7 @@ export function AuthScreen() {
       if (res.error) {
         setError(res.error)
       } else {
-        navigate('/setup')
+        window.location.href = '/#/setup'
       }
     }
   }
