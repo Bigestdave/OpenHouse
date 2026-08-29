@@ -44,6 +44,7 @@ export async function signIn(email: string, password: string): Promise<{ user: A
       agencyName: 'Lagos Luxury Realty',
     }
     localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(mockUser))
+    window.dispatchEvent(new Event('auth_state_changed'))
     return { user: mockUser, error: null }
   }
 

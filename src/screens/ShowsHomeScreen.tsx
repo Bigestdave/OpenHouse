@@ -168,7 +168,7 @@ export function ShowsHomeScreen() {
                       Orchid Apartments, Unit 4
                     </Link>
                     <div className="flex items-center gap-1.5 text-xs text-ink-2">
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                      <span className="h-2 w-2 rounded-full bg-[#194534]" />
                       <span>Building experience</span>
                     </div>
                   </div>
@@ -201,7 +201,7 @@ export function ShowsHomeScreen() {
                       Lekki Gardens, Unit 12
                     </Link>
                     <div className="flex items-center gap-1.5 text-xs text-ink-2">
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                      <span className="h-2 w-2 rounded-full bg-[#194534]" />
                       <span>Running final checks</span>
                     </div>
                   </div>
@@ -248,7 +248,7 @@ export function ShowsHomeScreen() {
                   <p className="text-[12.5px] text-ink-2 mt-0.5">2-bedroom apartment</p>
                   
                   <div className="flex items-center gap-1.5 text-xs text-ink-2 mt-2">
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                    <span className="h-2 w-2 rounded-full bg-[#194534]" />
                     <span>Preparing experience</span>
                   </div>
                 </div>
@@ -280,7 +280,7 @@ export function ShowsHomeScreen() {
                   <p className="text-[12.5px] text-ink-2 mt-0.5">3-bedroom terrace</p>
                   
                   <div className="flex items-center gap-1.5 text-xs text-ink-2 mt-2">
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                    <span className="h-2 w-2 rounded-full bg-[#194534]" />
                     <span>Ready for review</span>
                   </div>
                 </div>
@@ -312,7 +312,7 @@ export function ShowsHomeScreen() {
                   <p className="text-[12.5px] text-ink-2 mt-0.5">4-bedroom apartment</p>
                   
                   <div className="flex items-center gap-1.5 text-xs text-ink-2 mt-2">
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                    <span className="h-2 w-2 rounded-full bg-[#194534]" />
                     <span>Live</span>
                   </div>
                 </div>

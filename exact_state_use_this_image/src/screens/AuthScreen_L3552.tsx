@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signIn, signUp } from '../lib/auth'
-import { Input, Callout, Button } from '../components/ui'
+import { Input, Callout, Button, Badge } from '../components/ui'
 import { BoltIcon } from '../components/icons'
 import { OpenHouseLogoMark } from '../components/WorkspaceShell'
-import imgPointCloudDoorway from '../assets/openhouse-pointcloud-doorway.png'
 
 export function AuthScreen() {
   const navigate = useNavigate()
@@ -65,12 +64,12 @@ export function AuthScreen() {
   return (
     <div className="min-h-screen bg-canvas antialiased font-sans text-ink selection:bg-primary/20">
       <div className="grid min-h-screen lg:grid-cols-[1fr_1.05fr]">
-
+        
         {/* ========================================================================= */}
-        {/* LEFT PANEL: Realtor Auth Form                                             */}
+        {/* LEFT PANEL: Realtor Auth Form */}
         {/* ========================================================================= */}
         <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 bg-canvas">
-
+          
           {/* Header */}
           <header className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2.5">
@@ -89,7 +88,7 @@ export function AuthScreen() {
 
           {/* Form Container */}
           <div className="mx-auto w-full max-w-[420px] py-8 my-auto">
-
+            
             {/* Title Section */}
             <div className="pb-5">
               <h1 className="text-[28px] sm:text-[32px] font-extrabold tracking-tight text-ink leading-tight">
@@ -110,9 +109,9 @@ export function AuthScreen() {
                   setMode('signin')
                   setError(null)
                 }}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+                className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
                   mode === 'signin'
-                    ? 'bg-primary text-white shadow-sm'
+                    ? 'bg-primary text-text-inverse shadow-subtle'
                     : 'text-ink-2 hover:text-ink'
                 }`}
               >
@@ -124,9 +123,9 @@ export function AuthScreen() {
                   setMode('signup')
                   setError(null)
                 }}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+                className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
                   mode === 'signup'
-                    ? 'bg-primary text-white shadow-sm'
+                    ? 'bg-primary text-text-inverse shadow-subtle'
                     : 'text-ink-2 hover:text-ink'
                 }`}
               >
@@ -141,15 +140,15 @@ export function AuthScreen() {
                   type="button"
                   onClick={handleDemoSignIn}
                   disabled={loading}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-primary hover:bg-raised-2 transition-all disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-xs font-semibold text-primary shadow-subtle hover:bg-raised-2 transition-all disabled:opacity-50"
                 >
-                  <BoltIcon size={14} className="text-primary" />
+                  <BoltIcon size={15} className="text-primary" />
                   <span>Quick Demo Login (David Olabowale)</span>
                 </button>
-
-                <div className="relative flex py-3 items-center">
+                
+                <div className="relative flex py-3.5 items-center">
                   <div className="flex-grow border-t border-border"></div>
-                  <span className="flex-shrink mx-3 text-[11px] font-semibold text-ink-3 uppercase tracking-wider">
+                  <span className="flex-shrink mx-3 text-[10.5px] font-semibold text-ink-3 uppercase tracking-wider">
                     or sign in with email
                   </span>
                   <div className="flex-grow border-t border-border"></div>
@@ -158,15 +157,15 @@ export function AuthScreen() {
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3.5">
               {error && (
-                <Callout className="bg-accent/10 border-accent/30 text-accent py-2 px-3">
-                  <p className="text-sm font-medium text-accent">{error}</p>
+                <Callout className="bg-accent/10 border-accent/30 text-accent py-2">
+                  <p className="text-xs font-medium text-accent">{error}</p>
                 </Callout>
               )}
 
               {mode === 'signup' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <>
                   <Input
                     label="Full Name"
                     placeholder="David Olabowale"
@@ -175,12 +174,12 @@ export function AuthScreen() {
                     required
                   />
                   <Input
-                    label="Agency (Optional)"
+                    label="Agency / Brokerage (Optional)"
                     placeholder="Lekki Luxury Realty"
                     value={agencyName}
                     onChange={(e) => setAgencyName(e.target.value)}
                   />
-                </div>
+                </>
               )}
 
               <Input
@@ -215,7 +214,7 @@ export function AuthScreen() {
               </div>
 
               {/* Action Button */}
-              <div className="pt-1">
+              <div className="pt-2">
                 <Button
                   type="submit"
                   variant="primary"
@@ -230,7 +229,7 @@ export function AuthScreen() {
 
             {/* Terms Footer */}
             <p className="pt-5 text-center text-[11px] text-ink-3">
-              By continuing, you agree to OpenHouse's{' '}
+              By continuing, you agree to OpenHouse’s{' '}
               <span className="text-ink-2 hover:text-ink cursor-pointer underline">Terms of Service</span> and{' '}
               <span className="text-ink-2 hover:text-ink cursor-pointer underline">Privacy Policy</span>.
             </p>
@@ -245,14 +244,74 @@ export function AuthScreen() {
         </div>
 
         {/* ========================================================================= */}
-        {/* RIGHT PANEL: Full-bleed Pointcloud Doorway Image                          */}
+        {/* RIGHT PANEL: High-Impact 3D Spatial Showcase */}
         {/* ========================================================================= */}
-        <div className="hidden lg:block relative overflow-hidden">
-          <img
-            src={imgPointCloudDoorway}
-            alt="OpenHouse Spatial Pointcloud Doorway"
-            className="absolute inset-0 h-full w-full object-cover select-none"
-          />
+        <div className="hidden lg:flex relative flex-col justify-between overflow-hidden bg-[#0B1713] p-12 text-white border-l border-border/30">
+          
+          {/* Background Radial Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#194534]/50 via-[#0B1713] to-[#070E0B] pointer-events-none" />
+
+          {/* Top Headline Section */}
+          <div className="relative z-10 space-y-4 max-w-[540px] pt-6">
+            <div className="flex items-center gap-2">
+              <Badge variant="success">● Spatial OS Live</Badge>
+              <span className="text-xs text-white/60 font-medium">Realtor Attention Inbox</span>
+            </div>
+            
+            <h2 className="text-[38px] xl:text-[44px] font-extrabold tracking-tight text-white leading-[1.1]">
+              List normally.<br />
+              <span className="text-[#D97945]">OpenHouse</span> handles the rest.
+            </h2>
+            
+            <p className="text-sm text-white/70 leading-relaxed">
+              No Gaussian splatting, camera alignment, or confidence scores to learn. OpenHouse ingests listing details, identifies missing coverage, and builds interactive 3D tours automatically.
+            </p>
+          </div>
+
+          {/* Featured Property Showcase Card */}
+          <div className="relative z-10 my-8 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-md p-5 shadow-2xl space-y-4 max-w-[540px]">
+            <div className="relative aspect-[16/9] overflow-hidden rounded-xl bg-black/40">
+              <img
+                src="/src/assets/prop-admiralty.jpg"
+                alt="8 Admiralty Way 3D Walkthrough"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute top-3 left-3">
+                <span className="rounded-full bg-black/60 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-white border border-white/20">
+                  Interactive 3D Walkthrough
+                </span>
+              </div>
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-lg bg-black/70 backdrop-blur-md p-2.5 text-xs text-white">
+                <div>
+                  <p className="font-bold">8 Admiralty Way</p>
+                  <p className="text-[11px] text-white/70">Lekki Phase 1, Lagos · ₦8m/year</p>
+                </div>
+                <span className="text-[11px] font-semibold text-emerald-400">6/6 Rooms Verified ✓</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 text-center text-xs">
+              <div className="rounded-lg bg-white/5 p-2.5 border border-white/10">
+                <span className="block font-bold text-white">18–25 min</span>
+                <span className="text-[10px] text-white/60">Auto Pipeline</span>
+              </div>
+              <div className="rounded-lg bg-white/5 p-2.5 border border-white/10">
+                <span className="block font-bold text-white">24/7 Live</span>
+                <span className="text-[10px] text-white/60">Renter Access</span>
+              </div>
+              <div className="rounded-lg bg-white/5 p-2.5 border border-white/10">
+                <span className="block font-bold text-white">Grounded Q&A</span>
+                <span className="text-[10px] text-white/60">Evidence Verified</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Renter Quote & Badge */}
+          <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-6 text-xs text-white/60">
+            <span>Powering real estate in Lagos & international portals.</span>
+            <span className="font-semibold text-white/80">OpenHouse v2.0</span>
+          </div>
+
         </div>
 
       </div>

@@ -16,6 +16,8 @@ import { MobileCaptureScreen } from './screens/MobileCaptureScreen'
 import { InitialSetupScreen } from './screens/InitialSetupScreen'
 import { ListingPortalScreen } from './screens/ListingPortalScreen'
 import { LandingScreen } from './screens/LandingScreen'
+import { AddPropertyScreen } from './screens/AddPropertyScreen'
+import { AuthScreen } from './screens/AuthScreen'
 import { AuthGate } from './components/AuthGate'
 
 export default function App() {
@@ -24,6 +26,15 @@ export default function App() {
       <Routes>
         {/* Public Landing Page */}
         <Route path="/" element={<LandingScreen />} />
+
+        {/* Auth Routes — always show login screen */}
+        <Route path="/login" element={<AuthScreen />} />
+        <Route path="/signin" element={<AuthScreen />} />
+        <Route path="/auth" element={<AuthScreen />} />
+        <Route path="/signup" element={<AuthScreen />} />
+
+        {/* Add Property */}
+        <Route path="/add-property" element={<AuthGate><AddPropertyScreen /></AuthGate>} />
 
         {/* MLS & Listing Intake Feeds */}
         <Route path="/import" element={<ListingPortalScreen />} />

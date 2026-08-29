@@ -94,7 +94,7 @@ export function ShowOverviewScreen() {
                 >
                   <CopyIcon size={16} />
                 </button>
-                {copiedLink && <span className="text-[10.5px] font-semibold text-[#22C55E]">Copied!</span>}
+                {copiedLink && <span className="text-[10.5px] font-semibold text-[#194534]">Copied!</span>}
               </div>
 
               {/* Subtitle / Metadata */}
@@ -106,7 +106,7 @@ export function ShowOverviewScreen() {
                 <span>OH-00241</span>
                 <span>·</span>
                 <span className="inline-flex items-center gap-1.5 font-medium text-ink">
-                  <span className={`h-2 w-2 rounded-full ${activeTab === 'Experience' ? 'bg-[#22C55E]' : 'bg-[#22C55E]'}`} />
+                  <span className={`h-2 w-2 rounded-full ${activeTab === 'Experience' ? 'bg-[#194534]' : 'bg-[#194534]'}`} />
                   {activeTab === 'Experience' ? 'Ready for review' : 'Preparing experience'}
                 </span>
               </p>
@@ -207,7 +207,7 @@ export function ShowOverviewScreen() {
                     <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#194534]">
                       OPENHOUSE IS WORKING
                     </span>
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                    <span className="h-2 w-2 rounded-full bg-[#194534]" />
                   </div>
 
                   <h2 className="text-[22px] font-bold tracking-tight text-ink leading-tight">
@@ -289,7 +289,7 @@ export function ShowOverviewScreen() {
 
                 <div className="pt-3">
                   <p className="text-[12.5px] font-medium text-ink flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                    <span className="h-2 w-2 rounded-full bg-[#194534]" />
                     <span>Connecting living room to balcony</span>
                   </p>
                   <p className="text-[11px] text-ink-3 pl-4">Reconstruction underway</p>
@@ -308,7 +308,7 @@ export function ShowOverviewScreen() {
                       <span className="text-[10.5px] text-ink-3 mt-1 block">Expected spaces</span>
                     </div>
                     <div className="bg-canvas rounded-lg p-2">
-                      <span className="text-[18px] font-bold text-[#22C55E] block leading-none">7</span>
+                      <span className="text-[18px] font-bold text-[#194534] block leading-none">7</span>
                       <span className="text-[10.5px] text-ink-3 mt-1 block">Captured</span>
                     </div>
                     <div className="bg-canvas rounded-lg p-2">
@@ -360,7 +360,7 @@ export function ShowOverviewScreen() {
                   <div className="space-y-3.5 text-[12px]">
                     <div className="flex items-start gap-3">
                       <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:02</span>
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-[#194534] mt-1.5 shrink-0" />
                       <div>
                         <p className="font-semibold text-ink leading-tight">Additional balcony footage received</p>
                         <p className="text-ink-3 text-[11px]">New media uploaded</p>
@@ -369,7 +369,7 @@ export function ShowOverviewScreen() {
 
                     <div className="flex items-start gap-3">
                       <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:03</span>
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-[#194534] mt-1.5 shrink-0" />
                       <div>
                         <p className="font-semibold text-ink leading-tight">Capture quality passed</p>
                         <p className="text-ink-3 text-[11px]">All footage verified</p>
@@ -378,7 +378,7 @@ export function ShowOverviewScreen() {
 
                     <div className="flex items-start gap-3">
                       <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:04</span>
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-[#194534] mt-1.5 shrink-0" />
                       <div>
                         <p className="font-semibold text-ink leading-tight">Reconstruction resumed</p>
                         <p className="text-ink-3 text-[11px]">Building the connected experience</p>
@@ -387,7 +387,7 @@ export function ShowOverviewScreen() {
 
                     <div className="flex items-start gap-3">
                       <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:08</span>
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
+                      <span className="h-2 w-2 rounded-full bg-[#194534] mt-1.5 shrink-0" />
                       <div>
                         <p className="font-semibold text-ink leading-tight">Living room and balcony connected</p>
                         <p className="text-ink-3 text-[11px]">Spatial connection established</p>
@@ -469,7 +469,7 @@ export function ShowOverviewScreen() {
                     <div
                       className={`h-16 w-24 rounded-lg overflow-hidden border-2 ${
                         activeRoomIndex === idx
-                          ? 'border-[#22C55E] ring-2 ring-[#22C55E]/30 shadow-md'
+                          ? 'border-[#194534] ring-2 ring-[#194534]/30 shadow-md'
                           : 'border-border'
                       }`}
                     >
@@ -505,7 +505,7 @@ export function ShowOverviewScreen() {
                     onClick={() => setIsPublished(true)}
                     className={`rounded-lg px-5 py-2 text-[13.5px] font-bold text-white shadow-subtle transition-all ${
                       isPublished
-                        ? 'bg-[#22C55E] hover:bg-[#16A34A]'
+                        ? 'bg-[#194534] hover:bg-[#16A34A]'
                         : 'bg-[#17231E] hover:bg-black'
                     }`}
                   >
@@ -524,15 +524,15 @@ export function ShowOverviewScreen() {
                 <h3 className="text-[14px] font-bold text-ink mb-3">Ready to publish</h3>
                 <div className="space-y-2.5 text-[12.5px] text-ink-2">
                   <div className="flex items-start gap-2.5">
-                    <span className="h-4 w-4 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</span>
+                    <span className="h-4 w-4 rounded-full bg-[#194534] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</span>
                     <span className="text-ink font-medium">6 of 6 advertised rooms represented</span>
                   </div>
                   <div className="flex items-start gap-2.5">
-                    <span className="h-4 w-4 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</span>
+                    <span className="h-4 w-4 rounded-full bg-[#194534] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</span>
                     <span className="text-ink font-medium">2 capture issues identified and resolved</span>
                   </div>
                   <div className="flex items-start gap-2.5">
-                    <span className="h-4 w-4 rounded-full bg-[#22C55E] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</span>
+                    <span className="h-4 w-4 rounded-full bg-[#194534] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">✓</span>
                     <span className="text-ink font-medium">No blocking inconsistencies detected</span>
                   </div>
                 </div>
@@ -550,11 +550,11 @@ export function ShowOverviewScreen() {
                       <p className="text-ink-3 text-[11px]">7 captured spaces</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-semibold text-[#22C55E]">Verified</span>
+                      <span className="text-[11px] font-semibold text-[#194534]">Verified</span>
                       <div className="flex items-center gap-0.5">
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
                       </div>
                       <span className="text-ink-3 text-xs">›</span>
                     </div>
@@ -567,11 +567,11 @@ export function ShowOverviewScreen() {
                       <p className="text-ink-3 text-[11px]">Original video + requested recapture</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-semibold text-[#22C55E]">Verified</span>
+                      <span className="text-[11px] font-semibold text-[#194534]">Verified</span>
                       <div className="flex items-center gap-0.5">
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
                       </div>
                       <span className="text-ink-3 text-xs">›</span>
                     </div>
@@ -584,11 +584,11 @@ export function ShowOverviewScreen() {
                       <p className="text-ink-3 text-[11px]">Supplied floor plan</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-semibold text-[#22C55E]">Verified</span>
+                      <span className="text-[11px] font-semibold text-[#194534]">Verified</span>
                       <div className="flex items-center gap-0.5">
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
-                        <span className="h-3 w-1 rounded-sm bg-[#22C55E]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
+                        <span className="h-3 w-1 rounded-sm bg-[#194534]" />
                       </div>
                       <span className="text-ink-3 text-xs">›</span>
                     </div>
@@ -629,11 +629,11 @@ export function ShowOverviewScreen() {
                 {issuesOpen && (
                   <div className="pt-3 space-y-2 text-[11.5px] text-ink-2 pl-6">
                     <p className="flex items-center gap-2">
-                      <span className="text-[#22C55E]">✓</span>
+                      <span className="text-[#194534]">✓</span>
                       <span>Balcony doorway recaptured</span>
                     </p>
                     <p className="flex items-center gap-2">
-                      <span className="text-[#22C55E]">✓</span>
+                      <span className="text-[#194534]">✓</span>
                       <span>Floating visual artefact removed during quality review</span>
                     </p>
                   </div>
@@ -645,23 +645,23 @@ export function ShowOverviewScreen() {
                 <h3 className="text-[14px] font-bold text-ink mb-3">OpenHouse activity</h3>
                 <div className="space-y-2 text-[12px] text-ink-2">
                   <p className="flex items-center gap-2">
-                    <span className="text-[#22C55E]">✓</span>
+                    <span className="text-[#194534]">✓</span>
                     <span>Listing evidence organized</span>
                   </p>
                   <p className="flex items-center gap-2">
-                    <span className="text-[#22C55E]">✓</span>
+                    <span className="text-[#194534]">✓</span>
                     <span>Missing balcony capture requested</span>
                   </p>
                   <p className="flex items-center gap-2">
-                    <span className="text-[#22C55E]">✓</span>
+                    <span className="text-[#194534]">✓</span>
                     <span>New footage received</span>
                   </p>
                   <p className="flex items-center gap-2">
-                    <span className="text-[#22C55E]">✓</span>
+                    <span className="text-[#194534]">✓</span>
                     <span>Experience reconstructed</span>
                   </p>
                   <p className="flex items-center gap-2">
-                    <span className="text-[#22C55E]">✓</span>
+                    <span className="text-[#194534]">✓</span>
                     <span>Visual verification passed</span>
                   </p>
                   <p className="flex items-center gap-2 font-bold text-ink pt-1">
