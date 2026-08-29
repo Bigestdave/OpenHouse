@@ -12,76 +12,81 @@ import { ApprovalsScreen } from './screens/ApprovalsScreen'
 import { TeamScreen } from './screens/TeamScreen'
 import { PublishedExperienceScreen } from './screens/PublishedExperienceScreen'
 import { PublicPropertyViewerScreen } from './screens/PublicPropertyViewerScreen'
-import { CreateShowBasicsScreen } from './screens/CreateShowBasicsScreen'
-import { CreateShowStyleScreen } from './screens/CreateShowStyleScreen'
-import { CreateShowCharactersScreen } from './screens/CreateShowCharactersScreen'
 import { MobileCaptureScreen } from './screens/MobileCaptureScreen'
 import { InitialSetupScreen } from './screens/InitialSetupScreen'
-import { AuthScreen } from './screens/AuthScreen'
+import { ListingPortalScreen } from './screens/ListingPortalScreen'
 import { LandingScreen } from './screens/LandingScreen'
+import { AuthScreen } from './screens/AuthScreen'
+import { AddPropertyScreen } from './screens/AddPropertyScreen'
+import { AuthGate } from './components/AuthGate'
 
 export default function App() {
   return (
     <HashRouter>
       <Routes>
+        {/* Public Landing Page */}
         <Route path="/" element={<LandingScreen />} />
 
-        {/* Authentication */}
+        {/* Dedicated Auth Routes (Split-Screen with Pointcloud Artwork) */}
         <Route path="/login" element={<AuthScreen />} />
         <Route path="/signin" element={<AuthScreen />} />
         <Route path="/signup" element={<AuthScreen />} />
         <Route path="/auth" element={<AuthScreen />} />
 
-        {/* Onboarding & Setup */}
-        <Route path="/setup" element={<InitialSetupScreen />} />
-        <Route path="/onboarding" element={<InitialSetupScreen />} />
-        <Route path="/initial-setup" element={<InitialSetupScreen />} />
+        {/* MLS & Listing Intake Feeds */}
+        <Route path="/import" element={<ListingPortalScreen />} />
+        <Route path="/portal" element={<ListingPortalScreen />} />
+        <Route path="/listing-portal" element={<ListingPortalScreen />} />
+        <Route path="/demo-portal" element={<ListingPortalScreen />} />
 
-        {/* Create Property (3-Step Wizard) */}
-        <Route path="/create-show" element={<CreateShowBasicsScreen />} />
-        <Route path="/create-show/style" element={<CreateShowStyleScreen />} />
-        <Route path="/create-show/characters" element={<CreateShowCharactersScreen />} />
-        <Route path="/add-property" element={<CreateShowBasicsScreen />} />
-        <Route path="/new-property" element={<CreateShowBasicsScreen />} />
+        {/* Property Creation Flow */}
+        <Route path="/add-property" element={<AuthGate><AddPropertyScreen /></AuthGate>} />
+        <Route path="/create-show" element={<AuthGate><AddPropertyScreen /></AuthGate>} />
+        <Route path="/new-property" element={<AuthGate><AddPropertyScreen /></AuthGate>} />
 
-        {/* Workspace Hubs */}
-        <Route path="/properties" element={<ShowsHomeScreen />} />
-        <Route path="/shows" element={<ShowsHomeScreen />} />
-        <Route path="/capture-requests" element={<CaptureRequestsScreen />} />
-        <Route path="/capture-requests/:id" element={<CaptureRequestDetailScreen />} />
-        <Route path="/experiences" element={<ProductionsScreen />} />
-        <Route path="/productions" element={<ProductionsScreen />} />
-        <Route path="/approvals" element={<ApprovalsScreen />} />
-        <Route path="/activity" element={<ShowOverviewScreen />} />
-        <Route path="/assets" element={<AssetsScreen />} />
+        {/* Realtor Onboarding & Setup */}
+        <Route path="/setup" element={<AuthGate><InitialSetupScreen /></AuthGate>} />
+        <Route path="/onboarding" element={<AuthGate><InitialSetupScreen /></AuthGate>} />
+        <Route path="/initial-setup" element={<AuthGate><InitialSetupScreen /></AuthGate>} />
 
-        {/* Account Hubs */}
-        <Route path="/usage" element={<UsageScreen />} />
-        <Route path="/team" element={<TeamScreen />} />
-        <Route path="/settings" element={<SettingsScreen />} />
-        <Route path="/notifications" element={<NotificationsScreen />} />
+        {/* Protected Realtor Workspace Hubs */}
+        <Route path="/properties" element={<AuthGate><ShowsHomeScreen /></AuthGate>} />
+        <Route path="/shows" element={<Navigate to="/properties" replace />} />
+        <Route path="/capture-requests" element={<AuthGate><CaptureRequestsScreen /></AuthGate>} />
+        <Route path="/capture-requests/:id" element={<AuthGate><CaptureRequestDetailScreen /></AuthGate>} />
+        <Route path="/experiences" element={<AuthGate><ProductionsScreen /></AuthGate>} />
+        <Route path="/productions" element={<Navigate to="/experiences" replace />} />
+        <Route path="/approvals" element={<AuthGate><ApprovalsScreen /></AuthGate>} />
+        <Route path="/activity" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
+        <Route path="/assets" element={<AuthGate><AssetsScreen /></AuthGate>} />
 
-        {/* Mobile Capture App */}
+        {/* Account & Team Hubs */}
+        <Route path="/usage" element={<AuthGate><UsageScreen /></AuthGate>} />
+        <Route path="/team" element={<AuthGate><TeamScreen /></AuthGate>} />
+        <Route path="/settings" element={<AuthGate><SettingsScreen /></AuthGate>} />
+        <Route path="/notifications" element={<AuthGate><NotificationsScreen /></AuthGate>} />
+
+        {/* Public Mobile Capture Link (Sent to Agent / Assistant) */}
         <Route path="/capture/:id" element={<MobileCaptureScreen />} />
         <Route path="/capture" element={<MobileCaptureScreen />} />
         <Route path="/c/:id" element={<MobileCaptureScreen />} />
         <Route path="/mobile-capture" element={<MobileCaptureScreen />} />
 
-        {/* Property & Experience Details */}
-        <Route path="/property/:id" element={<ShowOverviewScreen />} />
-        <Route path="/show/:id" element={<ShowOverviewScreen />} />
-        <Route path="/experience/:id/published" element={<PublishedExperienceScreen />} />
-        <Route path="/experience/:id" element={<PublicPropertyViewerScreen />} />
+        {/* Property Inspector & Overview */}
+        <Route path="/property/:id" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
+        <Route path="/show/:id" element={<Navigate to="/property/:id" replace />} />
+        <Route path="/experience/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
+
+        {/* Public 3D Property Tour & Inspection Booking */}
         <Route path="/view/:id" element={<PublicPropertyViewerScreen />} />
         <Route path="/view" element={<PublicPropertyViewerScreen />} />
         <Route path="/viewer" element={<PublicPropertyViewerScreen />} />
+        <Route path="/experience/:id" element={<PublicPropertyViewerScreen />} />
         <Route path="/p/:id" element={<PublicPropertyViewerScreen />} />
 
+        {/* Catch-all redirect */}
         <Route path="*" element={<Navigate to="/properties" replace />} />
       </Routes>
     </HashRouter>
   )
 }
-
-
-

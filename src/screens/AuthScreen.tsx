@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { signIn, signUp } from '../lib/auth'
-import { Field } from '../components/WizardShell'
+import { signIn, signUp, demoSignIn } from '../lib/auth'
 import { Input, Callout } from '../components/ui'
 import { BoltIcon } from '../components/icons'
 import { OpenHouseLogoMark } from '../components/WorkspaceShell'
@@ -20,11 +19,9 @@ export function AuthScreen() {
   const handleDemoSignIn = async () => {
     setLoading(true)
     setError(null)
-    const res = await signIn('david@openhouse.com', 'demo1234')
+    await demoSignIn()
     setLoading(false)
-    if (res.user) {
-      navigate('/properties')
-    }
+    navigate('/properties')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,18 +61,29 @@ export function AuthScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-canvas antialiased font-sans text-ink selection:bg-primary/20">
-      <div className="grid min-h-screen lg:grid-cols-[1fr_1.1fr]">
+    <div className="h-screen w-full bg-canvas font-sans text-ink selection:bg-primary/20 overflow-hidden">
+      <div className="grid h-full lg:grid-cols-[1.1fr_1fr]">
         
         {/* ========================================================================= */}
-        {/* LEFT PANEL: Realtor Auth Form (Warm Limestone Background) */}
+        {/* LEFT PANEL: Pure Pointcloud Artwork (Uploaded Image, Seamless Blend)       */}
         {/* ========================================================================= */}
-        <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 bg-canvas">
+        <div className="hidden lg:flex relative items-center justify-center h-full bg-canvas p-6 sm:p-10 border-r border-border overflow-hidden">
+          <img
+            src={imgPointCloudDoorway}
+            alt="OpenHouse Spatial Pointcloud Doorway"
+            className="max-h-[85vh] w-auto max-w-full object-contain mix-blend-multiply select-none"
+          />
+        </div>
+
+        {/* ========================================================================= */}
+        {/* RIGHT PANEL: Compact Realtor Auth Form (Fits at 150% scaling)             */}
+        {/* ========================================================================= */}
+        <div className="flex flex-col justify-between h-full bg-canvas overflow-y-auto px-6 py-4 sm:px-10 lg:px-12">
           
           {/* Header */}
-          <header className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2.5 text-[20px] font-extrabold tracking-tight text-ink">
-              <OpenHouseLogoMark className="h-7 w-7 object-contain" />
+          <header className="flex items-center justify-between shrink-0 h-10">
+            <Link to="/" className="flex items-center gap-2 text-[18px] font-extrabold tracking-tight text-ink">
+              <OpenHouseLogoMark className="h-6 w-6 object-contain" />
               <span>OpenHouse</span>
             </Link>
             <Link
@@ -86,15 +94,15 @@ export function AuthScreen() {
             </Link>
           </header>
 
-          {/* Form Container */}
-          <div className="mx-auto w-full max-w-[520px] py-8 my-auto">
+          {/* Center Form Container */}
+          <div className="w-full max-w-[460px] mx-auto my-auto py-2">
             
             {/* Title Section */}
-            <div className="pb-6">
-              <h1 className="text-[32px] sm:text-[36px] font-bold tracking-tight text-ink leading-tight">
+            <div className="pb-3">
+              <h1 className="text-[24px] sm:text-[28px] font-bold tracking-tight text-ink leading-tight">
                 {mode === 'signin' ? 'Sign in to OpenHouse' : 'Create realtor workspace'}
               </h1>
-              <p className="pt-2 text-[15px] text-ink-2 leading-relaxed">
+              <p className="pt-1 text-[13px] text-ink-2 leading-relaxed">
                 {mode === 'signin'
                   ? 'Access your properties, 3D spatial captures, and publication controls.'
                   : 'Connect your listings and let OpenHouse automate interactive 3D tours.'}
@@ -102,16 +110,16 @@ export function AuthScreen() {
             </div>
 
             {/* Mode Switcher Tabs */}
-            <div className="flex rounded-xl bg-surface p-1 border border-border shadow-subtle mb-6">
+            <div className="flex rounded-lg bg-surface p-1 border border-border mb-3">
               <button
                 type="button"
                 onClick={() => {
                   setMode('signin')
                   setError(null)
                 }}
-                className={`flex-1 py-2 text-[14px] font-semibold rounded-lg transition-all ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${
                   mode === 'signin'
-                    ? 'bg-primary text-text-inverse shadow-subtle'
+                    ? 'bg-primary text-text-inverse'
                     : 'text-ink-2 hover:text-ink'
                 }`}
               >
@@ -123,9 +131,9 @@ export function AuthScreen() {
                   setMode('signup')
                   setError(null)
                 }}
-                className={`flex-1 py-2 text-[14px] font-semibold rounded-lg transition-all ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${
                   mode === 'signup'
-                    ? 'bg-primary text-text-inverse shadow-subtle'
+                    ? 'bg-primary text-text-inverse'
                     : 'text-ink-2 hover:text-ink'
                 }`}
               >
@@ -135,20 +143,20 @@ export function AuthScreen() {
 
             {/* Quick Demo Login Option */}
             {mode === 'signin' && (
-              <div className="pb-6">
+              <div className="pb-3">
                 <button
                   type="button"
                   onClick={handleDemoSignIn}
                   disabled={loading}
-                  className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-border bg-surface px-6 py-3 text-[14px] font-semibold text-primary shadow-subtle hover:bg-raised-2 transition-all disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-xs font-semibold text-primary hover:bg-raised-2 transition-all disabled:opacity-50"
                 >
-                  <BoltIcon size={16} className="text-primary" />
+                  <BoltIcon size={14} className="text-primary" />
                   <span>Quick Demo Login (David Olabowale)</span>
                 </button>
                 
-                <div className="relative flex py-5 items-center">
+                <div className="relative flex py-2.5 items-center">
                   <div className="flex-grow border-t border-border"></div>
-                  <span className="flex-shrink mx-3 text-[11.5px] font-semibold text-ink-3 uppercase tracking-wider">
+                  <span className="flex-shrink mx-3 text-[10.5px] font-semibold text-ink-3 uppercase tracking-wider">
                     or sign in with email
                   </span>
                   <div className="flex-grow border-t border-border"></div>
@@ -157,34 +165,37 @@ export function AuthScreen() {
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-2.5">
               {error && (
-                <Callout className="bg-accent/10 border-accent/30 text-accent">
+                <Callout className="bg-accent/10 border-accent/30 text-accent py-1.5 px-3">
                   <p className="text-xs font-medium text-accent">{error}</p>
                 </Callout>
               )}
 
               {mode === 'signup' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Field label="Full Name">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="space-y-1">
+                    <label className="block text-[11.5px] font-semibold text-ink">Full Name</label>
                     <Input
                       placeholder="David Olabowale"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
                     />
-                  </Field>
-                  <Field label="Agency / Brokerage (Optional)">
+                  </div>
+                  <div className="space-y-1">
+                    <label className="block text-[11.5px] font-semibold text-ink">Agency (Optional)</label>
                     <Input
                       placeholder="Lekki Luxury Realty"
                       value={agencyName}
                       onChange={(e) => setAgencyName(e.target.value)}
                     />
-                  </Field>
+                  </div>
                 </div>
               )}
 
-              <Field label="Email Address">
+              <div className="space-y-1">
+                <label className="block text-[11.5px] font-semibold text-ink">Email Address</label>
                 <Input
                   type="email"
                   placeholder="you@brokerage.com"
@@ -192,9 +203,21 @@ export function AuthScreen() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-              </Field>
+              </div>
 
-              <Field label="Password">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[11.5px] font-semibold text-ink">Password</label>
+                  {mode === 'signin' && (
+                    <button
+                      type="button"
+                      onClick={() => alert('Password reset instructions sent to your email.')}
+                      className="text-[11px] font-medium text-ink-2 hover:text-ink hover:underline"
+                    >
+                      Forgot?
+                    </button>
+                  )}
+                </div>
                 <Input
                   type="password"
                   placeholder="••••••••"
@@ -202,28 +225,17 @@ export function AuthScreen() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                {mode === 'signin' && (
-                  <div className="mt-2 text-right">
-                    <button
-                      type="button"
-                      onClick={() => alert('Password reset instructions sent to your email.')}
-                      className="text-[13px] font-medium text-ink-2 hover:text-ink hover:underline"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                )}
-              </Field>
+              </div>
 
               {/* Action Button */}
-              <div className="pt-3">
+              <div className="pt-2">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex h-12 w-full items-center justify-center gap-2.5 rounded-lg bg-primary px-8 text-[15px] font-semibold text-text-inverse shadow-subtle hover:bg-primary-hover disabled:opacity-50 transition-colors"
+                  className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 text-[14px] font-semibold text-text-inverse hover:bg-primary-hover disabled:opacity-50 transition-colors"
                 >
                   {loading ? 'Authenticating…' : mode === 'signin' ? 'Sign in to Console' : 'Create Account & Continue'}
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                  <svg width="15" height="15" viewBox="0 0 20 20" fill="none">
                     <path d="M4 10h12M11 4.5L16.5 10 11 15.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
@@ -231,36 +243,22 @@ export function AuthScreen() {
             </form>
 
             {/* Terms Footer */}
-            <p className="pt-6 text-center text-[12px] text-ink-3">
+            <p className="pt-3 text-center text-[11px] text-ink-3">
               By continuing, you agree to OpenHouse’s{' '}
-              <span className="text-ink-2 hover:text-ink cursor-pointer underline">Terms of Service</span> and{' '}
+              <span className="text-ink-2 hover:text-ink cursor-pointer underline">Terms</span> and{' '}
               <span className="text-ink-2 hover:text-ink cursor-pointer underline">Privacy Policy</span>.
             </p>
 
           </div>
 
           {/* Footer */}
-          <footer className="text-xs text-ink-3">
+          <footer className="text-[11px] text-ink-3 shrink-0 h-8 flex items-center">
             © {new Date().getFullYear()} OpenHouse Technologies Inc.
           </footer>
 
-        </div>
-
-        {/* ========================================================================= */}
-        {/* RIGHT PANEL: Pointcloud Matrix Doorway Artwork on Warm Canvas Background */}
-        {/* ========================================================================= */}
-        <div className="hidden lg:flex relative items-center justify-center overflow-hidden bg-canvas p-6 lg:p-12 border-l border-border/50">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <img
-              src={imgPointCloudDoorway}
-              alt="OpenHouse Spatial Pointcloud Doorway"
-              className="max-h-[88vh] w-auto max-w-full object-contain select-none"
-            />
-          </div>
         </div>
 
       </div>
     </div>
   )
 }
-

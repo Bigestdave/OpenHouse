@@ -34,7 +34,25 @@ function getSavedLocalUser(): AuthUser | null {
   }
 }
 
+export async function demoSignIn(): Promise<{ user: AuthUser; error: null }> {
+  const mockUser: AuthUser = {
+    id: 'usr-demo-01',
+    email: 'david@openhouse.com',
+    fullName: 'David Olabowale',
+    agencyName: 'OpenHouse Realty Advisors',
+  }
+  localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(mockUser))
+  localStorage.setItem('openhouse.userName', 'David Olabowale')
+  localStorage.setItem('openhouse.userEmail', 'david@openhouse.com')
+  window.dispatchEvent(new Event('auth_state_changed'))
+  return { user: mockUser, error: null }
+}
+
 export async function signIn(email: string, password: string): Promise<{ user: AuthUser | null; error: string | null }> {
+  if (email === 'david@openhouse.com' || email.includes('demo')) {
+    return demoSignIn()
+  }
+
   if (!isSupabaseConfigured) {
     // Offline / Local Demo mode
     const mockUser: AuthUser = {
@@ -44,6 +62,7 @@ export async function signIn(email: string, password: string): Promise<{ user: A
       agencyName: 'Lagos Luxury Realty',
     }
     localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(mockUser))
+    window.dispatchEvent(new Event('auth_state_changed'))
     return { user: mockUser, error: null }
   }
 

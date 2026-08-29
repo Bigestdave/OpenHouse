@@ -96,17 +96,23 @@ interface Message {
   subtext?: string
 }
 
+import { useStore, addBooking } from '../data/store'
+
 export function PublicPropertyViewerScreen() {
   const { id } = useParams()
+  const { properties } = useStore()
 
-  const propertyTitle = id?.includes('bourdillon')
-    ? 'Bourdillon Court, Unit 8'
-    : id?.includes('orchid')
-    ? 'Orchid Apartments, Unit 4'
-    : id?.includes('lekki')
-    ? 'Lekki Gardens, Unit 12'
-    : '8 Admiralty Way'
-  const propertyLocation = id?.includes('bourdillon') ? 'Ikoyi, Lagos' : 'Lekki, Lagos'
+  const property = properties.find((p) =>
+    p.id === id ||
+    p.title.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(id?.toLowerCase() || '') ||
+    (id?.includes('admiralty') && p.title.includes('Admiralty')) ||
+    (id?.includes('bourdillon') && p.title.includes('Bourdillon')) ||
+    (id?.includes('orchid') && p.title.includes('Orchid')) ||
+    (id?.includes('lekki') && p.title.includes('Lekki'))
+  ) || properties[0]
+
+  const propertyTitle = property?.title || '8 Admiralty Way'
+  const propertyLocation = property?.address || 'Lekki, Lagos'
 
   // Viewer state
   const [isEntered, setIsEntered] = useState(false)
@@ -764,11 +770,22 @@ export function PublicPropertyViewerScreen() {
               <div className="p-4 border-t border-stone-100 bg-stone-50 space-y-2">
                 <button
                   onClick={() => {
+                    addBooking({
+                      propertyId: property?.id || 'prop-admiralty',
+                      propertyTitle: property?.title || propertyTitle,
+                      renterName: bookingName,
+                      renterPhone: bookingPhone,
+                      renterEmail: bookingEmail,
+                      preferredDate: `March ${selectedDay}, 2026`,
+                      preferredTime: selectedTime,
+                      message: bookingNote,
+                      status: 'requested',
+                    })
                     setBookingSubmitted(true)
                     setTimeout(() => {
                       setBookingSubmitted(false)
                       setActiveRightDrawer('none')
-                    }, 2000)
+                    }, 2200)
                   }}
                   className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#0B1713] py-2.5 text-[13px] font-semibold text-white shadow-xs hover:bg-black active:scale-[0.98] transition-all"
                 >

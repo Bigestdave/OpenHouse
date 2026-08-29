@@ -22,11 +22,18 @@ import { isSupabaseConfigured } from '../lib/supabase';
 
 const STORAGE_KEY = 'openhouse.store';
 
+let initialSeed: StoreState | null = null;
+try {
+  initialSeed = getSeedData();
+} catch (error) {
+  console.warn('Seed data not available', error);
+}
+
 let state: StoreState = {
-  workspace: null,
-  properties: [],
-  captureRequests: [],
-  bookings: [],
+  workspace: initialSeed?.workspace || null,
+  properties: initialSeed?.properties || [],
+  captureRequests: initialSeed?.captureRequests || [],
+  bookings: initialSeed?.bookings || [],
   initialized: false,
 };
 
@@ -51,37 +58,30 @@ export function generateId(): string {
 }
 
 export function initStore() {
-  if (state.initialized) return;
+  if (state.initialized && state.properties.length > 0) return;
 
   // 1. Initial synchronous hydration from localStorage
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      state = { ...JSON.parse(saved), initialized: true };
+      const parsed = JSON.parse(saved);
+      if (parsed && Array.isArray(parsed.properties) && parsed.properties.length > 0) {
+        state = { ...parsed, initialized: true };
+      } else {
+        const seed = getSeedData();
+        state = { ...seed, initialized: true };
+      }
+    } else {
+      const seed = getSeedData();
+      state = { ...seed, initialized: true };
     }
   } catch (error) {
     console.error('Failed to load state from localStorage:', error);
+    const seed = getSeedData();
+    state = { ...seed, initialized: true };
   }
 
-  // 2. Fallback to seed data if empty
-  if (!state.properties || state.properties.length === 0) {
-    let seed: StoreState | null = null;
-    try {
-      seed = getSeedData();
-    } catch (error) {
-      console.warn('Seed data not available', error);
-    }
-
-    if (seed) {
-      state = { ...seed, initialized: true };
-    } else {
-      state.initialized = true;
-    }
-    persist();
-  } else {
-    state.initialized = true;
-  }
-
+  persist();
   notify();
 
   // 3. Asynchronous cloud hydration if Supabase is configured
@@ -101,6 +101,9 @@ export function initStore() {
     });
   }
 }
+
+// Auto-initialize on module load
+initStore();
 
 export function resetStore() {
   try {

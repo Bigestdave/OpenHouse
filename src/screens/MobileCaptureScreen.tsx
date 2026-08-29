@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { OpenHouseLogoMark } from '../components/WorkspaceShell'
-import { useStore, resolveCaptureRequest } from '../data/store'
 
 // Asset paths
 const propLivingPreviewImg = '/src/assets/prop-living-preview.png'
@@ -83,25 +82,93 @@ function BalconyIllustrationIcon({ className = 'h-5 w-5' }: { className?: string
   )
 }
 
+import { useStore, resolveCaptureRequest } from '../data/store'
+import { resumePropertyWorkflow } from '../data/workflow'
+import { uploadCaptureVideo } from '../lib/storage'
+import { useRef } from 'react'
+
 export function MobileCaptureScreen() {
   const navigate = useNavigate()
   const { id } = useParams()
-  const store = useStore()
+  const { properties, captureRequests } = useStore()
   const [mode, setMode] = useState<'intro' | 'recording' | 'checking' | 'submitted'>('intro')
 
-  // Recording state
-  const [seconds, setSeconds] = useState(9)
-  const [isRecording, setIsRecording] = useState(true)
+  // Find associated capture request or property
+  const request = captureRequests.find(r => r.id === id || r.propertyId === id || r.status !== 'resolved') || captureRequests[0]
+  const property = properties.find(p => p.id === request?.propertyId || p.id === id) || properties[0]
+
+  // Recording & Media state
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const recordedChunksRef = useRef<Blob[]>([])
+  const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null)
+  const [hasCameraStream, setHasCameraStream] = useState(false)
+
+  const [seconds, setSeconds] = useState(0)
+  const [isRecording, setIsRecording] = useState(false)
   const [blurPrivate, setBlurPrivate] = useState(true)
   const [showExampleModal, setShowExampleModal] = useState(false)
   const [showHelpModal, setShowHelpModal] = useState(false)
-
-  // Checking state
   const [isPlayingCheck, setIsPlayingCheck] = useState(false)
 
-  // Property info
-  const propertyTitle = id === '14-cooper' ? '14 Cooper Road' : '8 Admiralty Way'
-  const propertyLocation = id === '14-cooper' ? 'Ikoyi, Lagos' : 'Lekki, Lagos'
+  const propertyTitle = property?.title || '8 Admiralty Way'
+  const propertyLocation = property?.address || 'Lekki, Lagos'
+
+  // Initialize camera and recording when entering 'recording' mode
+  useEffect(() => {
+    if (mode === 'recording') {
+      setSeconds(0)
+      setIsRecording(true)
+      recordedChunksRef.current = []
+
+      // Attempt to get user camera
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices
+          .getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false,
+          })
+          .then((stream) => {
+            if (videoRef.current) {
+              videoRef.current.srcObject = stream
+              videoRef.current.play().catch(() => {})
+              setHasCameraStream(true)
+            }
+            try {
+              const recorder = new MediaRecorder(stream)
+              recorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                  recordedChunksRef.current.push(e.data)
+                }
+              }
+              recorder.onstop = () => {
+                const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' })
+                const url = URL.createObjectURL(blob)
+                setRecordedVideoUrl(url)
+              }
+              recorder.start(500)
+              mediaRecorderRef.current = recorder
+            } catch (err) {
+              console.warn('MediaRecorder error:', err)
+            }
+          })
+          .catch((err) => {
+            console.warn('Camera stream unavailable, using simulation:', err)
+            setHasCameraStream(false)
+          })
+      }
+    } else {
+      // Clean up camera stream on leaving recording mode
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream
+        stream.getTracks().forEach((track) => track.stop())
+        videoRef.current.srcObject = null
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop()
+      }
+    }
+  }, [mode])
 
   // Live timer for recording mode
   useEffect(() => {
@@ -110,6 +177,9 @@ export function MobileCaptureScreen() {
       interval = setInterval(() => {
         setSeconds((prev) => {
           if (prev >= 15) {
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+              mediaRecorderRef.current.stop()
+            }
             setMode('checking')
             return 15
           }
@@ -119,6 +189,34 @@ export function MobileCaptureScreen() {
     }
     return () => clearInterval(interval)
   }, [mode, isRecording])
+
+  const handleSubmitCapture = async () => {
+    setMode('submitted')
+    if (request) {
+      if (recordedChunksRef.current.length > 0) {
+        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' })
+        uploadCaptureVideo(blob, request.id).then((videoUrl) => {
+          resolveCaptureRequest(request.id, [
+            {
+              id: `media-${Date.now()}`,
+              url: videoUrl,
+              type: 'video',
+              room: request.room,
+              quality: 'good',
+              uploadedAt: Date.now(),
+            },
+          ])
+        }).catch(() => {
+          resolveCaptureRequest(request.id)
+        })
+      } else {
+        resolveCaptureRequest(request.id)
+      }
+      resumePropertyWorkflow(request.propertyId)
+    } else if (property) {
+      resumePropertyWorkflow(property.id)
+    }
+  }
 
   const formattedTime = `00:${seconds < 10 ? `0${seconds}` : seconds}`
 
@@ -311,15 +409,25 @@ export function MobileCaptureScreen() {
         {mode === 'recording' && (
           <div className="relative h-full flex-1 bg-black flex flex-col justify-between select-none overflow-hidden text-white font-sans">
             
-            {/* Viewfinder Image */}
-            <div className="absolute inset-0 z-0">
-              <img
-                src={cameraViewfinderBg}
-                alt="AR Viewfinder"
-                className={`h-full w-full object-cover transition-transform duration-10000 ease-linear ${
-                  isRecording ? 'scale-115 translate-y-[-10px]' : ''
-                }`}
-              />
+            {/* Viewfinder Video / Background */}
+            <div className="absolute inset-0 z-0 bg-black">
+              {hasCameraStream ? (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <img
+                  src={cameraViewfinderBg}
+                  alt="AR Viewfinder"
+                  className={`h-full w-full object-cover transition-transform duration-10000 ease-linear ${
+                    isRecording ? 'scale-115 translate-y-[-10px]' : ''
+                  }`}
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/75" />
             </div>
 
@@ -546,41 +654,55 @@ export function MobileCaptureScreen() {
                 </div>
               </div>
 
-              {/* Video Player Frame with Scrubber */}
+              {/* Video Player Frame with Scrubber / Real Video */}
               <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-xs bg-stone-900 group">
-                <img
-                  src={propLivingPreviewImg}
-                  alt="Captured video playback"
-                  className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 flex flex-col justify-between p-3.5 bg-gradient-to-t from-black/75 via-transparent to-black/20">
-                  <div />
-                  <div className="flex items-center justify-center">
-                    <button
-                      onClick={() => setIsPlayingCheck(!isPlayingCheck)}
-                      className="h-12 w-12 rounded-full bg-white/95 text-stone-900 flex items-center justify-center hover:bg-white active:scale-95 transition-all shadow-lg pl-0.5"
-                    >
-                      {isPlayingCheck ? (
-                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                          <rect x="6" y="4" width="4" height="16" />
-                          <rect x="14" y="4" width="4" height="16" />
-                        </svg>
-                      ) : (
-                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                          <polygon points="5 3 19 12 5 21 5 3" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                  {/* Timeline Scrubber */}
-                  <div className="flex items-center gap-2.5 text-white text-[11px] font-mono">
-                    <div className="flex-1 h-1 rounded-full bg-white/30 relative">
-                      <div className="absolute left-0 top-0 bottom-0 w-2/3 bg-white rounded-full" />
-                      <div className="absolute left-2/3 top-1/2 -translate-y-1/2 -translate-x-1/2 h-2.5 w-2.5 rounded-full bg-white shadow-md" />
+                {recordedVideoUrl ? (
+                  <video
+                    src={recordedVideoUrl}
+                    autoPlay
+                    loop
+                    playsInline
+                    controls
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={propLivingPreviewImg}
+                    alt="Captured video playback"
+                    className="h-full w-full object-cover"
+                  />
+                )}
+                
+                {!recordedVideoUrl && (
+                  <div className="absolute inset-0 flex flex-col justify-between p-3.5 bg-gradient-to-t from-black/75 via-transparent to-black/20">
+                    <div />
+                    <div className="flex items-center justify-center">
+                      <button
+                        onClick={() => setIsPlayingCheck(!isPlayingCheck)}
+                        className="h-12 w-12 rounded-full bg-white/95 text-stone-900 flex items-center justify-center hover:bg-white active:scale-95 transition-all shadow-lg pl-0.5"
+                      >
+                        {isPlayingCheck ? (
+                          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6" y="4" width="4" height="16" />
+                            <rect x="14" y="4" width="4" height="16" />
+                          </svg>
+                        ) : (
+                          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                          </svg>
+                        )}
+                      </button>
                     </div>
-                    <span>00:17</span>
+                    {/* Timeline Scrubber */}
+                    <div className="flex items-center gap-2.5 text-white text-[11px] font-mono">
+                      <div className="flex-1 h-1 rounded-full bg-white/30 relative">
+                        <div className="absolute left-0 top-0 bottom-0 w-2/3 bg-white rounded-full" />
+                        <div className="absolute left-2/3 top-1/2 -translate-y-1/2 -translate-x-1/2 h-2.5 w-2.5 rounded-full bg-white shadow-md" />
+                      </div>
+                      <span>00:15</span>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Checklist */}
@@ -656,7 +778,7 @@ export function MobileCaptureScreen() {
             {/* Action Buttons */}
             <div className="space-y-2 pt-4">
               <button
-                onClick={() => setMode('submitted')}
+                onClick={handleSubmitCapture}
                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0B1713] py-3.5 text-xs font-bold text-white hover:bg-black active:scale-[0.98] transition-all shadow-sm"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -796,22 +918,13 @@ export function MobileCaptureScreen() {
             {/* Action Button */}
             <div className="space-y-2 pt-4">
               <button
-                onClick={() => {
-                  const targetId = id || '8-admiralty'
-                  const req = store.captureRequests.find((r) => r.propertyId.includes(targetId) || targetId.includes(r.propertyId))
-                  if (req) {
-                    resolveCaptureRequest(req.id)
-                  } else if (store.captureRequests[0]) {
-                    resolveCaptureRequest(store.captureRequests[0].id)
-                  }
-                  navigate('/properties')
-                }}
+                onClick={() => navigate(property ? `/show/${property.id}` : '/properties')}
                 className="w-full rounded-xl bg-[#0B1713] py-3.5 text-xs font-bold text-white hover:bg-black active:scale-[0.98] transition-all shadow-sm"
               >
-                Done
+                Return to Property Overview →
               </button>
               <p className="text-[11px] text-center text-stone-400">
-                You can safely close this page.
+                You can safely close this page or return to the overview.
               </p>
             </div>
           </div>
