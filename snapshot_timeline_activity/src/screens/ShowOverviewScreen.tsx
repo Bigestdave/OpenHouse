@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { useStore } from '../data/store'
-import { CopyIcon, ClockIcon } from '../components/icons2'
+import {
+  CopyIcon,
+  ClockIcon,
+} from '../components/icons2'
 import { Ellipsis } from '../components/icons'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
 import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
@@ -14,7 +17,6 @@ import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
 
 export function ShowOverviewScreen() {
   const { id } = useParams()
-
   const { properties } = useStore()
   const [activeTab, setActiveTab] = useState<'Overview' | 'Evidence' | 'Experience' | 'Activity'>('Overview')
   const [showActivityModal, setShowActivityModal] = useState(false)
@@ -89,12 +91,12 @@ export function ShowOverviewScreen() {
                 </h1>
                 <button
                   onClick={handleCopyId}
-                  className="text-ink-3 hover:text-ink p-1 rounded transition-colors"
+                  className="text-ink-3 hover:text-ink p-1 rounded transition-colors text-xs flex items-center gap-1"
                   title="Copy title"
                 >
                   <CopyIcon size={16} />
+                  {copiedLink && <span className="text-[10px] text-[#22C55E] font-bold">Copied!</span>}
                 </button>
-                {copiedLink && <span className="text-[10.5px] font-semibold text-[#22C55E]">Copied!</span>}
               </div>
 
               {/* Subtitle / Metadata */}
@@ -271,121 +273,167 @@ export function ShowOverviewScreen() {
               </div>
             </div>
 
-            {/* BOTTOM 3 CARDS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* BOTTOM 3-CARD GRID */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
-              {/* CARD 1: Reconstruction status */}
-              <div className="flex flex-col justify-between rounded-2xl border border-border bg-surface p-5 shadow-subtle">
+              {/* Card 1: Reconstruction status */}
+              <div className="rounded-2xl border border-[#DDD7CB] bg-[#FBF8F2] p-5 shadow-sm flex flex-col justify-between">
                 <div>
-                  <h3 className="text-[14px] font-bold text-ink mb-3">Reconstruction status</h3>
-                  <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden border border-border/80 bg-stone-100 flex items-center justify-center">
+                  <h3 className="text-[15px] font-bold text-stone-900 pb-3">
+                    Reconstruction status
+                  </h3>
+                  
+                  <div className="relative overflow-hidden rounded-xl border border-[#DDD7CB] bg-stone-900 aspect-[16/10]">
                     <img
-                      src={pointcloudImg}
-                      alt="Pointcloud Reconstruction"
-                      className="h-full w-full object-cover"
+                      src={propKitchenImg}
+                      alt="Kitchen to dining connection"
+                      className="h-full w-full object-cover opacity-85"
                     />
+                    <div className="absolute top-2.5 left-2.5">
+                      <span className="rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10.5px] font-medium text-white border border-white/20">
+                        Kitchen-to-dining connection
+                      </span>
+                    </div>
+                    <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center gap-2 rounded-lg bg-black/70 backdrop-blur-md px-2.5 py-1.5 text-[11px] text-white">
+                      <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
+                      <span className="truncate font-medium">Connecting living room to balcony</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-3">
-                  <p className="text-[12.5px] font-medium text-ink flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-                    <span>Connecting living room to balcony</span>
-                  </p>
-                  <p className="text-[11px] text-ink-3 pl-4">Reconstruction underway</p>
+                <div className="pt-3 text-[12px] text-stone-500">
+                  Reconstruction underway
                 </div>
               </div>
 
-              {/* CARD 2: Property evidence */}
-              <div className="flex flex-col justify-between rounded-2xl border border-border bg-surface p-5 shadow-subtle">
+              {/* Card 2: Property evidence */}
+              <div className="rounded-2xl border border-[#DDD7CB] bg-[#FBF8F2] p-5 shadow-sm flex flex-col justify-between">
                 <div>
-                  <h3 className="text-[14px] font-bold text-ink mb-3">Property evidence</h3>
-                  
-                  {/* Top Stats */}
-                  <div className="grid grid-cols-3 gap-2 pb-3 mb-3 border-b border-border/60 text-center">
-                    <div className="bg-canvas rounded-lg p-2">
-                      <span className="text-[18px] font-bold text-ink block leading-none">7</span>
-                      <span className="text-[10.5px] text-ink-3 mt-1 block">Expected spaces</span>
-                    </div>
-                    <div className="bg-canvas rounded-lg p-2">
-                      <span className="text-[18px] font-bold text-[#22C55E] block leading-none">7</span>
-                      <span className="text-[10.5px] text-ink-3 mt-1 block">Captured</span>
-                    </div>
-                    <div className="bg-canvas rounded-lg p-2">
-                      <span className="text-[18px] font-bold text-ink block leading-none">1</span>
-                      <span className="text-[10.5px] text-ink-3 mt-1 block">Issue resolved</span>
+                  <div className="flex items-center justify-between pb-3">
+                    <h3 className="text-[15px] font-bold text-stone-900">
+                      Property evidence
+                    </h3>
+                    <div className="flex items-center gap-2 font-mono text-[11px] text-stone-500">
+                      <span><strong>7</strong> Exp</span>
+                      <span><strong>7</strong> Cap</span>
+                      <span><strong>1</strong> Res</span>
                     </div>
                   </div>
 
-                  {/* Spaces List */}
-                  <div className="space-y-2 text-[12px] max-h-[190px] overflow-y-auto pr-1">
-                    <div className="flex items-center justify-between py-1 border-b border-border/40">
-                      <span className="font-medium text-ink">Entrance</span>
-                      <span className="text-ink-2">Phone capture</span>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center justify-between py-1 border-b border-[#DDD7CB]/40">
+                      <span className="font-medium text-stone-800">Entrance</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-700 font-medium text-[11px]">✓ Captured</span>
+                        <span className="text-stone-500 text-[11px]">Phone capture</span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between py-1 border-b border-border/40">
-                      <span className="font-medium text-ink">Living room</span>
-                      <span className="text-ink-2">Phone capture</span>
+
+                    <div className="flex items-center justify-between py-1 border-b border-[#DDD7CB]/40">
+                      <span className="font-medium text-stone-800">Living room</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-700 font-medium text-[11px]">✓ Captured</span>
+                        <span className="text-stone-500 text-[11px]">Phone capture</span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between py-1 border-b border-border/40">
-                      <span className="font-medium text-ink">Kitchen</span>
-                      <span className="text-ink-2">Phone capture</span>
+
+                    <div className="flex items-center justify-between py-1 border-b border-[#DDD7CB]/40">
+                      <span className="font-medium text-stone-800">Kitchen</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-700 font-medium text-[11px]">✓ Captured</span>
+                        <span className="text-stone-500 text-[11px]">Phone capture</span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between py-1 border-b border-border/40">
-                      <span className="font-medium text-ink">Main bedroom</span>
-                      <span className="text-ink-2">Phone capture</span>
+
+                    <div className="flex items-center justify-between py-1 border-b border-[#DDD7CB]/40">
+                      <span className="font-medium text-stone-800">Main bedroom</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-700 font-medium text-[11px]">✓ Captured</span>
+                        <span className="text-stone-500 text-[11px]">Phone capture</span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between py-1 border-b border-border/40">
-                      <span className="font-medium text-ink">Bedroom 2</span>
-                      <span className="text-ink-2">Phone capture</span>
+
+                    <div className="flex items-center justify-between py-1 border-b border-[#DDD7CB]/40">
+                      <span className="font-medium text-stone-800">Bedroom 2</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-700 font-medium text-[11px]">✓ Captured</span>
+                        <span className="text-stone-500 text-[11px]">Phone capture</span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between py-1 border-b border-border/40">
-                      <span className="font-medium text-ink">Bedroom 3</span>
-                      <span className="text-ink-2">Phone capture</span>
-                    </div>
+
                     <div className="flex items-center justify-between py-1">
-                      <span className="font-bold text-ink">Balcony</span>
-                      <span className="text-[#194534] font-semibold">Original video + recapture</span>
+                      <span className="font-medium text-stone-800">Balcony</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-emerald-700 font-medium text-[11px]">✓ Recaptured</span>
+                        <span className="text-emerald-700 font-medium text-[11px]">Verified</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* CARD 3: Recent activity */}
-              <div className="flex flex-col justify-between rounded-2xl border border-border bg-surface p-5 shadow-subtle">
+              {/* Card 3: Recent activity */}
+              <div className="rounded-2xl border border-[#DDD7CB] bg-[#FBF8F2] p-5 shadow-sm flex flex-col justify-between">
                 <div>
-                  <h3 className="text-[14px] font-bold text-ink mb-3">Recent activity</h3>
-                  
-                  {/* Timeline Items */}
-                  <div className="space-y-3.5 text-[12px]">
-                    <div className="flex items-start gap-3">
-                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:02</span>
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
-                      <div>
-                        <p className="font-semibold text-ink leading-tight">Additional balcony footage received</p>
-                        <p className="text-ink-3 text-[11px]">New media uploaded</p>
+                  <h3 className="text-[15px] font-bold text-stone-900 pb-3">
+                    Recent activity
+                  </h3>
+
+                  <div className="space-y-2.5 text-xs">
+                    <div className="space-y-0.5">
+                      <div className="flex items-start justify-between">
+                        <span className="font-semibold text-stone-900 truncate max-w-[220px]">
+                          <span className="text-stone-500 font-mono text-[11px] mr-1.5">14:02</span>
+                          Additional balcony footage receiv...
+                        </span>
                       </div>
+                      <p className="text-[11px] text-stone-500 pl-11">New media uploaded</p>
                     </div>
 
-                    <div className="flex items-start gap-3">
-                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:03</span>
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
-                      <div>
-                        <p className="font-semibold text-ink leading-tight">Capture quality passed</p>
-                        <p className="text-ink-3 text-[11px]">All footage verified</p>
+                    <div className="space-y-0.5">
+                      <div className="flex items-start justify-between">
+                        <span className="font-semibold text-stone-900">
+                          <span className="text-stone-500 font-mono text-[11px] mr-1.5">14:03</span>
+                          Capture quality passed
+                        </span>
                       </div>
+                      <p className="text-[11px] text-stone-500 pl-11">All footage verified</p>
                     </div>
 
-                    <div className="flex items-start gap-3">
-                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:04</span>
-                      <span className="h-2 w-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
-                      <div>
-                        <p className="font-semibold text-ink leading-tight">Reconstruction resumed</p>
-                        <p className="text-ink-3 text-[11px]">Building the connected experience</p>
+                    <div className="space-y-0.5">
+                      <div className="flex items-start justify-between">
+                        <span className="font-semibold text-stone-900">
+                          <span className="text-stone-500 font-mono text-[11px] mr-1.5">14:04</span>
+                          Reconstruction resumed
+                        </span>
                       </div>
+                      <p className="text-[11px] text-stone-500 pl-11">Building connected experience</p>
                     </div>
 
-                    <div className="flex items-start gap-3">
+                    <div className="space-y-0.5">
+                      <div className="flex items-start justify-between">
+                        <span className="font-semibold text-stone-900">
+                          <span className="text-stone-500 font-mono text-[11px] mr-1.5">14:08</span>
+                          Living room & balcony connected
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-stone-500 pl-11">Spatial connection established</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-[#DDD7CB]/50">
+                  <button
+                    type="button"
+                    onClick={() => setShowActivityModal(true)}
+                    className="w-full py-2 px-3 text-center text-xs font-semibold text-stone-800 bg-white border border-[#DDD7CB] rounded-xl hover:bg-[#F2EEE5] transition-colors"
+                  >
+                    View all activity
+                  </button>
+                </div>
+              </div>
+
+            </div>
                       <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:08</span>
                       <span className="h-2 w-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
                       <div>

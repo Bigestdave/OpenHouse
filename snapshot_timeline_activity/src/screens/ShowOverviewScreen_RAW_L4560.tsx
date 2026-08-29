@@ -1,20 +1,29 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { useStore } from '../data/store'
-import { CopyIcon, ClockIcon } from '../components/icons2'
-import { Ellipsis } from '../components/icons'
+import {
+  SearchIcon,
+  CopyIcon,
+  CheckCircleIcon,
+  ActivityIcon,
+  ClockIcon,
+  CameraIcon,
+  EyeIcon,
+} from '../components/icons2'
+import { Ellipsis, ArrowLeft } from '../components/icons'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
 import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
 import propKitchenImg from '../assets/prop-kitchen.png'
 import propOrchidImg from '../assets/prop-orchid.jpg'
 import propLekkiImg from '../assets/prop-lekkigardens.jpg'
 import pointcloudImg from '../assets/openhouse-pointcloud-doorway.png'
+import propLivingPreview from '../assets/prop-living-preview.png'
 import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
 
 export function ShowOverviewScreen() {
   const { id } = useParams()
-
+  const navigate = useNavigate()
   const { properties } = useStore()
   const [activeTab, setActiveTab] = useState<'Overview' | 'Evidence' | 'Experience' | 'Activity'>('Overview')
   const [showActivityModal, setShowActivityModal] = useState(false)
@@ -94,7 +103,6 @@ export function ShowOverviewScreen() {
                 >
                   <CopyIcon size={16} />
                 </button>
-                {copiedLink && <span className="text-[10.5px] font-semibold text-[#22C55E]">Copied!</span>}
               </div>
 
               {/* Subtitle / Metadata */}
