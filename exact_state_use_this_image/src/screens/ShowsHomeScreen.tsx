@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { WorkspaceShell, NotificationButton } from '../components/WorkspaceShell'
 import { useStore, usePropertyStats } from '../data/store'
 import { Button, Badge } from '../components/ui'
-import { SearchIcon } from '../components/icons2'
-
+import { SearchIcon, ClockIcon, MapPinIcon, PhoneIcon } from '../components/icons2'
+import { Ellipsis, CheckCircle, ShareIcon } from '../components/icons'
 import type { Property } from '../data/types'
 
 const filterOptions = ['All', 'Needs attention', 'Preparing', 'Ready for review', 'Live'] as const

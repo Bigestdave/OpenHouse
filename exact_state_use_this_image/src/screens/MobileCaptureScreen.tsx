@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { OpenHouseLogoMark } from '../components/WorkspaceShell'
 import { useStore, resolveCaptureRequest } from '../data/store'
-import { resumePropertyWorkflow } from '../data/workflow'
-import { uploadCaptureVideo } from '../lib/storage'
 
 // Asset paths
 const propLivingPreviewImg = '/src/assets/prop-living-preview.png'
@@ -85,6 +83,10 @@ function BalconyIllustrationIcon({ className = 'h-5 w-5' }: { className?: string
   )
 }
 
+import { useStore, resolveCaptureRequest } from '../data/store'
+import { resumePropertyWorkflow } from '../data/workflow'
+import { uploadCaptureVideo } from '../lib/storage'
+import { useRef } from 'react'
 
 export function MobileCaptureScreen() {
   const navigate = useNavigate()

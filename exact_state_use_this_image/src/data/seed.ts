@@ -1,0 +1,210 @@
+import type { Workspace, Property, CaptureRequest, StoreState } from './types';
+import propAdmiraltyImg from '../assets/prop-admiralty.jpg';
+import propOrchidImg from '../assets/prop-orchid.jpg';
+import propLekkiImg from '../assets/prop-lekkigardens.jpg';
+import propBourdillonImg from '../assets/prop-bourdillon.jpg';
+import propKitchenImg from '../assets/prop-kitchen.png';
+
+const now = Date.now();
+let _seedCounter = 0;
+const stableId = (prefix: string) => `${prefix}-${++_seedCounter}`;
+
+export const SEED_WORKSPACE: Workspace = {
+  id: 'ws-default',
+  name: "OpenHouse Premier Workspace",
+  ownerName: 'David Sterling',
+  ownerEmail: 'david@openhouse.app',
+  workType: 'agency',
+  portfolioSize: '25–100 active properties',
+  primaryMarket: 'New York & Los Angeles',
+  teamSize: '5–10 people',
+  listingSource: 'webhook',
+  requireApproval: true,
+  defaultVisibility: 'unlisted',
+  notificationPreferences: {
+    captureRequired: true,
+    reviewReady: true,
+    published: true,
+    processingFailed: true,
+    everyUpdate: false,
+    channels: ['email', 'in_app'],
+  },
+  createdAt: now - 86400000 * 30,
+};
+
+export const SEED_PROPERTIES: Property[] = [
+  {
+    id: stableId('prop'),
+    title: '740 Park Avenue, Apt 12B',
+    address: 'Upper East Side, New York, NY 10021',
+    type: '3-Bed Luxury Penthouse',
+    bedrooms: 3,
+    bathrooms: 3,
+    price: '$18,500 / month',
+    description: 'Iconic pre-war architectural masterpiece with private elevator landing, grand entertaining gallery, wood-burning fireplace, and private terrace.',
+    status: 'needs_recapture',
+    spaces: [
+      { id: stableId('s'), name: 'Living Room', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Kitchen', captured: true, verified: true, issues: [], thumbnailUrl: propKitchenImg },
+      { id: stableId('s'), name: 'Primary Suite', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Guest Bedroom', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Library / Den', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Marble Bath', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Private Terrace', captured: false, verified: false, issues: ['Doorway connection path from living room missing'] },
+    ],
+    sourceMedia: [],
+    timeline: [
+      { id: stableId('s'), timestamp: now - 3600000 * 4, event: 'New listing detected', type: 'detection', detail: 'Listing ingested from MLS syndication webhook.' },
+      { id: stableId('s'), timestamp: now - 3600000 * 3, event: 'Checking media coverage', type: 'analysis', detail: 'Evaluating 16 source captures across 7 listed spaces.' },
+      { id: stableId('s'), timestamp: now - 3600000 * 2, event: 'Terrace coverage incomplete', type: 'capture_request', detail: 'Doorway transition between Living Room and Terrace needs one 15s pass.' },
+      { id: stableId('s'), timestamp: now - 3600000 * 1, event: 'Guided recapture link dispatched', type: 'capture_request', detail: 'Mobile capture link sent to listing agent.' },
+    ],
+    coverImage: propAdmiraltyImg,
+    createdAt: now - 86400000 * 2,
+    updatedAt: now - 3600000 * 1,
+    workspaceId: 'ws-default',
+  },
+  {
+    id: stableId('prop'),
+    title: '1048 Ocean Drive',
+    address: 'South Beach, Miami, FL 33139',
+    type: '5-Bed Waterfront Villa',
+    bedrooms: 5,
+    bathrooms: 6,
+    price: '$35,000 / month',
+    description: 'Modern waterfront sanctuary with infinity-edge pool, private dock, chef kitchen, and panoramic rooftop sunset deck.',
+    status: 'preparing',
+    spaces: [
+      { id: stableId('s'), name: 'Foyer', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Grand Living Hall', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Chef Kitchen', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Primary Suite', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Poolside Terrace', captured: true, verified: true, issues: [] },
+    ],
+    sourceMedia: [],
+    timeline: [
+      { id: stableId('s'), timestamp: now - 3600000 * 5, event: 'New listing detected', type: 'detection' },
+      { id: stableId('s'), timestamp: now - 3600000 * 4, event: 'Media check passed', type: 'analysis', detail: '100% spatial overlap confirmed across all rooms.' },
+      { id: stableId('s'), timestamp: now - 3600000 * 3, event: 'Spatial reconstruction active', type: 'reconstruction', detail: 'Building 3D Gaussian Splatting representation.' },
+    ],
+    coverImage: propBourdillonImg,
+    createdAt: now - 86400000 * 3,
+    updatedAt: now - 3600000 * 3,
+    workspaceId: 'ws-default',
+  },
+  {
+    id: stableId('prop'),
+    title: '452 Beverly Glen Blvd',
+    address: 'Bel Air, Los Angeles, CA 90077',
+    type: '4-Bed Architectural Estate',
+    bedrooms: 4,
+    bathrooms: 5,
+    price: '$24,000 / month',
+    description: 'Contemporary estate featuring floor-to-ceiling glass walls, terrazzo floors, smart home automation, and tranquil canyon views.',
+    status: 'quality_check',
+    spaces: [
+      { id: stableId('s'), name: 'Atrium', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Living Room', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Kitchen', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Primary Suite', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Courtyard', captured: true, verified: true, issues: [] },
+    ],
+    sourceMedia: [],
+    timeline: [
+      { id: stableId('s'), timestamp: now - 3600000 * 6, event: 'New listing detected', type: 'detection' },
+      { id: stableId('s'), timestamp: now - 3600000 * 3, event: 'Reconstruction finished', type: 'reconstruction' },
+      { id: stableId('s'), timestamp: now - 3600000 * 1, event: 'Quality verification underway', type: 'verification', detail: 'Evaluating 14 key viewpoints for visual consistency.' },
+    ],
+    coverImage: propOrchidImg,
+    createdAt: now - 86400000 * 4,
+    updatedAt: now - 3600000 * 1,
+    workspaceId: 'ws-default',
+  },
+  {
+    id: stableId('prop'),
+    title: '880 Lake Washington Blvd',
+    address: 'Seattle, WA 98122',
+    type: '3-Bed Modern Craftsman',
+    bedrooms: 3,
+    bathrooms: 4,
+    price: '$12,500 / month',
+    description: 'Lakeside residence with panoramic Mount Rainier views, private moorage, open-concept living, and custom walnut finishes.',
+    status: 'ready_for_review',
+    spaces: [
+      { id: stableId('s'), name: 'Living Room', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Kitchen', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Master Bedroom', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Lakefront Deck', captured: true, verified: true, issues: [] },
+    ],
+    sourceMedia: [],
+    timeline: [
+      { id: stableId('s'), timestamp: now - 3600000 * 8, event: 'New listing detected', type: 'detection' },
+      { id: stableId('s'), timestamp: now - 3600000 * 4, event: 'Reconstruction completed', type: 'reconstruction' },
+      { id: stableId('s'), timestamp: now - 3600000 * 2, event: 'Quality check passed', type: 'verification' },
+      { id: stableId('s'), timestamp: now - 3600000 * 1, event: 'Ready for agent approval', type: 'approval', detail: 'Experience packaged and ready for publication.' },
+    ],
+    coverImage: propLekkiImg,
+    createdAt: now - 86400000 * 5,
+    updatedAt: now - 3600000 * 1,
+    workspaceId: 'ws-default',
+  },
+  {
+    id: stableId('prop'),
+    title: '2100 Ocean Way, Penthouse 4',
+    address: 'Laguna Beach, CA 92651',
+    type: '4-Bed Coastal Penthouse',
+    bedrooms: 4,
+    bathrooms: 5,
+    price: '$45,000 / month',
+    description: 'Unrivaled bluff-top oceanfront penthouse with panoramic Pacific views, private elevator access, and wraparound ocean terrace.',
+    status: 'live',
+    spaces: [
+      { id: stableId('s'), name: 'Penthouse Great Room', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Ocean Terrace', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Primary Suite', captured: true, verified: true, issues: [] },
+      { id: stableId('s'), name: 'Wine Room & Lounge', captured: true, verified: true, issues: [] },
+    ],
+    sourceMedia: [],
+    timeline: [
+      { id: stableId('s'), timestamp: now - 3600000 * 24, event: 'New listing detected', type: 'detection' },
+      { id: stableId('s'), timestamp: now - 3600000 * 12, event: 'Reconstruction completed', type: 'reconstruction' },
+      { id: stableId('s'), timestamp: now - 3600000 * 6, event: 'Approved by listing agent', type: 'approval' },
+      { id: stableId('s'), timestamp: now - 3600000 * 5, event: 'Published & Live', type: 'publication', detail: 'Virtual Open House active for public inspection.' },
+    ],
+    experienceUrl: '/view/55555555-5555-5555-5555-555555555555',
+    coverImage: propAdmiraltyImg,
+    createdAt: now - 86400000 * 6,
+    updatedAt: now - 3600000 * 5,
+    workspaceId: 'ws-default',
+  },
+];
+
+export const SEED_CAPTURE_REQUESTS: CaptureRequest[] = [
+  {
+    id: 'cr-1',
+    propertyId: SEED_PROPERTIES[0].id,
+    propertyTitle: '740 Park Avenue, Apt 12B',
+    room: 'Private Terrace',
+    reason: 'The terrace is listed in floor plan, but doorway transition video was missing.',
+    instructions: 'Record one continuous 15-second walkthrough starting in the Living Room and stepping through the terrace French doors.',
+    estimatedTime: '15 seconds',
+    status: 'awaiting_capture',
+    recipientName: 'David Sterling',
+    recipientPhone: '+1 (555) 234-5678',
+    recipientEmail: 'david@openhouse.app',
+    captureUrl: '/capture/cr-1',
+    uploadedMedia: [],
+    createdAt: now - 3600000 * 1,
+    updatedAt: now - 3600000 * 1,
+  },
+];
+
+export function getSeedData() {
+  return {
+    workspace: SEED_WORKSPACE,
+    properties: SEED_PROPERTIES,
+    captureRequests: SEED_CAPTURE_REQUESTS,
+    bookings: [],
+    initialized: true,
+  };
+}

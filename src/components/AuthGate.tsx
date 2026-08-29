@@ -35,11 +35,11 @@ export function AuthGate({ children }: AuthGateProps) {
     );
   }
 
-  // If user is authenticated via Supabase OR has a local demo session, render protected workspace
+  // If authenticated via Supabase or local demo session, show the workspace
   if (user || localUser) {
     return <>{children}</>;
   }
 
-  // Otherwise render AuthScreen
+  // Not authenticated — show the full split-screen AuthScreen
   return <AuthScreen />;
 }
