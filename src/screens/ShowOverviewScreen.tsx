@@ -356,29 +356,31 @@ export function ShowOverviewScreen() {
                 <div>
                   <h3 className="text-[14px] font-bold text-ink mb-3">Recent activity</h3>
                   
-                  {/* Timeline Items */}
-                  <div className="space-y-3.5 text-[12px]">
-                    <div className="flex items-start gap-3">
-                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:02</span>
-                      <span className="h-2 w-2 rounded-full bg-[#194534] mt-1.5 shrink-0" />
+                  {/* Timeline Items — vertical line + colored dots */}
+                  <div className="relative text-[12px]">
+                    <div className="absolute left-[52px] top-2 bottom-2 w-px bg-border" />
+
+                    <div className="flex items-start gap-3 pb-3.5">
+                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5 w-10 text-right">14:02</span>
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#D97945] mt-1 shrink-0 relative z-10 ring-2 ring-surface" />
                       <div>
                         <p className="font-semibold text-ink leading-tight">Additional balcony footage received</p>
                         <p className="text-ink-3 text-[11px]">New media uploaded</p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3">
-                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:03</span>
-                      <span className="h-2 w-2 rounded-full bg-[#194534] mt-1.5 shrink-0" />
+                    <div className="flex items-start gap-3 pb-3.5">
+                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5 w-10 text-right">14:03</span>
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#194534] mt-1 shrink-0 relative z-10 ring-2 ring-surface" />
                       <div>
                         <p className="font-semibold text-ink leading-tight">Capture quality passed</p>
                         <p className="text-ink-3 text-[11px]">All footage verified</p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3">
-                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:04</span>
-                      <span className="h-2 w-2 rounded-full bg-[#194534] mt-1.5 shrink-0" />
+                    <div className="flex items-start gap-3 pb-3.5">
+                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5 w-10 text-right">14:04</span>
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#2563EB] mt-1 shrink-0 relative z-10 ring-2 ring-surface" />
                       <div>
                         <p className="font-semibold text-ink leading-tight">Reconstruction resumed</p>
                         <p className="text-ink-3 text-[11px]">Building the connected experience</p>
@@ -386,8 +388,8 @@ export function ShowOverviewScreen() {
                     </div>
 
                     <div className="flex items-start gap-3">
-                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5">14:08</span>
-                      <span className="h-2 w-2 rounded-full bg-[#194534] mt-1.5 shrink-0" />
+                      <span className="text-ink-3 font-mono text-[11px] shrink-0 pt-0.5 w-10 text-right">14:08</span>
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#194534] mt-1 shrink-0 relative z-10 ring-2 ring-surface" />
                       <div>
                         <p className="font-semibold text-ink leading-tight">Living room and balcony connected</p>
                         <p className="text-ink-3 text-[11px]">Spatial connection established</p>
@@ -681,34 +683,73 @@ export function ShowOverviewScreen() {
         {activeTab === 'Activity' && (
           <div className="pt-6">
             <div className="rounded-2xl border border-border bg-surface p-6 shadow-subtle max-w-[800px]">
-              <h2 className="text-[16px] font-bold text-ink mb-4">Complete Audit Log</h2>
-              <div className="space-y-4 text-[13px]">
-                <div className="flex items-start gap-4 pb-3 border-b border-border/60">
-                  <span className="font-mono text-xs text-ink-3">14:08</span>
-                  <div>
-                    <p className="font-bold text-ink">Living room & balcony connected</p>
-                    <p className="text-ink-2 text-xs">Spatial connection established</p>
+              <h2 className="text-[16px] font-bold text-ink mb-5">Complete Audit Log</h2>
+              <div className="relative">
+                {/* Vertical connecting line */}
+                <div className="absolute left-[52px] top-3 bottom-3 w-px bg-border" />
+
+                <div className="space-y-0 text-[13px]">
+                  <div className="flex items-start gap-3 pb-4">
+                    <span className="font-mono text-xs text-ink-3 shrink-0 pt-0.5 w-10 text-right">14:08</span>
+                    <span className="h-3 w-3 rounded-full bg-[#194534] mt-0.5 shrink-0 relative z-10 ring-2 ring-surface" />
+                    <div>
+                      <p className="font-bold text-ink">Living room & balcony connected</p>
+                      <p className="text-ink-2 text-xs mt-0.5">Spatial connection established</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start gap-4 pb-3 border-b border-border/60">
-                  <span className="font-mono text-xs text-ink-3">14:04</span>
-                  <div>
-                    <p className="font-bold text-ink">Reconstruction resumed</p>
-                    <p className="text-ink-2 text-xs">Building connected experience</p>
+
+                  <div className="flex items-start gap-3 pb-4">
+                    <span className="font-mono text-xs text-ink-3 shrink-0 pt-0.5 w-10 text-right">14:04</span>
+                    <span className="h-3 w-3 rounded-full bg-[#2563EB] mt-0.5 shrink-0 relative z-10 ring-2 ring-surface" />
+                    <div>
+                      <p className="font-bold text-ink">Reconstruction resumed</p>
+                      <p className="text-ink-2 text-xs mt-0.5">Building connected experience</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start gap-4 pb-3 border-b border-border/60">
-                  <span className="font-mono text-xs text-ink-3">14:03</span>
-                  <div>
-                    <p className="font-bold text-ink">Capture quality passed</p>
-                    <p className="text-ink-2 text-xs">All footage verified</p>
+
+                  <div className="flex items-start gap-3 pb-4">
+                    <span className="font-mono text-xs text-ink-3 shrink-0 pt-0.5 w-10 text-right">14:03</span>
+                    <span className="h-3 w-3 rounded-full bg-[#194534] mt-0.5 shrink-0 relative z-10 ring-2 ring-surface" />
+                    <div>
+                      <p className="font-bold text-ink">Capture quality passed</p>
+                      <p className="text-ink-2 text-xs mt-0.5">All footage verified</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <span className="font-mono text-xs text-ink-3">14:02</span>
-                  <div>
-                    <p className="font-bold text-ink">Additional balcony footage received</p>
-                    <p className="text-ink-2 text-xs">New media uploaded from mobile capture</p>
+
+                  <div className="flex items-start gap-3 pb-4">
+                    <span className="font-mono text-xs text-ink-3 shrink-0 pt-0.5 w-10 text-right">14:02</span>
+                    <span className="h-3 w-3 rounded-full bg-[#D97945] mt-0.5 shrink-0 relative z-10 ring-2 ring-surface" />
+                    <div>
+                      <p className="font-bold text-ink">Additional balcony footage received</p>
+                      <p className="text-ink-2 text-xs mt-0.5">New media uploaded from mobile capture</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 pb-4">
+                    <span className="font-mono text-xs text-ink-3 shrink-0 pt-0.5 w-10 text-right">13:47</span>
+                    <span className="h-3 w-3 rounded-full bg-[#DC2626] mt-0.5 shrink-0 relative z-10 ring-2 ring-surface" />
+                    <div>
+                      <p className="font-bold text-ink">Balcony capture missing</p>
+                      <p className="text-ink-2 text-xs mt-0.5">Doorway not captured — capture request sent</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 pb-4">
+                    <span className="font-mono text-xs text-ink-3 shrink-0 pt-0.5 w-10 text-right">13:31</span>
+                    <span className="h-3 w-3 rounded-full bg-[#2563EB] mt-0.5 shrink-0 relative z-10 ring-2 ring-surface" />
+                    <div>
+                      <p className="font-bold text-ink">All rooms identified</p>
+                      <p className="text-ink-2 text-xs mt-0.5">7 distinct spaces mapped — confidence 94%</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <span className="font-mono text-xs text-ink-3 shrink-0 pt-0.5 w-10 text-right">13:20</span>
+                    <span className="h-3 w-3 rounded-full bg-[#6B7280] mt-0.5 shrink-0 relative z-10 ring-2 ring-surface" />
+                    <div>
+                      <p className="font-bold text-ink">Property detected from listing</p>
+                      <p className="text-ink-2 text-xs mt-0.5">Pulled from PropertyPro listing</p>
+                    </div>
                   </div>
                 </div>
               </div>
