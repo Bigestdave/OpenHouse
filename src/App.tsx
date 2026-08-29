@@ -16,8 +16,10 @@ import { MobileCaptureScreen } from './screens/MobileCaptureScreen'
 import { InitialSetupScreen } from './screens/InitialSetupScreen'
 import { ListingPortalScreen } from './screens/ListingPortalScreen'
 import { LandingScreen } from './screens/LandingScreen'
-import { AddPropertyScreen } from './screens/AddPropertyScreen'
 import { AuthScreen } from './screens/AuthScreen'
+import { CreateShowBasicsScreen } from './screens/CreateShowBasicsScreen'
+import { CreateShowStyleScreen } from './screens/CreateShowStyleScreen'
+import { CreateShowCharactersScreen } from './screens/CreateShowCharactersScreen'
 import { AuthGate } from './components/AuthGate'
 
 export default function App() {
@@ -33,8 +35,11 @@ export default function App() {
         <Route path="/auth" element={<AuthScreen />} />
         <Route path="/signup" element={<AuthScreen />} />
 
-        {/* Add Property */}
-        <Route path="/add-property" element={<AuthGate><AddPropertyScreen /></AuthGate>} />
+        {/* Add Property — 3-step Create Show wizard */}
+        <Route path="/add-property" element={<Navigate to="/create-show" replace />} />
+        <Route path="/create-show" element={<AuthGate><CreateShowBasicsScreen /></AuthGate>} />
+        <Route path="/create-show/capture" element={<AuthGate><CreateShowStyleScreen /></AuthGate>} />
+        <Route path="/create-show/publish" element={<AuthGate><CreateShowCharactersScreen /></AuthGate>} />
 
         {/* MLS & Listing Intake Feeds */}
         <Route path="/import" element={<ListingPortalScreen />} />
