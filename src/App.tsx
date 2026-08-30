@@ -78,6 +78,8 @@ export default function App() {
         {/* Property Inspector & Overview */}
         <Route path="/property/:id" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
         <Route path="/show/:id" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
+        <Route path="/property/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
+        <Route path="/show/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
         <Route path="/experience/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
 
         {/* Public 3D Property Tour & Inspection Booking */}
