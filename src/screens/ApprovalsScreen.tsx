@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { SearchIcon } from '../components/icons2'
-import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
 import propLekkiImg from '../assets/prop-lekkigardens.jpg'
 import propOrchidImg from '../assets/prop-orchid.jpg'
-import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
+import demoLiving from '../assets/demo-living-room.jpg'
+import { DEMO_PROPERTY_ID } from '../context/DemoContext'
 
 // SVGs matching the reference UI
 function CheckCircleIcon({ className = 'h-4 w-4' }: { className?: string }) {
@@ -43,16 +43,16 @@ export function ApprovalsScreen() {
 
   // Featured Property (matches reference hero card)
   const featuredProperty: ApprovalItem = {
-    id: '8-admiralty-way',
-    title: '8 Admiralty Way',
-    subtitle: '3-bedroom apartment · Lekki, Lagos',
-    image: propHeroWaterfront || propAdmiraltyImg,
-    representation: '6 of 6 advertised rooms represented',
+    id: DEMO_PROPERTY_ID,
+    title: '2847 Laurel Canyon Rd, Unit 12A',
+    subtitle: '3-bedroom luxury condo · Austin, TX 78701',
+    image: demoLiving,
+    representation: '7 of 7 advertised rooms represented',
     status: 'READY TO PUBLISH',
     checklist: [
-      '6 of 6 advertised rooms represented',
-      '2 issues resolved',
-      'No blocking inconsistencies detected',
+      '7 of 7 advertised spaces represented',
+      'Balcony recapture verified & integrated',
+      'Gemini spatial continuity validated',
     ],
   }
 

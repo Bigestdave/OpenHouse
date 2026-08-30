@@ -20,6 +20,12 @@ import {
 } from '../components/icons2'
 import { Ellipsis, FullscreenIcon, CloseIcon } from '../components/icons'
 import { OpenHouseLogoMark } from '../components/WorkspaceShell'
+import demoLiving from '../assets/demo-living-room.jpg'
+import demoKitchen from '../assets/demo-kitchen.jpg'
+import demoBed from '../assets/demo-master-bedroom.jpg'
+import demoBalcony from '../assets/demo-balcony.jpg'
+import demoBath from '../assets/demo-bathroom.jpg'
+import demoExterior from '../assets/demo-exterior.jpg'
 
 interface Room {
   id: string
@@ -29,6 +35,57 @@ interface Room {
   hotspotTarget?: string
   hotspotLabel?: string
 }
+
+const DEMO_PROPERTY_ROOMS: Room[] = [
+  {
+    id: 'entrance',
+    name: 'Building & Entry Foyer',
+    img: demoExterior,
+    description: 'Ground floor luxury lobby with concierge and private high-speed elevator access.',
+    hotspotTarget: 'living',
+    hotspotLabel: 'Living Room',
+  },
+  {
+    id: 'living',
+    name: 'Living Room',
+    img: demoLiving,
+    description: 'Expansive open living room with oak hardwood floors and seamless flow into balcony terrace.',
+    hotspotTarget: 'balcony',
+    hotspotLabel: 'Balcony Terrace',
+  },
+  {
+    id: 'kitchen',
+    name: 'Chef Kitchen',
+    img: demoKitchen,
+    description: 'Custom walnut cabinetry, quartz waterfall island, and built-in premium appliances.',
+    hotspotTarget: 'living',
+    hotspotLabel: 'Living Room',
+  },
+  {
+    id: 'main-bed',
+    name: 'Primary Suite',
+    img: demoBed,
+    description: 'King-size master suite with panoramic floor-to-ceiling skyline windows.',
+    hotspotTarget: 'bathroom',
+    hotspotLabel: 'Primary Bathroom',
+  },
+  {
+    id: 'bathroom',
+    name: 'Primary Bathroom',
+    img: demoBath,
+    description: 'Freestanding soaking tub, walk-in rainfall shower, and double marble vanity.',
+    hotspotTarget: 'main-bed',
+    hotspotLabel: 'Primary Bedroom',
+  },
+  {
+    id: 'balcony',
+    name: 'Balcony Terrace',
+    img: demoBalcony,
+    description: 'Covered outdoor terrace with panoramic skyline views of Lady Bird Lake and downtown Austin.',
+    hotspotTarget: 'living',
+    hotspotLabel: 'Living Room',
+  },
+]
 
 const PROPERTY_ROOMS: Room[] = [
   {
@@ -102,6 +159,9 @@ export function PublicPropertyViewerScreen() {
   const { id } = useParams()
   const { properties } = useStore()
 
+  const isDemo = id === 'laurel-12a' || id?.includes('laurel') || id === 'orchid-1' || !id || id === 'demo'
+  const propertyRooms = isDemo ? DEMO_PROPERTY_ROOMS : PROPERTY_ROOMS
+
   const property = properties.find((p) =>
     p.id === id ||
     p.title.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(id?.toLowerCase() || '') ||
@@ -111,8 +171,8 @@ export function PublicPropertyViewerScreen() {
     (id?.includes('lekki') && p.title.includes('Lekki'))
   ) || properties[0]
 
-  const propertyTitle = property?.title || '8 Admiralty Way'
-  const propertyLocation = property?.address || 'Lekki, Lagos'
+  const propertyTitle = isDemo ? '2847 Laurel Canyon Rd, Unit 12A' : (property?.title || '8 Admiralty Way')
+  const propertyLocation = isDemo ? 'Austin, TX 78701' : (property?.address || 'Lekki, Lagos')
 
   // Viewer state
   const [isEntered, setIsEntered] = useState(false)
@@ -129,7 +189,7 @@ export function PublicPropertyViewerScreen() {
   const [selectedTime, setSelectedTime] = useState<string>('11:30 AM')
   const [bookingName, setBookingName] = useState('David Olabowale')
   const [bookingEmail, setBookingEmail] = useState('david@example.com')
-  const [bookingPhone, setBookingPhone] = useState('+234 801 234 5678')
+  const [bookingPhone, setBookingPhone] = useState('+1 (512) 555-0192')
   const [bookingNote, setBookingNote] = useState('')
   const [bookingSubmitted, setBookingSubmitted] = useState(false)
 
@@ -148,20 +208,20 @@ export function PublicPropertyViewerScreen() {
     },
   ])
 
-  const activeRoom = PROPERTY_ROOMS.find((r) => r.id === activeRoomId) || PROPERTY_ROOMS[1]
+  const activeRoom = propertyRooms.find((r) => r.id === activeRoomId) || propertyRooms[1]
 
   // Guided tour animation
   useEffect(() => {
     if (!isTouring) return
     const interval = setInterval(() => {
       setActiveRoomId((curr) => {
-        const index = PROPERTY_ROOMS.findIndex((r) => r.id === curr)
-        const nextIndex = (index + 1) % PROPERTY_ROOMS.length
-        return PROPERTY_ROOMS[nextIndex].id
+        const index = propertyRooms.findIndex((r) => r.id === curr)
+        const nextIndex = (index + 1) % propertyRooms.length
+        return propertyRooms[nextIndex].id
       })
     }, 4500)
     return () => clearInterval(interval)
-  }, [isTouring])
+  }, [isTouring, propertyRooms])
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -482,7 +542,7 @@ export function PublicPropertyViewerScreen() {
 
               {/* Room List Stream */}
               <div className="flex-1 overflow-y-auto p-4 space-y-1.5 no-scrollbar">
-                {PROPERTY_ROOMS.map((room) => {
+                {propertyRooms.map((room) => {
                   const isActive = room.id === activeRoomId
                   return (
                     <button

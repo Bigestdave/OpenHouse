@@ -4,28 +4,41 @@ import { handleNewListing } from '../data/workflow'
 import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
 import propOrchidImg from '../assets/prop-orchid.jpg'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
+import demoExterior from '../assets/demo-exterior.jpg'
 import { OpenHouseLogoMark } from '../components/WorkspaceShell'
+import { useDemoContext } from '../context/DemoContext'
 
 export function ListingPortalScreen() {
   const navigate = useNavigate()
-  const [selectedPreset, setSelectedPreset] = useState<'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom'>('park_ave')
-  
-  const [title, setTitle] = useState('740 Park Avenue, Apt 12B')
-  const [address, setAddress] = useState('Upper East Side, New York, NY 10021')
-  const [type, setType] = useState('3-Bedroom Luxury Penthouse')
+  const { setStage } = useDemoContext()
+  const [selectedPreset, setSelectedPreset] = useState<'laurel_12a' | 'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom'>('laurel_12a')
+
+  const [title, setTitle] = useState('2847 Laurel Canyon Rd, Unit 12A')
+  const [address, setAddress] = useState('Austin, TX 78701')
+  const [type, setType] = useState('3-Bedroom Luxury Condo')
   const [bedrooms, setBedrooms] = useState(3)
-  const [bathrooms, setBathrooms] = useState(3)
-  const [price, setPrice] = useState('$18,500 / month')
-  const [description, setDescription] = useState('Iconic pre-war architectural masterpiece with private elevator landing, grand entertaining gallery, and private terrace.')
+  const [bathrooms, setBathrooms] = useState(2)
+  const [price, setPrice] = useState('$6,400 / month')
+  const [description, setDescription] = useState('Corner-unit high-rise condo with panoramic Lady Bird Lake views, chef kitchen with island, and wraparound balcony terrace.')
   const [missingSpaceFlag, setMissingSpaceFlag] = useState(true)
-  const [coverImage, setCoverImage] = useState<string>(propAdmiraltyImg)
-  
+  const [coverImage, setCoverImage] = useState<string>(demoExterior)
+
   const [isPublishing, setIsPublishing] = useState(false)
   const [webhookSent, setWebhookSent] = useState(false)
 
-  const handleSelectPreset = (preset: 'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom') => {
+  const handleSelectPreset = (preset: 'laurel_12a' | 'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom') => {
     setSelectedPreset(preset)
-    if (preset === 'park_ave') {
+    if (preset === 'laurel_12a') {
+      setTitle('2847 Laurel Canyon Rd, Unit 12A')
+      setAddress('Austin, TX 78701')
+      setType('3-Bedroom Luxury Condo')
+      setBedrooms(3)
+      setBathrooms(2)
+      setPrice('$6,400 / month')
+      setDescription('Corner-unit high-rise condo with panoramic Lady Bird Lake views, chef kitchen with island, and wraparound balcony terrace.')
+      setMissingSpaceFlag(true)
+      setCoverImage(demoExterior)
+    } else if (preset === 'park_ave') {
       setTitle('740 Park Avenue, Apt 12B')
       setAddress('Upper East Side, New York, NY 10021')
       setType('3-Bedroom Luxury Penthouse')
@@ -60,6 +73,16 @@ export function ListingPortalScreen() {
 
   const handlePublish = () => {
     setIsPublishing(true)
+
+    // For demo preset: fire Stage 1, navigate to demo property
+    if (selectedPreset === 'laurel_12a') {
+      setWebhookSent(true)
+      setTimeout(() => {
+        setStage(1)
+        navigate('/property/laurel-12a')
+      }, 1800)
+      return
+    }
 
     const spaces = [
       { name: 'Living Room', captured: true },
@@ -149,8 +172,30 @@ export function ListingPortalScreen() {
           <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">
             Select Active Listing Feed:
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+            {/* DEMO PRESET — Laurel Canyon */}
+            <button
+              type="button"
+              onClick={() => handleSelectPreset('laurel_12a')}
+              className={`p-4 rounded-xl border text-left transition-all cursor-pointer relative ${
+                selectedPreset === 'laurel_12a'
+                  ? 'border-[#194534] bg-emerald-50/50 ring-2 ring-[#194534]/20'
+                  : 'border-stone-200 bg-white hover:border-stone-300'
+              }`}
+            >
+              <div className="absolute top-2 right-2 text-[10px] font-bold bg-[#194534] text-white px-2 py-0.5 rounded-full uppercase tracking-wide">
+                Demo
+              </div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-xs font-bold text-stone-900">2847 Laurel Canyon Rd</span>
+              </div>
+              <p className="text-xs text-stone-500">Austin, TX · \$6,400/mo</p>
+              <p className="text-[11px] text-amber-700 font-medium mt-2">
+                Simulates missing balcony terrace footage — full demo flow.
+              </p>
+            </button>
+
             <button
               type="button"
               onClick={() => handleSelectPreset('park_ave')}
@@ -166,7 +211,7 @@ export function ListingPortalScreen() {
                   Recapture Test
                 </span>
               </div>
-              <p className="text-xs text-stone-500">Upper East Side, NY · $18,500/mo</p>
+              <p className="text-xs text-stone-500">Upper East Side, NY · \$18,500/mo</p>
               <p className="text-[11px] text-amber-700 font-medium mt-2">
                 Simulates missing terrace doorway footage.
               </p>
@@ -187,7 +232,7 @@ export function ListingPortalScreen() {
                   Full Coverage
                 </span>
               </div>
-              <p className="text-xs text-stone-500">South Beach, Miami · $35,000/mo</p>
+              <p className="text-xs text-stone-500">South Beach, Miami · \$35,000/mo</p>
               <p className="text-[11px] text-emerald-700 font-medium mt-2">
                 All rooms captured. Direct reconstruction flow.
               </p>
@@ -208,7 +253,7 @@ export function ListingPortalScreen() {
                   Bel Air Estate
                 </span>
               </div>
-              <p className="text-xs text-stone-500">Los Angeles, CA · $24,000/mo</p>
+              <p className="text-xs text-stone-500">Los Angeles, CA · \$24,000/mo</p>
               <p className="text-[11px] text-emerald-700 font-medium mt-2">
                 Complete architectural photo set.
               </p>

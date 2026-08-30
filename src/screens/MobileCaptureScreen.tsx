@@ -4,6 +4,9 @@ import { OpenHouseLogoMark } from '../components/WorkspaceShell'
 import { useStore, resolveCaptureRequest } from '../data/store'
 import { resumePropertyWorkflow } from '../data/workflow'
 import { uploadCaptureVideo } from '../lib/storage'
+import { useDemoContext } from '../context/DemoContext'
+import demoLiving from '../assets/demo-living-room.jpg'
+import demoExterior from '../assets/demo-exterior.jpg'
 
 // Asset paths
 const propLivingPreviewImg = '/src/assets/prop-living-preview.png'
@@ -88,8 +91,11 @@ function BalconyIllustrationIcon({ className = 'h-5 w-5' }: { className?: string
 export function MobileCaptureScreen() {
   const navigate = useNavigate()
   const { id } = useParams()
+  const { setStage } = useDemoContext()
   const { properties, captureRequests } = useStore()
   const [mode, setMode] = useState<'intro' | 'recording' | 'checking' | 'submitted'>('intro')
+
+  const isDemo = id === 'laurel-balcony' || id === 'orchid-balcony' || id?.includes('laurel') || id?.includes('balcony') || !id
 
   // Find associated capture request or property
   const request = captureRequests.find(r => r.id === id || r.propertyId === id || r.status !== 'resolved') || captureRequests[0]
@@ -109,8 +115,10 @@ export function MobileCaptureScreen() {
   const [showHelpModal, setShowHelpModal] = useState(false)
   const [isPlayingCheck, setIsPlayingCheck] = useState(false)
 
-  const propertyTitle = property?.title || '8 Admiralty Way'
-  const propertyLocation = property?.address || 'Lekki, Lagos'
+  const propertyTitle = isDemo ? '2847 Laurel Canyon Rd, Unit 12A' : (property?.title || '8 Admiralty Way')
+  const propertyLocation = isDemo ? 'Austin, TX 78701' : (property?.address || 'Lekki, Lagos')
+  const propertyThumb = isDemo ? demoExterior : propAdmiraltyThumbImg
+  const targetPreviewImg = isDemo ? demoLiving : propLivingPreviewImg
 
   // Initialize camera and recording when entering 'recording' mode
   useEffect(() => {
@@ -190,6 +198,9 @@ export function MobileCaptureScreen() {
 
   const handleSubmitCapture = async () => {
     setMode('submitted')
+    if (isDemo) {
+      setStage(4)
+    }
     if (request) {
       if (recordedChunksRef.current.length > 0) {
         const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' })
@@ -251,7 +262,7 @@ export function MobileCaptureScreen() {
               {/* Property Header */}
               <div className="flex items-center gap-3.5 pt-1">
                 <img
-                  src={propAdmiraltyThumbImg}
+                  src={propertyThumb}
                   alt={propertyTitle}
                   className="h-12 w-16 rounded-xl object-cover shadow-xs shrink-0"
                 />
@@ -284,7 +295,7 @@ export function MobileCaptureScreen() {
               {/* Living Room Perspective Preview with Orange Reticle */}
               <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-xs bg-stone-100">
                 <img
-                  src={propLivingPreviewImg}
+                  src={targetPreviewImg}
                   alt="Balcony entrance target preview"
                   className="h-full w-full object-cover"
                 />
@@ -840,7 +851,7 @@ export function MobileCaptureScreen() {
               <div className="rounded-2xl border border-stone-200/80 bg-[#FDFDFD] p-4 space-y-3.5 shadow-xs">
                 <div className="flex items-center gap-3">
                   <img
-                    src={propAdmiraltyThumbImg}
+                    src={propertyThumb}
                     alt={propertyTitle}
                     className="h-11 w-14 rounded-lg object-cover shadow-xs shrink-0"
                   />
@@ -916,7 +927,7 @@ export function MobileCaptureScreen() {
             {/* Action Button */}
             <div className="space-y-2 pt-4">
               <button
-                onClick={() => navigate(property ? `/show/${property.id}` : '/properties')}
+                onClick={() => navigate(isDemo ? '/property/laurel-12a' : (property ? `/show/${property.id}` : '/properties'))}
                 className="w-full rounded-xl bg-[#0B1713] py-3.5 text-xs font-bold text-white hover:bg-black active:scale-[0.98] transition-all shadow-sm"
               >
                 Return to Property Overview →
