@@ -1,4 +1,4 @@
-﻿/**
+/**
  * DemoContext.tsx
  * Global demo state + toast system for OpenHouse demo video.
  *
@@ -43,8 +43,8 @@ export interface DemoNotification {
   read: boolean
 }
 
-const DEMO_PROPERTY_ID = 'orchid-1'
-const DEMO_PROPERTY_LABEL = 'Orchid Apartments, Unit 4'
+export const DEMO_PROPERTY_ID = 'laurel-12a'
+export const DEMO_PROPERTY_LABEL = '2847 Laurel Canyon Rd, Unit 12A'
 
 export const DEMO_SCRIPT: Record<DemoStage, {
   toast?: Omit<Toast, 'id'>

@@ -12,10 +12,30 @@ import { showBanner } from '../data/artwork'
 import { SkeletonShowHeader } from '../components/Skeleton'
 import { CopyIcon } from '../components/icons2'
 import { Ellipsis, CheckCircle } from '../components/icons'
+import { useDemoStage, DEMO_PROPERTY_ID } from '../context/DemoContext'
+
+import demoLiving   from '../assets/demo-living-room.jpg'
+import demoKitchen  from '../assets/demo-kitchen.jpg'
+import demoBed      from '../assets/demo-master-bedroom.jpg'
+import demoBalcony  from '../assets/demo-balcony.jpg'
+import demoBath     from '../assets/demo-bathroom.jpg'
+import demoExterior from '../assets/demo-exterior.jpg'
 
 const tabs = ['Overview', 'Evidence', 'Experience', 'Activity'] as const
 type TabType = (typeof tabs)[number]
 
+// Demo property rooms (US property with AI-generated images)
+const DEMO_ROOMS = [
+  { id: 'entrance',  name: 'Entry Foyer',      img: demoExterior },
+  { id: 'living',    name: 'Living Room',       img: demoLiving   },
+  { id: 'kitchen',   name: 'Kitchen',           img: demoKitchen  },
+  { id: 'main-bed',  name: 'Primary Bedroom',   img: demoBed      },
+  { id: 'bathroom',  name: 'Primary Bathroom',  img: demoBath     },
+  { id: 'bed-2',     name: 'Bedroom 2',         img: demoBed      },
+  { id: 'balcony',   name: 'Balcony Terrace',   img: demoBalcony  },
+]
+
+// Fallback rooms for non-demo properties
 const ROOM_LIST = [
   { id: 'entrance', name: 'Entrance', img: '/src/assets/prop-hero-waterfront.jpg' },
   { id: 'living', name: 'Living room', img: '/src/assets/prop-admiralty.jpg' },
@@ -28,6 +48,10 @@ const ROOM_LIST = [
 
 export function ShowOverviewScreen() {
   const { id } = useParams()
+  const demoStage = useDemoStage()
+  const isDemoProperty = id === DEMO_PROPERTY_ID || id === 'laurel-12a'
+  const roomList = isDemoProperty ? DEMO_ROOMS : ROOM_LIST
+
   const [tab, setTab] = useState<TabType>('Overview')
   const [show, setShow] = useState<Show | null>(null)
   const [, setCharacters] = useState<CharacterSummary[]>([])
@@ -53,8 +77,12 @@ export function ShowOverviewScreen() {
         if (!cancelled) {
           setShow({
             id: id,
-            title: id.includes('admiralty') ? '8 Admiralty Way' : id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-            premise: '3-bedroom apartment · Lekki, Lagos',
+            title: isDemoProperty
+              ? '2847 Laurel Canyon Rd, Unit 12A'
+              : id.includes('admiralty') ? '8 Admiralty Way' : id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            premise: isDemoProperty
+              ? '3-bed · 2-bath condo · Austin, TX 78701'
+              : '3-bedroom apartment · Lekki, Lagos',
             status: 'Preparing experience',
             created_at: '2026-08-25T10:00:00Z',
           } as any)
@@ -64,7 +92,7 @@ export function ShowOverviewScreen() {
     return () => {
       cancelled = true
     }
-  }, [id])
+  }, [id, isDemoProperty])
 
   if (loading) {
     return (
@@ -89,7 +117,18 @@ export function ShowOverviewScreen() {
     )
   }
 
-  const currentHeroImg = showBanner(show.title) || '/src/assets/prop-hero-waterfront.jpg'
+  const currentHeroImg = isDemoProperty ? demoLiving : (showBanner(show.title) || '/src/assets/prop-hero-waterfront.jpg')
+
+  // Stage-aware text helpers for demo property
+  const demoStatusLabel =
+    demoStage <= 1 ? 'Collecting listing data' :
+    demoStage === 2 ? 'Building experience' :
+    demoStage === 3 ? 'Capture required' :
+    demoStage === 4 ? 'Resuming build' :
+    demoStage >= 5 ? 'Ready for review' : 'Preparing experience'
+
+  const statusLabel = isDemoProperty ? demoStatusLabel : (tab === 'Experience' ? 'Ready for review' : 'Preparing experience')
+  const statusDot = isDemoProperty && demoStage === 3 ? 'bg-amber-400' : 'bg-success'
 
   return (
     <WorkspaceShell
@@ -130,8 +169,8 @@ export function ShowOverviewScreen() {
               <span className="font-mono text-[13px]">OH-00241</span>
               <span>·</span>
               <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-success" />
-                <span className="text-text-primary font-medium">{tab === 'Experience' ? 'Ready for review' : 'Preparing experience'}</span>
+                <span className={`h-2 w-2 rounded-full ${statusDot}`} />
+                <span className="text-text-primary font-medium">{statusLabel}</span>
               </div>
             </div>
           </div>
@@ -177,70 +216,123 @@ export function ShowOverviewScreen() {
                 <img src={currentHeroImg} alt={show.title} className="h-full w-full object-cover" />
               </div>
 
-              {/* Center Status Card */}
+              {/* Center Status Card — stage-aware for demo */}
               <div className="flex flex-col justify-between p-6 border-b lg:border-b-0 lg:border-r border-border bg-surface">
                 <div>
-                  <div className="flex items-center gap-1.5 pb-2">
-                    <span className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-success">
-                      OPENHOUSE IS WORKING
-                    </span>
-                    <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                  </div>
-                  <h2 className="text-[20px] font-bold text-text-primary leading-snug">
-                    Building the property experience
-                  </h2>
-                  <p className="pt-2 text-[13.5px] text-text-secondary leading-relaxed">
-                    The additional balcony capture passed its quality check. OpenHouse is now preparing the connected experience.
-                  </p>
+                  {/* Stage 3: capture warning */}
+                  {isDemoProperty && demoStage === 3 ? (
+                    <>
+                      <div className="flex items-center gap-1.5 pb-2">
+                        <span className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-amber-500">
+                          ACTION REQUIRED
+                        </span>
+                        <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+                      </div>
+                      <h2 className="text-[20px] font-bold text-text-primary leading-snug">
+                        Balcony capture missing
+                      </h2>
+                      <p className="pt-2 text-[13.5px] text-text-secondary leading-relaxed">
+                        Gemini detected a missing connection angle on the Balcony Terrace. A recapture guide has been sent to your agent.
+                      </p>
+                    </>
+                  ) : isDemoProperty && demoStage === 4 ? (
+                    <>
+                      <div className="flex items-center gap-1.5 pb-2">
+                        <span className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-success">
+                          RECAPTURE RECEIVED
+                        </span>
+                        <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                      </div>
+                      <h2 className="text-[20px] font-bold text-text-primary leading-snug">
+                        Resuming build
+                      </h2>
+                      <p className="pt-2 text-[13.5px] text-text-secondary leading-relaxed">
+                        Balcony footage received and verified. OpenHouse is now connecting the spaces and completing the experience.
+                      </p>
+                    </>
+                  ) : isDemoProperty && demoStage >= 5 ? (
+                    <>
+                      <div className="flex items-center gap-1.5 pb-2">
+                        <span className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-success">
+                          BUILD COMPLETE
+                        </span>
+                        <span className="h-2 w-2 rounded-full bg-success" />
+                      </div>
+                      <h2 className="text-[20px] font-bold text-text-primary leading-snug">
+                        Ready for your approval
+                      </h2>
+                      <p className="pt-2 text-[13.5px] text-text-secondary leading-relaxed">
+                        All 7 spaces captured and verified. The 3D experience is complete and awaiting your review before publishing.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-1.5 pb-2">
+                        <span className="text-[11.5px] font-bold uppercase tracking-[0.1em] text-success">
+                          OPENHOUSE IS WORKING
+                        </span>
+                        <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                      </div>
+                      <h2 className="text-[20px] font-bold text-text-primary leading-snug">
+                        Building the property experience
+                      </h2>
+                      <p className="pt-2 text-[13.5px] text-text-secondary leading-relaxed">
+                        {isDemoProperty
+                          ? 'Collecting and processing all spaces for 2847 Laurel Canyon Rd. Estimated 18–25 minutes.'
+                          : 'The additional balcony capture passed its quality check. OpenHouse is now preparing the connected experience.'}
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div className="pt-4">
-                  <p className="text-[13px] text-text-secondary">
-                    <span className="font-semibold text-text-primary">18–25 minutes</span> Estimated completion
-                  </p>
-                  <button
-                    onClick={() => setTab('Activity')}
-                    className="mt-3 inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2 text-[13.5px] font-semibold text-text-primary hover:bg-surface-elevated transition-colors"
-                  >
-                    View activity
-                  </button>
+                  {isDemoProperty && demoStage >= 5 ? (
+                    <a
+                      href="/#/approvals"
+                      className="mt-3 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-[13.5px] font-semibold text-text-inverse hover:bg-primary-hover transition-colors"
+                    >
+                      Go to Approvals
+                    </a>
+                  ) : (
+                    <>
+                      <p className="text-[13px] text-text-secondary">
+                        <span className="font-semibold text-text-primary">18–25 minutes</span> Estimated completion
+                      </p>
+                      <button
+                        onClick={() => setTab('Activity')}
+                        className="mt-3 inline-flex items-center justify-center rounded-lg border border-border bg-surface px-4 py-2 text-[13.5px] font-semibold text-text-primary hover:bg-surface-elevated transition-colors"
+                      >
+                        View activity
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
-              {/* Right Milestone Stepper */}
+              {/* Right Milestone Stepper — stage-aware */}
               <div className="p-6 flex flex-col justify-center bg-surface-elevated/40 text-[13.5px]">
                 <div className="space-y-3.5">
-                  <div className="flex items-center gap-2.5 text-text-secondary">
-                    <CheckCircle size={16} className="text-success shrink-0" />
-                    <span>Listing collected</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-text-secondary">
-                    <CheckCircle size={16} className="text-success shrink-0" />
-                    <span>Seven expected spaces identified</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-text-secondary">
-                    <CheckCircle size={16} className="text-success shrink-0" />
-                    <span>Balcony capture requested</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-text-secondary">
-                    <CheckCircle size={16} className="text-success shrink-0" />
-                    <span>New footage received</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 font-bold text-text-primary">
-                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-text-inverse text-[10px]">➔</span>
-                    <span>Building interactive experience</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-text-secondary/60 pl-6 text-[12.5px]">
-                    <span>In progress</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-text-secondary/60">
-                    <span className="h-4 w-4 rounded-full border border-border shrink-0" />
-                    <span>Checking the finished experience</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-text-secondary/60">
-                    <span className="h-4 w-4 rounded-full border border-border shrink-0" />
-                    <span>Ready for your approval</span>
-                  </div>
+                  {[
+                    { label: 'Listing collected', done: true },
+                    { label: 'Spaces identified', done: demoStage >= 2 || !isDemoProperty },
+                    { label: 'Balcony capture requested', done: demoStage >= 3 || !isDemoProperty },
+                    { label: 'New footage received', done: demoStage >= 4 || !isDemoProperty },
+                    { label: 'Building interactive experience', done: demoStage >= 5 || !isDemoProperty, active: isDemoProperty && (demoStage === 2 || demoStage === 4) },
+                    { label: 'Checking the finished experience', done: demoStage >= 5 || !isDemoProperty },
+                    { label: 'Ready for your approval', done: demoStage >= 5 || !isDemoProperty },
+                  ].map((step, i) => (
+                    <div key={i} className={`flex items-center gap-2.5 ${step.done ? 'text-text-secondary' : step.active ? 'font-bold text-text-primary' : 'text-text-secondary/50'}`}>
+                      {step.done ? (
+                        <CheckCircle size={16} className="text-success shrink-0" />
+                      ) : step.active ? (
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-text-inverse text-[10px] shrink-0">→</span>
+                      ) : (
+                        <span className="h-4 w-4 rounded-full border border-border shrink-0" />
+                      )}
+                      <span>{step.label}</span>
+                      {step.active && <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -253,7 +345,7 @@ export function ShowOverviewScreen() {
                   <h3 className="text-[15px] font-bold text-text-primary mb-4">Reconstruction status</h3>
                   <div className="aspect-[4/3] rounded-xl overflow-hidden bg-sidebar relative border border-border">
                     <img
-                      src="/src/assets/prop-kitchen.png"
+                      src={isDemoProperty ? demoKitchen : '/src/assets/prop-kitchen.png'}
                       alt="Reconstruction wireframe"
                       className="h-full w-full object-cover opacity-80"
                     />
@@ -282,7 +374,7 @@ export function ShowOverviewScreen() {
                 </div>
 
                 <div className="divide-y divide-border/60 text-[13px]">
-                  {ROOM_LIST.slice(0, 5).map((room) => (
+                  {roomList.slice(0, 5).map((room) => (
                     <div key={room.id} className="py-2.5 flex items-center justify-between gap-2">
                       <span className="font-medium text-text-primary truncate">{room.name}</span>
                       <div className="flex items-center gap-2 shrink-0">
@@ -360,18 +452,18 @@ export function ShowOverviewScreen() {
               <div className="space-y-4">
                 <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-sidebar border border-border shadow-card">
                   <img
-                    src={ROOM_LIST.find(r => r.id === activeRoom)?.img || currentHeroImg}
+                    src={roomList.find(r => r.id === activeRoom)?.img || currentHeroImg}
                     alt={activeRoom}
                     className="h-full w-full object-cover"
                   />
                   {/* Top-Left HUD Badge */}
                   <div className="absolute top-4 left-4 rounded-md bg-black/65 backdrop-blur-md px-3 py-1.5 text-white border border-white/10 text-[11px] font-bold tracking-wider uppercase">
-                    {ROOM_LIST.find(r => r.id === activeRoom)?.name} / 01
+                    {roomList.find(r => r.id === activeRoom)?.name} / 01
                   </div>
 
                   {/* Bottom-Left Room HUD Overlay */}
                   <div className="absolute bottom-4 left-4 right-20 sm:right-auto rounded-xl bg-black/65 backdrop-blur-md p-4 text-white border border-white/10 max-w-sm">
-                    <p className="text-[16px] font-bold leading-tight">{ROOM_LIST.find(r => r.id === activeRoom)?.name}</p>
+                    <p className="text-[16px] font-bold leading-tight">{roomList.find(r => r.id === activeRoom)?.name}</p>
                     <p className="text-[12.5px] text-white/80 mt-1 leading-snug">
                       Connected to the entrance hall, kitchen and balcony.
                     </p>
@@ -393,7 +485,7 @@ export function ShowOverviewScreen() {
 
                 {/* Room Selector Strip Carousel */}
                 <div className="flex items-center gap-3 overflow-x-auto pb-2">
-                  {ROOM_LIST.map((room) => (
+                  {roomList.map((room) => (
                     <button
                       key={room.id}
                       onClick={() => setActiveRoom(room.id)}
@@ -534,7 +626,7 @@ export function ShowOverviewScreen() {
         {/* TAB 3: EVIDENCE */}
         {tab === 'Evidence' && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {ROOM_LIST.map((room) => (
+            {roomList.map((room) => (
               <div key={room.id} className="rounded-2xl border border-border bg-surface overflow-hidden shadow-subtle">
                 <img src={room.img} alt={room.name} className="aspect-[16/10] w-full object-cover" />
                 <div className="p-5">
