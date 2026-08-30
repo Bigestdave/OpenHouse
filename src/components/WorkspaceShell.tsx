@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import {
   GridIcon,
@@ -13,7 +13,25 @@ import {
   PlusIcon,
 } from './icons2'
 import { ArrowLeft, ChevronDown } from './icons'
-import { getRecentEvents, type WorkflowEventItem } from '../data/api'
+import { getRecentEvents, getShows, type WorkflowEventItem } from '../data/api'
+
+function prettyEventType(t?: string): string {
+  if (!t) return 'Event'
+  return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase().replace(/_/g, ' ')
+}
+
+function eventTimeAgo(iso?: string | null): string {
+  if (!iso) return ''
+  const then = new Date(iso.replace(' ', 'T') + (iso.includes('Z') ? '' : 'Z')).getTime()
+  if (Number.isNaN(then)) return ''
+  const mins = Math.max(0, Math.round((Date.now() - then) / 60000))
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hours = Math.round(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.round(hours / 24)}d ago`
+}
+
 import logoMarkUrl from '../assets/logo-mark.png'
 
 export function OpenHouseLogoMark({ className = 'h-6 w-6' }: { className?: string }) {
@@ -46,24 +64,24 @@ export function NotificationButton() {
               .finally(() => setEventsLoading(false))
           }
         }}
-        className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-ink-2 transition-all hover:border-line-strong hover:bg-surface-elevated hover:text-ink shadow-subtle"
+        className="relative flex h-11 w-11 items-center justify-center rounded-[12px] border border-border bg-surface text-text-secondary transition-all hover:border-line-strong hover:bg-surface-elevated hover:text-text-primary shadow-subtle"
         aria-label="Notifications"
       >
-        <BellIcon size={17} />
+        <BellIcon />
         <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-accent" />
       </button>
 
       {showNotifications && (
-        <div className="absolute right-0 top-full mt-3 w-[360px] rounded-2xl border border-border bg-surface shadow-overlay z-50 overflow-hidden font-sans">
+        <div className="absolute right-0 top-full mt-3 w-[360px] rounded-2xl border border-border bg-surface shadow-overlay z-50 overflow-hidden">
           <div className="flex items-center justify-between border-b border-border p-4 bg-surface-elevated">
-            <span className="font-bold text-ink text-[15px]">Property Notifications</span>
+            <span className="font-bold text-text-primary text-[15px]">Property Notifications</span>
           </div>
           <div className="max-h-[380px] overflow-y-auto divide-y divide-border/60">
             {eventsLoading && (
-              <div className="p-6 text-center text-[13.5px] text-ink-2">Loading updates…</div>
+              <div className="p-6 text-center text-[13.5px] text-text-secondary">Loading updates…</div>
             )}
             {!eventsLoading && events.length === 0 && (
-              <div className="p-6 text-center text-[13.5px] text-ink-2">
+              <div className="p-6 text-center text-[13.5px] text-text-secondary">
                 No notifications yet — property events will appear here.
               </div>
             )}
@@ -76,10 +94,11 @@ export function NotificationButton() {
                     }`}
                   />
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-semibold text-ink leading-tight">{e.event_type}</h3>
+                    <h3 className="text-[14px] font-semibold text-text-primary">{prettyEventType(e.event_type)}</h3>
                     {typeof e.payload?.message === 'string' && (
-                      <p className="text-[13px] text-ink-2 mt-0.5 leading-snug">{e.payload.message}</p>
+                      <p className="text-[13px] text-text-secondary mt-0.5 leading-snug">{e.payload.message}</p>
                     )}
+                    <span className="text-[11.5px] text-text-secondary/80 block mt-1.5">{eventTimeAgo(e.created_at)}</span>
                   </div>
                 </div>
               ))}
@@ -91,9 +110,9 @@ export function NotificationButton() {
 }
 
 const workspaceNav = [
-  { label: 'Properties', icon: GridIcon, to: '/properties' },
+  { label: 'Properties', icon: GridIcon, to: '/shows' },
   { label: 'Capture requests', icon: CaptureRequestsIcon, to: '/capture-requests' },
-  { label: 'Experiences', icon: CubeIcon, to: '/experiences' },
+  { label: 'Experiences', icon: CubeIcon, to: '/productions' },
   { label: 'Approvals', icon: ApprovalsIcon, to: '/approvals' },
   { label: 'Activity', icon: ActivityIcon, to: '/activity' },
 ]
@@ -108,46 +127,49 @@ interface WorkspaceShellProps {
   children: ReactNode
   breadcrumb?: ReactNode
   backTo?: string
-  actions?: ReactNode
 }
 
-export function WorkspaceShell({ children, breadcrumb, backTo, actions }: WorkspaceShellProps) {
-  const [userName, setUserName] = useState(() => localStorage.getItem('openhouse.userName') || 'David Olabowale')
-  const userEmail = localStorage.getItem('openhouse.userEmail') || 'kiki@citcable.dev'
+export function WorkspaceShell({ children, breadcrumb, backTo = '/shows' }: WorkspaceShellProps) {
+  const [userName, setUserName] = useState(() => localStorage.getItem('openhouse.userName') || 'Kiki Casa')
+  const userEmail = localStorage.getItem('openhouse.userEmail') || 'kiki@citeable.dev'
+
+  useEffect(() => {
+    getShows()
+      .catch(() => {
+        /* offline */
+      })
+  }, [])
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-canvas font-sans text-ink">
+    <div className="flex h-screen w-screen overflow-hidden bg-canvas font-sans text-text-primary">
       {/* Sleek Deep Green-Black Sidebar */}
-      <aside className="flex w-[240px] xl:w-[250px] shrink-0 flex-col bg-sidebar border-r border-border-dark select-none h-full z-20 transition-all">
+      <aside className="flex w-[248px] xl:w-[260px] shrink-0 flex-col bg-sidebar border-r border-border-dark select-none h-full z-20 transition-all">
         {/* Brand Header */}
-        <div className="px-4 pt-5 pb-3 flex items-center justify-between">
-          <Link to="/properties" className="flex items-center gap-2.5 group">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sidebar-active border border-border-dark shadow-subtle group-hover:border-accent/50 transition-colors">
-              <OpenHouseLogoMark className="h-4 w-4" />
+        <div className="px-4 pt-5 pb-3">
+          <Link to="/shows" className="flex items-center gap-2.5 group">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sidebar-active border border-border-dark shadow-subtle group-hover:border-accent/50 transition-colors">
+              <OpenHouseLogoMark className="h-4.5 w-4.5" />
             </div>
-            <span className="text-[17px] font-extrabold tracking-tight text-text-inverse leading-none">
+            <span className="text-[18px] font-extrabold tracking-tight text-text-inverse leading-none">
               OpenHouse
             </span>
           </Link>
-          <button className="text-text-inverse-muted/60 hover:text-text-inverse p-1 rounded transition-colors text-xs font-mono">
-            &lt;
-          </button>
         </div>
 
-        {/* Top + Add Property Button CTA (White background as in original design) */}
-        <div className="px-3.5 pb-4 pt-1">
+        {/* Top + Add Property Button CTA */}
+        <div className="px-3.5 pb-3">
           <Link
             to="/create-show"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white hover:bg-stone-100 px-3.5 py-2.5 text-[13.5px] font-bold text-ink shadow-subtle transition-all duration-150 active:scale-[0.98] whitespace-nowrap"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-surface px-3.5 py-2 text-[13.5px] font-semibold text-text-primary shadow-subtle transition-all duration-200 hover:bg-surface-elevated hover:shadow-card active:translate-y-0 whitespace-nowrap"
           >
-            <PlusIcon size={14} strokeWidth={2.5} className="text-ink" />
-            <span>+ Add property</span>
+            <PlusIcon size={14} strokeWidth={2} />
+            <span>Add property</span>
           </Link>
         </div>
 
         {/* WORKSPACE Navigation Section */}
         <div className="pt-1">
-          <p className="px-4 pb-1.5 text-[10.5px] font-bold tracking-[0.12em] text-text-inverse-muted/50 uppercase">
+          <p className="px-4 pb-1.5 text-[10.5px] font-bold tracking-[0.12em] text-text-inverse-muted/60 uppercase">
             WORKSPACE
           </p>
           <nav className="flex flex-col gap-0.5 px-2.5">
@@ -156,9 +178,9 @@ export function WorkspaceShell({ children, breadcrumb, backTo, actions }: Worksp
                 key={label}
                 to={to}
                 className={({ isActive }) =>
-                  `group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13.5px] font-semibold transition-all duration-150 whitespace-nowrap ${
+                  `group relative flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13.5px] font-semibold transition-all duration-150 whitespace-nowrap ${
                     isActive
-                      ? 'bg-sidebar-active text-text-inverse border border-border-dark/60 shadow-sm'
+                      ? 'bg-sidebar-active text-text-inverse border border-border-dark shadow-sm'
                       : 'text-text-inverse-muted hover:bg-sidebar-active/50 hover:text-text-inverse'
                   }`
                 }
@@ -166,7 +188,7 @@ export function WorkspaceShell({ children, breadcrumb, backTo, actions }: Worksp
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <span className="absolute left-1 h-3.5 w-[2.5px] rounded-full bg-accent" />
+                      <span className="absolute left-1 h-3 w-[2.5px] rounded-full bg-accent" />
                     )}
                     <Icon
                       size={16}
@@ -183,8 +205,8 @@ export function WorkspaceShell({ children, breadcrumb, backTo, actions }: Worksp
         </div>
 
         {/* ACCOUNT Navigation Section */}
-        <div className="pt-5">
-          <p className="px-4 pb-1.5 text-[10.5px] font-bold tracking-[0.12em] text-text-inverse-muted/50 uppercase">
+        <div className="pt-4">
+          <p className="px-4 pb-1.5 text-[10.5px] font-bold tracking-[0.12em] text-text-inverse-muted/60 uppercase">
             ACCOUNT
           </p>
           <nav className="flex flex-col gap-0.5 px-2.5">
@@ -195,7 +217,7 @@ export function WorkspaceShell({ children, breadcrumb, backTo, actions }: Worksp
                 className={({ isActive }) =>
                   `group relative flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13.5px] font-medium transition-all duration-150 whitespace-nowrap ${
                     isActive
-                      ? 'bg-sidebar-active text-text-inverse border border-border-dark/60 shadow-sm'
+                      ? 'bg-sidebar-active text-text-inverse border border-border-dark shadow-sm'
                       : 'text-text-inverse-muted hover:bg-sidebar-active/50 hover:text-text-inverse'
                   }`
                 }
@@ -246,29 +268,22 @@ export function WorkspaceShell({ children, breadcrumb, backTo, actions }: Worksp
         </div>
       </aside>
 
-      {/* Main Workspace (Warm Limestone) */}
+      {/* Main Workspace (Warm Limestone) - Dedicated Clean Scroll Container */}
       <div className="flex min-w-0 flex-1 flex-col overflow-y-auto h-full bg-canvas">
         {/* Render Slim Breadcrumb Bar ONLY on Subpages with backTo/breadcrumb */}
         {breadcrumb && (
-          <div className="flex h-14 shrink-0 items-center justify-between px-6 lg:px-10 border-b border-border/60 bg-canvas sticky top-0 z-10">
+          <div className="flex h-13 shrink-0 items-center justify-between px-6 lg:px-10 border-b border-border/60 bg-canvas sticky top-0 z-10">
             <div className="flex items-center gap-2.5 min-w-0">
-              {backTo && (
-                <Link
-                  to={backTo}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface text-ink-2 transition-all hover:bg-surface-elevated hover:text-ink shadow-subtle shrink-0"
-                  aria-label="Back"
-                >
-                  <ArrowLeft size={16} />
-                </Link>
-              )}
-              <div className="text-[14px] font-semibold text-ink truncate flex items-center gap-2">
-                {breadcrumb}
-              </div>
+              <Link
+                to={backTo}
+                className="flex h-7.5 w-7.5 items-center justify-center rounded-lg border border-border bg-surface text-text-secondary transition-all hover:bg-surface-elevated hover:text-text-primary shadow-subtle shrink-0"
+                aria-label="Back"
+              >
+                <ArrowLeft size={16} />
+              </Link>
+              <div className="text-[14px] font-semibold text-text-primary truncate">{breadcrumb}</div>
             </div>
-            <div className="flex items-center gap-3">
-              {actions}
-              <NotificationButton />
-            </div>
+            <NotificationButton />
           </div>
         )}
 
