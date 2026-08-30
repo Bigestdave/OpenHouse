@@ -144,10 +144,10 @@ export function ApprovalsScreen() {
         {/* ── Top Header ─────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <h1 className="text-[28px] sm:text-[32px] font-bold tracking-tight text-ink leading-tight">
+            <h1 className="text-[28px] sm:text-[32px] lg:text-[34px] font-extrabold tracking-tight text-text-primary leading-tight">
               Approvals
             </h1>
-            <p className="text-[14px] text-ink-2 mt-1 font-normal">
+            <p className="text-[14px] text-text-secondary mt-1 font-normal">
               Review completed experiences before they go live.
             </p>
           </div>
