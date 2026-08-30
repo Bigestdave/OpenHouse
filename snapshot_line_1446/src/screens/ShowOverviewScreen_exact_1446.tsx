@@ -57,7 +57,7 @@ export function ShowOverviewScreen() {
             premise: '3-bedroom apartment · Lekki, Lagos',
             status: 'Preparing experience',
             created_at: '2026-08-25T10:00:00Z',
-          } as any)
+          })
           setLoading(false)
         }
       })
