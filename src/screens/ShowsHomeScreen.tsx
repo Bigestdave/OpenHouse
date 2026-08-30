@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { SearchIcon, ClockIcon, CameraIcon } from '../components/icons2'
 import { Ellipsis } from '../components/icons'
-import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
 import propOrchidImg from '../assets/prop-orchid.jpg'
 import propLekkiImg from '../assets/prop-lekkigardens.jpg'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
+import demoLiving from '../assets/demo-living-room.jpg'
 
 const filterOptions = ['All', 'Preparing', 'Needs attention', 'Ready', 'Live'] as const
 type FilterType = (typeof filterOptions)[number]
@@ -74,13 +74,13 @@ export function ShowsHomeScreen() {
               {/* Left Photo */}
               <div className="relative aspect-[16/10] lg:aspect-auto lg:col-span-6 min-h-[260px] overflow-hidden bg-sidebar">
                 <img
-                  src={propAdmiraltyImg}
-                  alt="8 Admiralty Way"
+                  src={demoLiving}
+                  alt="2847 Laurel Canyon Rd, Unit 12A"
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute bottom-3.5 left-3.5 rounded-lg bg-black/75 backdrop-blur-md px-3.5 py-2 text-white border border-white/10 shadow-lg">
-                  <p className="text-[13.5px] font-bold leading-tight">8 Admiralty Way</p>
-                  <p className="text-[11.5px] text-white/80 font-normal mt-0.5">Lekki, Lagos</p>
+                  <p className="text-[13.5px] font-bold leading-tight">2847 Laurel Canyon Rd, Unit 12A</p>
+                  <p className="text-[11.5px] text-white/80 font-normal mt-0.5">Austin, TX 78701</p>
                 </div>
               </div>
 
@@ -90,15 +90,15 @@ export function ShowsHomeScreen() {
                   <div className="flex items-center gap-2 pb-2">
                     <span className="h-2 w-2 rounded-full bg-[#D97945]" />
                     <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#D97945]">
-                      CAPTURE NEEDED
+                      CAPTURE NEEDED · GEMINI SPATIAL CHECK
                     </span>
                   </div>
 
                   <h3 className="text-[21px] font-bold tracking-tight text-ink leading-snug">
-                    One balcony connection is missing.
+                    Balcony terrace connection missing.
                   </h3>
                   <p className="pt-2 text-[13.5px] text-ink-2 leading-relaxed">
-                    OpenHouse needs a slow 15-second capture from the living room through the balcony doorway.
+                    OpenHouse detected an unbridged exterior threshold. A 15-second mobile capture from living room through balcony doors is required.
                   </p>
                 </div>
 
@@ -106,11 +106,11 @@ export function ShowsHomeScreen() {
                   <div className="flex items-center gap-5 text-[12.5px] text-ink-2 pb-2.5">
                     <div className="flex items-center gap-1.5">
                       <ClockIcon size={14} className="text-ink-3" />
-                      <span>Estimated time · <strong className="font-semibold text-ink">1 minute</strong></span>
+                      <span>Estimated time · <strong className="font-semibold text-ink">15 seconds</strong></span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <CameraIcon size={14} className="text-ink-3" />
-                      <span>6 of 7 spaces sufficiently captured</span>
+                      <span>6 of 7 spaces captured</span>
                     </div>
                   </div>
 
@@ -128,13 +128,13 @@ export function ShowsHomeScreen() {
 
                 <div className="flex items-center gap-3 pt-2">
                   <Link
-                    to="/capture/prop-01"
+                    to="/capture/laurel-balcony"
                     className="rounded-lg bg-[#17231E] hover:bg-black px-5 py-2.5 text-[13.5px] font-bold text-white shadow-subtle transition-colors"
                   >
                     Record now
                   </Link>
                   <Link
-                    to="/property/prop-01"
+                    to="/property/laurel-12a"
                     className="rounded-lg border border-border bg-surface hover:bg-raised-2 px-5 py-2.5 text-[13.5px] font-semibold text-ink transition-colors"
                   >
                     See why
