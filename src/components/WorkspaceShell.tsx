@@ -112,8 +112,8 @@ interface WorkspaceShellProps {
 }
 
 export function WorkspaceShell({ children, breadcrumb, backTo, actions }: WorkspaceShellProps) {
-  const [userName, setUserName] = useState(() => localStorage.getItem('openhouse.userName') || 'Kiki Casa')
-  const userEmail = localStorage.getItem('openhouse.userEmail') || 'kiki@openhouse.com'
+  const [userName, setUserName] = useState(() => localStorage.getItem('openhouse.userName') || 'David Olabowale')
+  const userEmail = localStorage.getItem('openhouse.userEmail') || 'kiki@citcable.dev'
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-canvas font-sans text-ink">
@@ -134,14 +134,14 @@ export function WorkspaceShell({ children, breadcrumb, backTo, actions }: Worksp
           </button>
         </div>
 
-        {/* Top + Add Property Button CTA */}
+        {/* Top + Add Property Button CTA (White background as in original design) */}
         <div className="px-3.5 pb-4 pt-1">
           <Link
-            to="/add-property"
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#194534] hover:bg-[#123A2B] px-3.5 py-2.5 text-[13.5px] font-bold text-white shadow-subtle transition-all duration-200 active:translate-y-0 whitespace-nowrap"
+            to="/create-show"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white hover:bg-stone-100 px-3.5 py-2.5 text-[13.5px] font-bold text-ink shadow-subtle transition-all duration-150 active:scale-[0.98] whitespace-nowrap"
           >
-            <PlusIcon size={14} strokeWidth={2.5} />
-            <span>Add property</span>
+            <PlusIcon size={14} strokeWidth={2.5} className="text-ink" />
+            <span>+ Add property</span>
           </Link>
         </div>
 
