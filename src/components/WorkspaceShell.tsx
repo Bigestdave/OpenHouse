@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink, Link, useNavigate } from 'react-router-dom'
 import {
   GridIcon,
   CaptureRequestsIcon,
@@ -13,24 +13,8 @@ import {
   PlusIcon,
 } from './icons2'
 import { ArrowLeft, ChevronDown } from './icons'
-import { getRecentEvents, getShows, type WorkflowEventItem } from '../data/api'
-
-function prettyEventType(t?: string): string {
-  if (!t) return 'Event'
-  return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase().replace(/_/g, ' ')
-}
-
-function eventTimeAgo(iso?: string | null): string {
-  if (!iso) return ''
-  const then = new Date(iso.replace(' ', 'T') + (iso.includes('Z') ? '' : 'Z')).getTime()
-  if (Number.isNaN(then)) return ''
-  const mins = Math.max(0, Math.round((Date.now() - then) / 60000))
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.round(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.round(hours / 24)}d ago`
-}
+import { getShows } from '../data/api'
+import { useDemoContext, type DemoNotification } from '../context/DemoContext'
 
 import logoMarkUrl from '../assets/logo-mark.png'
 
@@ -47,8 +31,7 @@ export function OpenHouseLogoMark({ className = 'h-6 w-6' }: { className?: strin
 /** Reusable Header Notification Button & Popover */
 export function NotificationButton() {
   const [showNotifications, setShowNotifications] = useState(false)
-  const [events, setEvents] = useState<WorkflowEventItem[]>([])
-  const [eventsLoading, setEventsLoading] = useState(false)
+  const { notifications, unreadCount, markAllRead } = useDemoContext()
 
   return (
     <div className="relative">
@@ -56,54 +39,67 @@ export function NotificationButton() {
         onClick={() => {
           const next = !showNotifications
           setShowNotifications(next)
-          if (next) {
-            setEventsLoading(true)
-            getRecentEvents()
-              .then(setEvents)
-              .catch(() => setEvents([]))
-              .finally(() => setEventsLoading(false))
-          }
+          if (next) markAllRead()
         }}
         className="relative flex h-11 w-11 items-center justify-center rounded-[12px] border border-border bg-surface text-text-secondary transition-all hover:border-line-strong hover:bg-surface-elevated hover:text-text-primary shadow-subtle"
         aria-label="Notifications"
       >
         <BellIcon />
-        <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-accent" />
+        {unreadCount > 0 && (
+          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-accent animate-pulse" />
+        )}
+        {unreadCount === 0 && (
+          <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-accent opacity-40" />
+        )}
       </button>
 
       {showNotifications && (
-        <div className="absolute right-0 top-full mt-3 w-[360px] rounded-2xl border border-border bg-surface shadow-overlay z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-3 w-[380px] rounded-2xl border border-border bg-surface shadow-overlay z-50 overflow-hidden">
           <div className="flex items-center justify-between border-b border-border p-4 bg-surface-elevated">
-            <span className="font-bold text-text-primary text-[15px]">Property Notifications</span>
-          </div>
-          <div className="max-h-[380px] overflow-y-auto divide-y divide-border/60">
-            {eventsLoading && (
-              <div className="p-6 text-center text-[13.5px] text-text-secondary">Loading updates…</div>
+            <span className="font-bold text-text-primary text-[15px]">Notifications</span>
+            {notifications.length > 0 && (
+              <span className="text-[11px] text-text-secondary font-medium">{notifications.length} update{notifications.length !== 1 ? 's' : ''}</span>
             )}
-            {!eventsLoading && events.length === 0 && (
+          </div>
+          <div className="max-h-[420px] overflow-y-auto divide-y divide-border/60">
+            {notifications.length === 0 && (
               <div className="p-6 text-center text-[13.5px] text-text-secondary">
                 No notifications yet — property events will appear here.
               </div>
             )}
-            {!eventsLoading &&
-              events.map((e) => (
-                <div key={e.id} className="p-4 flex items-start gap-3 hover:bg-surface-elevated transition-colors">
-                  <span
-                    className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                      e.severity === 'error' ? 'bg-danger' : e.severity === 'warning' ? 'bg-accent' : 'bg-success'
-                    }`}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-semibold text-text-primary">{prettyEventType(e.event_type)}</h3>
-                    {typeof e.payload?.message === 'string' && (
-                      <p className="text-[13px] text-text-secondary mt-0.5 leading-snug">{e.payload.message}</p>
-                    )}
-                    <span className="text-[11.5px] text-text-secondary/80 block mt-1.5">{eventTimeAgo(e.created_at)}</span>
-                  </div>
-                </div>
-              ))}
+            {notifications.map((n) => (
+              <NotificationRow key={n.id} notification={n} onClose={() => setShowNotifications(false)} />
+            ))}
           </div>
         </div>
+      )}
+    </div>
+  )
+}
+
+function NotificationRow({ notification: n, onClose }: { notification: DemoNotification; onClose: () => void }) {
+  const navigate = useNavigate()
+  const dotColor =
+    n.kind === 'warning' ? 'bg-amber-400' :
+    n.kind === 'success' ? 'bg-success' :
+    n.kind === 'error' ? 'bg-danger' : 'bg-accent'
+  const timeParts = n.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+  return (
+    <div
+      onClick={() => { if (n.route) { navigate(n.route); onClose() } }}
+      className={`p-4 flex items-start gap-3 transition-colors ${n.route ? 'cursor-pointer hover:bg-surface-elevated' : ''}`}
+    >
+      <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${dotColor} ${!n.read ? 'opacity-100' : 'opacity-40'}`} />
+      <div className="flex-1 min-w-0">
+        <h3 className="text-[13.5px] font-semibold text-text-primary">{n.title}</h3>
+        <p className="text-[12.5px] text-text-secondary mt-0.5 leading-snug">{n.body}</p>
+        <span className="text-[11px] text-text-secondary/70 block mt-1.5">{timeParts}</span>
+      </div>
+      {n.route && (
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-text-secondary shrink-0 mt-1">
+          <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
       )}
     </div>
   )

@@ -21,10 +21,16 @@ import { CreateShowBasicsScreen } from './screens/CreateShowBasicsScreen'
 import { CreateShowStyleScreen } from './screens/CreateShowStyleScreen'
 import { CreateShowCharactersScreen } from './screens/CreateShowCharactersScreen'
 import { AuthGate } from './components/AuthGate'
+import { DemoProvider } from './context/DemoContext'
+import { DemoToaster } from './components/DemoToaster'
+import { DemoControlBar } from './components/DemoControlBar'
 
 export default function App() {
   return (
     <HashRouter>
+      <DemoProvider>
+        <DemoToaster />
+        <DemoControlBar />
       <Routes>
         {/* Public Landing Page */}
         <Route path="/" element={<LandingScreen />} />
@@ -92,6 +98,7 @@ export default function App() {
         {/* Catch-all redirect */}
         <Route path="*" element={<Navigate to="/properties" replace />} />
       </Routes>
+      </DemoProvider>
     </HashRouter>
   )
 }
