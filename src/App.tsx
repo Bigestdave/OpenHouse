@@ -54,7 +54,7 @@ export default function App() {
         <Route path="/create-show" element={<AuthGate><CreateShowBasicsScreen /></AuthGate>} />
         <Route path="/create-show/basics" element={<AuthGate><CreateShowBasicsScreen /></AuthGate>} />
         <Route path="/create-show/style" element={<AuthGate><CreateShowStyleScreen /></AuthGate>} />
-        <Route path="/create-show/capture" element={<AuthGate><CreateShowStyleScreen /></AuthGate>} />
+        <Route path="/create-show/capture" element={<AuthGate><CreateShowCharactersScreen /></AuthGate>} />
         <Route path="/create-show/characters" element={<AuthGate><CreateShowCharactersScreen /></AuthGate>} />
         <Route path="/create-show/publish" element={<AuthGate><CreateShowCharactersScreen /></AuthGate>} />
         <Route path="/create-show/spaces" element={<AuthGate><CreateShowCharactersScreen /></AuthGate>} />

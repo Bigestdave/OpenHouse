@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { SearchIcon, PlusIcon, LightBulbIcon } from '../components/icons2'
+import { useStore } from '../data/store'
 
 import propOrchid from '../assets/prop-orchid.jpg'
 import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
@@ -71,10 +72,37 @@ const filterTabs = ['Open', 'Awaiting capture', 'Received', 'Checking', 'Resolve
 type FilterTab = (typeof filterTabs)[number]
 
 export function CaptureRequestsScreen() {
+  const { captureRequests, properties } = useStore()
   const [filter, setFilter] = useState<FilterTab>('Open')
   const [query, setQuery] = useState('')
 
-  const visibleRequests = REQUESTS_DATA.filter((r) => {
+  const requestData = captureRequests.length
+    ? captureRequests.map((request) => {
+        const property = properties.find((item) => item.id === request.propertyId)
+        const normalizedStatus =
+          request.status === 'resolved'
+            ? 'Resolved'
+            : request.status === 'received'
+            ? 'Footage received'
+            : request.status === 'checking'
+            ? 'Checking'
+            : 'Awaiting capture'
+
+        return {
+          id: request.id,
+          propertyTitle: request.propertyTitle,
+          propertyLocation: property?.address || 'Location unavailable',
+          propertyImg: property?.coverImage || demoBalcony,
+          captureNeeded: request.room,
+          recipient: request.recipientName,
+          status: normalizedStatus as CaptureRequestItem['status'],
+          updated: new Date(request.updatedAt).toLocaleString(),
+          actionLabel: normalizedStatus === 'Resolved' ? 'View history' : 'View request',
+        }
+      })
+    : REQUESTS_DATA
+
+  const visibleRequests = requestData.filter((r) => {
     if (query && !r.propertyTitle.toLowerCase().includes(query.toLowerCase()) && !r.captureNeeded.toLowerCase().includes(query.toLowerCase())) {
       return false
     }
@@ -85,6 +113,10 @@ export function CaptureRequestsScreen() {
     if (filter === 'Resolved') return r.status === 'Resolved'
     return true
   })
+
+  const awaitingCount = requestData.filter((item) => item.status === 'Awaiting capture').length
+  const receivedCount = requestData.filter((item) => item.status === 'Footage received').length
+  const resolvedCount = requestData.filter((item) => item.status === 'Resolved').length
 
   return (
     <WorkspaceShell>
@@ -123,7 +155,7 @@ export function CaptureRequestsScreen() {
 
         {/* Counter Subheading */}
         <p className="text-[13px] text-text-secondary font-medium whitespace-nowrap">
-          <strong className="text-text-primary">2</strong> awaiting capture · <strong className="text-text-primary">1</strong> received · <strong className="text-text-primary">6</strong> resolved this month
+        <strong className="text-text-primary">{awaitingCount}</strong> awaiting capture · <strong className="text-text-primary">{receivedCount}</strong> received · <strong className="text-text-primary">{resolvedCount}</strong> resolved
         </p>
 
         {/* Filter Pills */}

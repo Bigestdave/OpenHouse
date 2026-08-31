@@ -3,20 +3,22 @@ import { Link, useParams } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { CopyIcon, PersonIcon, MailIcon, ClockIcon, LinkIcon } from '../components/icons2'
 import { Ellipsis, CheckCircle } from '../components/icons'
+import { useStore } from '../data/store'
 import demoBalcony from '../assets/demo-balcony.jpg'
 import propKitchen from '../assets/prop-kitchen.png'
 
 export function CaptureRequestDetailScreen() {
   const { id } = useParams()
+  const { captureRequests, properties } = useStore()
   const [copied, setCopied] = useState(false)
 
-  const isDemo = id === 'homestead-pool' || id?.includes('homestead') || id?.includes('pool') || !id || id === '1'
-
-  const propTitle = isDemo ? '72691 Homestead Road, Palm Desert' : '14 Cooper Road'
-  const propLocation = isDemo ? 'Palm Desert, CA' : 'Ikoyi, Lagos'
-  const captureTitle = isDemo ? 'Pool-to-guest house connection' : 'Kitchen-to-dining connection'
-  const captureImg = isDemo ? demoBalcony : propKitchen
-  const captureRouteId = isDemo ? 'homestead-pool' : '14-cooper'
+  const request = captureRequests.find((item) => item.id === id || item.propertyId === id) || captureRequests[0]
+  const property = properties.find((item) => item.id === request?.propertyId)
+  const propTitle = request?.propertyTitle || '72691 Homestead Road, Palm Desert'
+  const propLocation = property?.address || 'Palm Desert, CA'
+  const captureTitle = request?.room || 'Pool-to-guest house connection'
+  const captureImg = property?.coverImage || demoBalcony || propKitchen
+  const captureRouteId = request?.id || request?.propertyId || 'homestead-pool'
 
   return (
     <WorkspaceShell
@@ -192,14 +194,14 @@ export function CaptureRequestDetailScreen() {
                     <PersonIcon size={14} className="text-text-secondary" />
                     <span>Recipient</span>
                   </span>
-                  <span className="font-bold text-text-primary">{isDemo ? 'David Vance (Listing Agent)' : 'Kiki Casa'}</span>
+                  <span className="font-bold text-text-primary">{request?.recipientName || 'Property Manager'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-text-secondary flex items-center gap-2">
                     <MailIcon size={14} className="text-text-secondary" />
                     <span>Delivery</span>
                   </span>
-                  <span className="font-medium text-text-primary">SMS & WhatsApp push</span>
+                  <span className="font-medium text-text-primary">Secure link (demo dispatch)</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-text-secondary flex items-center gap-2">

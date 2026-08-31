@@ -6,6 +6,7 @@ import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
 import logoAsset from '../assets/landing-logo.png'
 import { useDemoContext } from '../context/DemoContext'
+import { handleNewListing } from '../data/workflow'
 
 interface ListingOption {
   id: string
@@ -104,7 +105,24 @@ export function ListingPortalScreen() {
     setIsProcessing(true)
     setTimeout(() => {
       setStage(1)
-      navigate('/property/homestead-pd')
+      const propertyId = handleNewListing({
+        title: selectedListing.title,
+        address: selectedListing.address,
+        type: selectedListing.propertyType,
+        bedrooms: selectedListing.bedrooms,
+        bathrooms: Number(selectedListing.bathrooms) || 1,
+        price: selectedListing.price,
+        description: `${selectedListing.specs} · Demo import from ${selectedSource}`,
+        coverImage: selectedListing.image,
+        spaces: [
+          { name: 'Entrance', captured: true },
+          { name: 'Living Room', captured: true },
+          { name: 'Kitchen', captured: true },
+          { name: 'Primary Bedroom', captured: true },
+          { name: 'Balcony', captured: selectedListing.id !== 'homestead_pd' },
+        ],
+      })
+      navigate(`/property/${propertyId}`)
     }, 1200)
   }
 

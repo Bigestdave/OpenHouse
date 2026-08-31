@@ -1,17 +1,3 @@
-/**
- * OpenHouse Gemini AI Spatial Intelligence Agent
- * Powered by Google Gen AI SDK (@google/genai) & Gemini 3.7 Flash
- * 
- * Functions:
- * 1. Autonomous Room & Spatial Continuity Validator (Flags missing connections like Balcony Terrace)
- * 2. Ask OpenHouse Multimodal Inspector QA Agent (Cross-references property spatial facts)
- */
-
-import { GoogleGenAI } from '@google/genai'
-
-const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || ''
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null
-
 export interface SpatialValidationResult {
   passed: boolean
   totalSpacesDetected: number
@@ -22,103 +8,118 @@ export interface SpatialValidationResult {
     reason: string
     recommendedCaptureTimeSeconds: number
   }[]
+  lowConfidenceFields: string[]
   confidenceScore: number
+  model: 'gemini-3.7-flash' | 'deterministic-demo'
+  demoMode: boolean
 }
 
-/**
- * Validates ingested listing media and identifies missing spatial angles.
- */
+interface GeminiAssistantResult {
+  answer: string
+  badge: string
+}
+
+interface GeminiApiResponse<T> {
+  ok: boolean
+  data?: T
+}
+
+async function callGeminiApi<T>(body: Record<string, unknown>): Promise<T | null> {
+  try {
+    const response = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) return null
+    const payload = (await response.json()) as GeminiApiResponse<T>
+    return payload.ok && payload.data ? payload.data : null
+  } catch {
+    return null
+  }
+}
+
+function deterministicSpatialFallback(propertyTitle: string, spacesList: string[]): SpatialValidationResult {
+  const hasOutdoor = spacesList.some((space) => /balcony|pool|outdoor|terrace/i.test(space))
+  const hasLiving = spacesList.some((space) => /living/i.test(space))
+  const isLikelyMissingConnection = hasOutdoor && hasLiving && /homestead|admiralty|laurel|orchid/i.test(propertyTitle)
+
+  return {
+    passed: !isLikelyMissingConnection,
+    totalSpacesDetected: spacesList.length || 6,
+    expectedSpaces: Math.max(spacesList.length, 6),
+    missingConnections: isLikelyMissingConnection
+      ? [{
+          fromRoom: 'Living Room',
+          toRoom: 'Balcony Terrace',
+          reason: 'Outdoor transition continuity is unclear in submitted media.',
+          recommendedCaptureTimeSeconds: 15,
+        }]
+      : [],
+    lowConfidenceFields: isLikelyMissingConnection ? ['balcony_transition'] : [],
+    confidenceScore: isLikelyMissingConnection ? 0.69 : 0.96,
+    model: 'deterministic-demo',
+    demoMode: true,
+  }
+}
+
 export async function validatePropertySpatialContinuity(
   propertyTitle: string,
   spacesList: string[]
 ): Promise<SpatialValidationResult> {
-  if (ai) {
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
-        contents: `You are the OpenHouse Spatial Intelligence Agent analyzing uploaded real estate media for "${propertyTitle}".
-Spaces provided: ${spacesList.join(', ')}.
-Evaluate spatial continuity and identify if the balcony or exterior connections are adequately bridged to interior living areas. Return a JSON structure.`,
-      })
-      if (response.text) {
-        try {
-          return JSON.parse(response.text)
-        } catch {
-          // fallback
-        }
-      }
-    } catch (e) {
-      console.warn('Gemini API call returned fallback simulation:', e)
+  const remote = await callGeminiApi<SpatialValidationResult>({
+    action: 'spatial_validation',
+    propertyTitle,
+    spacesList,
+  })
+
+  if (remote && typeof remote.passed === 'boolean' && Array.isArray(remote.missingConnections)) {
+    return {
+      ...remote,
+      model: remote.model === 'gemini-3.7-flash' ? 'gemini-3.7-flash' : 'deterministic-demo',
+      demoMode: Boolean(remote.demoMode),
     }
   }
 
-  // High-fidelity fallback for offline / demo presentation
-  const isBalconyMissing = propertyTitle.toLowerCase().includes('laurel') || propertyTitle.toLowerCase().includes('admiralty')
-  return {
-    passed: !isBalconyMissing,
-    totalSpacesDetected: 6,
-    expectedSpaces: 7,
-    missingConnections: isBalconyMissing ? [
-      {
-        fromRoom: 'Living Room',
-        toRoom: 'Balcony Terrace',
-        reason: 'Threshold transition between indoor living glazing and exterior terrace lacks continuous 15-second tracking arc.',
-        recommendedCaptureTimeSeconds: 15,
-      }
-    ] : [],
-    confidenceScore: 0.96,
-  }
+  return deterministicSpatialFallback(propertyTitle, spacesList)
 }
 
-/**
- * Ask OpenHouse: Multimodal Property Assistant for prospective buyers
- */
 export async function askOpenHouseAssistant(
   question: string,
   propertyContext: { title: string; location: string; rooms: string[] }
-): Promise<{ answer: string; badge: string }> {
-  if (ai) {
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.7-flash',
-        contents: `You are OpenHouse AI, a spatial real estate assistant for ${propertyContext.title} in ${propertyContext.location}.
-Available rooms: ${propertyContext.rooms.join(', ')}.
-Answer the buyer's question accurately based only on observable spatial and listing facts:
-Question: "${question}"`,
-      })
-      if (response.text) {
-        return {
-          answer: response.text,
-          badge: 'Analyzed with Gemini 3.7 Flash from spatial media',
-        }
-      }
-    } catch (e) {
-      console.warn('Gemini QA fallback:', e)
-    }
+): Promise<GeminiAssistantResult> {
+  const remote = await callGeminiApi<GeminiAssistantResult>({
+    action: 'assistant_qa',
+    question,
+    propertyContext,
+  })
+
+  if (remote?.answer) {
+    return remote
   }
 
-  // Responsive intelligent fallback
   const lower = question.toLowerCase()
   if (lower.includes('light') || lower.includes('sun')) {
     return {
-      answer: 'The living room and balcony terrace receive extensive south-facing natural sunlight throughout the morning and afternoon via floor-to-ceiling glass.',
-      badge: 'Observed from daytime spatial capture by Gemini',
+      answer: 'The living room and balcony receive the strongest natural light based on the captured daytime media.',
+      badge: 'Deterministic demo fallback',
     }
   }
   if (lower.includes('parking') || lower.includes('car') || lower.includes('garage')) {
     return {
-      answer: 'The property includes two reserved garage spaces in the secure underground structure with EV charging capability.',
-      badge: 'Verified in building metadata by Gemini',
+      answer: 'Listing metadata indicates two reserved parking spots and additional visitor parking.',
+      badge: 'Deterministic demo fallback',
     }
   }
-  if (lower.includes('balcony') || lower.includes('view') || lower.includes('lake')) {
+  if (lower.includes('balcony') || lower.includes('view') || lower.includes('outdoor')) {
     return {
-      answer: 'The wraparound balcony terrace offers 180° panoramic views of the downtown skyline and Lady Bird Lake.',
-      badge: 'Observed from reconstructed 3D spatial model',
+      answer: 'The living room transitions directly to the balcony through sliding doors, with open skyline views.',
+      badge: 'Deterministic demo fallback',
     }
   }
   return {
-    answer: 'All dimensions and architectural finishes have been cross-verified with the uploaded floor plan and spatial captures.',
-    badge: 'Verified with Gemini Multimodal Analysis',
+    answer: 'OpenHouse cross-checked captured media and listing context; ask about a room, connection, or feature for specifics.',
+    badge: 'Deterministic demo fallback',
   }
 }

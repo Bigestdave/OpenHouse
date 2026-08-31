@@ -42,7 +42,7 @@ export const SEED_PROPERTIES: Property[] = [
     bathrooms: 2,
     price: '₦8,000,000/year',
     description: 'Beautiful 3-bedroom apartment on the 9th floor of Admiralty Tower with panoramic lagoon views.',
-    status: 'needs_recapture',
+    status: 'CAPTURE_REQUESTED',
     spaces: [
       { id: 'p01-s1', name: 'Living Room', captured: true, verified: true, issues: [], thumbnailUrl: propAdmiraltyImg },
       { id: 'p01-s2', name: 'Kitchen', captured: true, verified: true, issues: [], thumbnailUrl: propKitchenImg },
@@ -76,7 +76,7 @@ export const SEED_PROPERTIES: Property[] = [
     bathrooms: 6,
     price: '₦45,000,000/year',
     description: 'Elegant colonial-style 5-bedroom detached house with private pool and garden in the heart of Ikoyi.',
-    status: 'preparing',
+    status: 'VERIFYING',
     spaces: [
       { id: 'p02-s1', name: 'Entrance Hall', captured: true, verified: true, issues: [] },
       { id: 'p02-s2', name: 'Living Room', captured: true, verified: true, issues: [] },
@@ -114,7 +114,7 @@ export const SEED_PROPERTIES: Property[] = [
     bathrooms: 5,
     price: '₦22,000,000/year',
     description: 'Spacious 4-bedroom semi-detached villa in the sought-after Orchid Road corridor.',
-    status: 'quality_check',
+    status: 'VERIFYING',
     spaces: [
       { id: 'p03-s1', name: 'Entrance Porch', captured: true, verified: true, issues: [] },
       { id: 'p03-s2', name: 'Living Room', captured: true, verified: true, issues: [] },
@@ -144,7 +144,7 @@ export const SEED_PROPERTIES: Property[] = [
     bathrooms: 3,
     price: '₦6,000,000/year',
     description: 'Modern 3-bed terrace duplex with rooftop terrace and fitted kitchen.',
-    status: 'ready_for_review',
+    status: 'EXPERIENCE_BUILT',
     spaces: [
       { id: 'p04-s1', name: 'Living Room', captured: true, verified: true, issues: [] },
       { id: 'p04-s2', name: 'Kitchen', captured: true, verified: true, issues: [], thumbnailUrl: propKitchenImg },
@@ -176,7 +176,7 @@ export const SEED_PROPERTIES: Property[] = [
     bathrooms: 4,
     price: '₦18,000,000/year',
     description: 'Spectacular 4-bedroom penthouse on the 18th floor with floor-to-ceiling glass and city skyline views.',
-    status: 'live',
+    status: 'PUBLISHED',
     spaces: [
       { id: 'p05-s1', name: 'Foyer', captured: true, verified: true, issues: [] },
       { id: 'p05-s2', name: 'Open Plan Living', captured: true, verified: true, issues: [] },

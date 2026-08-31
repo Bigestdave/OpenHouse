@@ -13,6 +13,9 @@ import { SkeletonShowHeader } from '../components/Skeleton'
 import { CopyIcon } from '../components/icons2'
 import { Ellipsis, CheckCircle } from '../components/icons'
 import { useDemoStage, DEMO_PROPERTY_ID } from '../context/DemoContext'
+import { useProperty } from '../data/store'
+import { PROPERTY_STATUS_LABELS } from '../data/types'
+import { approveProperty } from '../data/workflow'
 
 import demoLiving   from '../assets/demo-living-room.jpg'
 import demoKitchen  from '../assets/demo-kitchen.jpg'
@@ -56,6 +59,7 @@ const ROOM_LIST = [
 export function ShowOverviewScreen() {
   const { id } = useParams()
   const demoStage = useDemoStage()
+  const propertyState = useProperty(id || '')
   const isDemoProperty = id === DEMO_PROPERTY_ID || id === 'homestead-pd' || id === 'laurel-12a' || id?.includes('homestead') || id?.includes('laurel') || !id || id === 'prop-01'
   const roomList = isDemoProperty ? DEMO_ROOMS : ROOM_LIST
 
@@ -70,6 +74,17 @@ export function ShowOverviewScreen() {
 
   useEffect(() => {
     if (!id) return
+    if (propertyState) {
+      setShow({
+        id: propertyState.id,
+        title: propertyState.title,
+        premise: `${propertyState.bedrooms}-bed · ${propertyState.bathrooms}-bath · ${propertyState.address}`,
+        status: propertyState.status,
+        created_at: new Date(propertyState.createdAt).toISOString(),
+      } as any)
+      setLoading(false)
+      return
+    }
     let cancelled = false
     Promise.all([getShow(id), listCharacters(id).catch(() => [])])
       .then(([showData, charData]) => {
@@ -99,7 +114,7 @@ export function ShowOverviewScreen() {
     return () => {
       cancelled = true
     }
-  }, [id, isDemoProperty])
+  }, [id, isDemoProperty, propertyState])
 
   if (loading) {
     return (
@@ -134,8 +149,13 @@ export function ShowOverviewScreen() {
     demoStage === 4 ? 'Resuming build' :
     demoStage >= 5 ? 'Ready for review' : 'Preparing experience'
 
-  const statusLabel = isDemoProperty ? demoStatusLabel : (tab === 'Experience' ? 'Ready for review' : 'Preparing experience')
-  const statusDot = isDemoProperty && demoStage === 3 ? 'bg-amber-400' : 'bg-success'
+  const statusLabel = propertyState?.status
+    ? PROPERTY_STATUS_LABELS[propertyState.status]
+    : (isDemoProperty ? demoStatusLabel : (tab === 'Experience' ? 'Ready for review' : 'Preparing experience'))
+  const statusDot =
+    propertyState?.status === 'NEEDS_CAPTURE' || propertyState?.status === 'CAPTURE_REQUESTED' || propertyState?.status === 'NEEDS_MORE_CAPTURE'
+      ? 'bg-amber-400'
+      : 'bg-success'
 
   return (
     <WorkspaceShell
@@ -621,6 +641,11 @@ export function ShowOverviewScreen() {
 
                 <Link
                   to={`/view/${show?.id || '8-admiralty-way'}`}
+                  onClick={() => {
+                    if (show?.id) {
+                      approveProperty(show.id)
+                    }
+                  }}
                   className="rounded-lg bg-primary px-6 py-2.5 text-[14px] font-semibold text-text-inverse shadow-subtle hover:bg-primary-hover transition-colors"
                 >
                   Approve and publish
