@@ -25,7 +25,15 @@ import { DemoProvider } from './context/DemoContext'
 import { DemoToaster } from './components/DemoToaster'
 import { DemoControlBar } from './components/DemoControlBar'
 
+import { useEffect } from 'react'
+
 export default function App() {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.pathname && window.location.pathname !== '/' && !window.location.hash) {
+      window.location.replace(`/#${window.location.pathname}${window.location.search}`)
+    }
+  }, [])
+
   return (
     <HashRouter>
       <DemoProvider>
