@@ -46,20 +46,20 @@ interface Room {
 
 const DEMO_PROPERTY_ROOMS: Room[] = [
   {
+    id: 'living',
+    name: 'Living Room',
+    img: demoLiving,
+    description: 'Soaring architectural wood-beam ceilings, designer blue velvet seating, statement fireplace, and open flow to dining and kitchen.',
+    hotspotTarget: 'balcony',
+    hotspotLabel: 'Pool & Outdoor',
+  },
+  {
     id: 'entrance',
     name: 'Entry & Patio',
     img: demoExterior,
     description: 'Lush private patio with covered seating, access to the resort-style pool and guest house.',
     hotspotTarget: 'living',
     hotspotLabel: 'Living Room',
-  },
-  {
-    id: 'living',
-    name: 'Living Room',
-    img: demoLiving,
-    description: 'Soaring wood-beam ceilings, statement fireplace, and direct sight-line to the outdoor pool terrace.',
-    hotspotTarget: 'balcony',
-    hotspotLabel: 'Pool & Outdoor',
   },
   {
     id: 'kitchen',

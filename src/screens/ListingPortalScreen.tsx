@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Check, Link as LinkIcon, ShieldCheck, Lock, ArrowRight, Camera, Layers, Video } from 'lucide-react'
-import demoExterior from '../assets/demo-exterior.jpg'
+import demoLiving from '../assets/demo-living-room.jpg'
 import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
 import logoAsset from '../assets/landing-logo.png'
@@ -45,7 +45,7 @@ const LISTING_OPTIONS: ListingOption[] = [
     photosCount: 16,
     floorPlansCount: 1,
     walkthroughsCount: 1,
-    image: demoExterior,
+    image: demoLiving,
     sourceText: 'Listed on Zillow MLS',
     updatedDate: 'Updated May 17, 2025'
   },
