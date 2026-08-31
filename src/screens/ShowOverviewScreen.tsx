@@ -21,6 +21,13 @@ import demoBalcony  from '../assets/demo-balcony.jpg'
 import demoBath     from '../assets/demo-bathroom.jpg'
 import demoExterior from '../assets/demo-exterior.jpg'
 
+import propAdmiralty from '../assets/prop-admiralty.jpg'
+import propOrchid from '../assets/prop-orchid.jpg'
+import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
+import propBourdillon from '../assets/prop-bourdillon.jpg'
+import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
+import propKitchen from '../assets/prop-kitchen.png'
+
 const tabs = ['Overview', 'Evidence', 'Experience', 'Activity'] as const
 type TabType = (typeof tabs)[number]
 
@@ -37,19 +44,19 @@ const DEMO_ROOMS = [
 
 // Fallback rooms for non-demo properties
 const ROOM_LIST = [
-  { id: 'entrance', name: 'Entrance', img: '/src/assets/prop-hero-waterfront.jpg' },
-  { id: 'living', name: 'Living room', img: '/src/assets/prop-admiralty.jpg' },
-  { id: 'kitchen', name: 'Kitchen', img: '/src/assets/prop-kitchen.png' },
-  { id: 'main-bed', name: 'Main bedroom', img: '/src/assets/prop-bourdillon.jpg' },
-  { id: 'bed-2', name: 'Bedroom 2', img: '/src/assets/prop-lekkigardens.jpg' },
-  { id: 'bed-3', name: 'Bedroom 3', img: '/src/assets/prop-orchid.jpg' },
-  { id: 'balcony', name: 'Balcony', img: '/src/assets/prop-hero-waterfront.jpg' },
+  { id: 'entrance', name: 'Entrance', img: propHeroWaterfront },
+  { id: 'living', name: 'Living room', img: propAdmiralty },
+  { id: 'kitchen', name: 'Kitchen', img: propKitchen },
+  { id: 'main-bed', name: 'Main bedroom', img: propBourdillon },
+  { id: 'bed-2', name: 'Bedroom 2', img: propLekkiGardens },
+  { id: 'bed-3', name: 'Bedroom 3', img: propOrchid },
+  { id: 'balcony', name: 'Balcony', img: propHeroWaterfront },
 ]
 
 export function ShowOverviewScreen() {
   const { id } = useParams()
   const demoStage = useDemoStage()
-  const isDemoProperty = id === DEMO_PROPERTY_ID || id === 'homestead-pd'
+  const isDemoProperty = id === DEMO_PROPERTY_ID || id === 'homestead-pd' || id === 'laurel-12a' || id?.includes('homestead') || id?.includes('laurel') || !id || id === 'prop-01'
   const roomList = isDemoProperty ? DEMO_ROOMS : ROOM_LIST
 
   const [tab, setTab] = useState<TabType>('Overview')
@@ -117,7 +124,7 @@ export function ShowOverviewScreen() {
     )
   }
 
-  const currentHeroImg = isDemoProperty ? demoLiving : (showBanner(show.title) || '/src/assets/prop-hero-waterfront.jpg')
+  const currentHeroImg = isDemoProperty ? demoLiving : (showBanner(show.title) || propHeroWaterfront)
 
   // Stage-aware text helpers for demo property
   const demoStatusLabel =
@@ -345,7 +352,7 @@ export function ShowOverviewScreen() {
                   <h3 className="text-[15px] font-bold text-text-primary mb-4">Reconstruction status</h3>
                   <div className="aspect-[4/3] rounded-xl overflow-hidden bg-sidebar relative border border-border">
                     <img
-                      src={isDemoProperty ? demoKitchen : '/src/assets/prop-kitchen.png'}
+                      src={isDemoProperty ? demoKitchen : propKitchen}
                       alt="Reconstruction wireframe"
                       className="h-full w-full object-cover opacity-80"
                     />

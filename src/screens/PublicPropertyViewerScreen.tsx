@@ -19,13 +19,20 @@ import {
   NavArrowUpIcon,
 } from '../components/icons2'
 import { Ellipsis, FullscreenIcon, CloseIcon } from '../components/icons'
-import { OpenHouseLogoMark } from '../components/WorkspaceShell'
 import demoLiving from '../assets/demo-living-room.jpg'
 import demoKitchen from '../assets/demo-kitchen.jpg'
 import demoBed from '../assets/demo-master-bedroom.jpg'
 import demoBalcony from '../assets/demo-balcony.jpg'
 import demoBath from '../assets/demo-bathroom.jpg'
 import demoExterior from '../assets/demo-exterior.jpg'
+
+import propAdmiralty from '../assets/prop-admiralty.jpg'
+import propOrchid from '../assets/prop-orchid.jpg'
+import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
+import propBourdillon from '../assets/prop-bourdillon.jpg'
+import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
+import propKitchen from '../assets/prop-kitchen.png'
+import { DEMO_PROPERTY_ID, DEMO_PROPERTY_LABEL } from '../context/DemoContext'
 
 interface Room {
   id: string
@@ -91,7 +98,7 @@ const PROPERTY_ROOMS: Room[] = [
   {
     id: 'entrance',
     name: 'Entrance',
-    img: '/src/assets/prop-admiralty.jpg',
+    img: propAdmiralty,
     description: 'Connected to the entrance hall, living room and guest washroom.',
     hotspotTarget: 'living',
     hotspotLabel: 'Living room',
@@ -99,7 +106,7 @@ const PROPERTY_ROOMS: Room[] = [
   {
     id: 'living',
     name: 'Living room',
-    img: '/src/assets/prop-hero-waterfront.jpg',
+    img: propHeroWaterfront,
     description: 'Connected to the entrance hall, kitchen and balcony.',
     hotspotTarget: 'balcony',
     hotspotLabel: 'Balcony',
@@ -107,7 +114,7 @@ const PROPERTY_ROOMS: Room[] = [
   {
     id: 'kitchen',
     name: 'Kitchen',
-    img: '/src/assets/prop-kitchen.png',
+    img: propKitchen,
     description: 'Custom fitted cabinetry with integrated appliances, connected to dining area.',
     hotspotTarget: 'living',
     hotspotLabel: 'Living room',
@@ -115,7 +122,7 @@ const PROPERTY_ROOMS: Room[] = [
   {
     id: 'main-bed',
     name: 'Main bedroom',
-    img: '/src/assets/prop-bourdillon.jpg',
+    img: propBourdillon,
     description: 'Expansive master suite with floor-to-ceiling windows and en-suite bathroom.',
     hotspotTarget: 'balcony',
     hotspotLabel: 'Balcony',
@@ -123,7 +130,7 @@ const PROPERTY_ROOMS: Room[] = [
   {
     id: 'bed-2',
     name: 'Bedroom 2',
-    img: '/src/assets/prop-lekkigardens.jpg',
+    img: propLekkiGardens,
     description: 'Spacious second bedroom with direct natural light and fitted wardrobes.',
     hotspotTarget: 'living',
     hotspotLabel: 'Living room',
@@ -131,7 +138,7 @@ const PROPERTY_ROOMS: Room[] = [
   {
     id: 'bed-3',
     name: 'Bedroom 3',
-    img: '/src/assets/prop-orchid.jpg',
+    img: propOrchid,
     description: 'Quiet third bedroom suitable for guests, children, or dedicated home workspace.',
     hotspotTarget: 'living',
     hotspotLabel: 'Living room',
@@ -139,7 +146,7 @@ const PROPERTY_ROOMS: Room[] = [
   {
     id: 'balcony',
     name: 'Balcony',
-    img: '/src/assets/prop-hero-waterfront.jpg',
+    img: propHeroWaterfront,
     description: 'Panoramic private outdoor terrace overlooking the waterfront skyline.',
     hotspotTarget: 'living',
     hotspotLabel: 'Living room',
@@ -159,7 +166,7 @@ export function PublicPropertyViewerScreen() {
   const { id } = useParams()
   const { properties } = useStore()
 
-  const isDemo = id === 'laurel-12a' || id?.includes('laurel') || id === 'orchid-1' || !id || id === 'demo'
+  const isDemo = id === DEMO_PROPERTY_ID || id === 'homestead-pd' || id === 'laurel-12a' || id?.includes('homestead') || id?.includes('laurel') || !id || id === 'demo'
   const propertyRooms = isDemo ? DEMO_PROPERTY_ROOMS : PROPERTY_ROOMS
 
   const property = properties.find((p) =>
@@ -171,8 +178,8 @@ export function PublicPropertyViewerScreen() {
     (id?.includes('lekki') && p.title.includes('Lekki'))
   ) || properties[0]
 
-  const propertyTitle = isDemo ? '2847 Laurel Canyon Rd, Unit 12A' : (property?.title || '8 Admiralty Way')
-  const propertyLocation = isDemo ? 'Austin, TX 78701' : (property?.address || 'Lekki, Lagos')
+  const propertyTitle = isDemo ? '72691 Homestead Road, Palm Desert' : (property?.title || '8 Admiralty Way')
+  const propertyLocation = isDemo ? 'Palm Desert, CA 92260' : (property?.address || 'Lekki, Lagos')
 
   // Viewer state
   const [isEntered, setIsEntered] = useState(false)
@@ -701,7 +708,7 @@ export function PublicPropertyViewerScreen() {
                   <h3 className="text-[18px] font-bold text-[#1A1A1A] tracking-tight">Book an inspection</h3>
                   <div className="flex items-center gap-2.5 mt-2">
                     <img
-                      src="/src/assets/prop-admiralty.jpg"
+                      src={propertyRooms[0]?.img || demoLiving}
                       alt={propertyTitle}
                       className="h-9 w-12 rounded-lg object-cover border border-stone-200"
                     />

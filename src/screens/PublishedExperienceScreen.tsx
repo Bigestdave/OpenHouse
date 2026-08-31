@@ -5,22 +5,48 @@ import { ShareIcon, GridIcon, MapPinIcon, MailIcon, QrCodeIcon } from '../compon
 import { FullscreenIcon } from '../components/icons'
 
 
-const ROOM_LIST = [
-  { id: 'entrance', name: 'Entrance', img: '/src/assets/prop-hero-waterfront.jpg' },
-  { id: 'living', name: 'Living room', img: '/src/assets/prop-admiralty.jpg' },
-  { id: 'kitchen', name: 'Kitchen', img: '/src/assets/prop-kitchen.png' },
-  { id: 'main-bed', name: 'Main bedroom', img: '/src/assets/prop-bourdillon.jpg' },
-  { id: 'bed-2', name: 'Bedroom 2', img: '/src/assets/prop-lekkigardens.jpg' },
-  { id: 'bed-3', name: 'Bedroom 3', img: '/src/assets/prop-orchid.jpg' },
-  { id: 'balcony', name: 'Balcony', img: '/src/assets/prop-hero-waterfront.jpg' },
+import propAdmiralty from '../assets/prop-admiralty.jpg'
+import propOrchid from '../assets/prop-orchid.jpg'
+import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
+import propBourdillon from '../assets/prop-bourdillon.jpg'
+import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
+import propKitchen from '../assets/prop-kitchen.png'
+
+import demoLiving from '../assets/demo-living-room.jpg'
+import demoExterior from '../assets/demo-exterior.jpg'
+import demoKitchen from '../assets/demo-kitchen.jpg'
+import demoBed from '../assets/demo-master-bedroom.jpg'
+import demoBath from '../assets/demo-bathroom.jpg'
+import demoBalcony from '../assets/demo-balcony.jpg'
+import { DEMO_PROPERTY_ID, DEMO_PROPERTY_LABEL } from '../context/DemoContext'
+
+const DEMO_ROOMS = [
+  { id: 'entrance', name: 'Entry & Patio', img: demoExterior },
+  { id: 'living', name: 'Living room', img: demoLiving },
+  { id: 'kitchen', name: 'Dining & Kitchen', img: demoKitchen },
+  { id: 'main-bed', name: 'Primary Suite', img: demoBed },
+  { id: 'bathroom', name: 'Primary Bathroom', img: demoBath },
+  { id: 'balcony', name: 'Pool & Outdoor', img: demoBalcony },
+]
+
+const STANDARD_ROOMS = [
+  { id: 'entrance', name: 'Entrance', img: propHeroWaterfront },
+  { id: 'living', name: 'Living room', img: propAdmiralty },
+  { id: 'kitchen', name: 'Kitchen', img: propKitchen },
+  { id: 'main-bed', name: 'Main bedroom', img: propBourdillon },
+  { id: 'bed-2', name: 'Bedroom 2', img: propLekkiGardens },
+  { id: 'bed-3', name: 'Bedroom 3', img: propOrchid },
+  { id: 'balcony', name: 'Balcony', img: propHeroWaterfront },
 ]
 
 export function PublishedExperienceScreen() {
   const { id } = useParams()
+  const isDemo = id === DEMO_PROPERTY_ID || id === 'homestead-pd' || id === 'laurel-12a' || id?.includes('homestead')
+  const roomList = isDemo ? DEMO_ROOMS : STANDARD_ROOMS
   const [activeRoom, setActiveRoom] = useState('living')
   const [copiedLink, setCopiedLink] = useState(false)
 
-  const propertyTitle = id?.includes('admiralty') ? '8 Admiralty Way' : '8 Admiralty Way'
+  const propertyTitle = isDemo ? DEMO_PROPERTY_LABEL : (id?.includes('admiralty') ? '8 Admiralty Way' : '8 Admiralty Way')
 
   return (
     <WorkspaceShell
@@ -67,18 +93,18 @@ export function PublishedExperienceScreen() {
           <div className="space-y-4">
             <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-sidebar border border-border shadow-card">
               <img
-                src={ROOM_LIST.find((r) => r.id === activeRoom)?.img || '/src/assets/prop-admiralty.jpg'}
+                src={roomList.find((r) => r.id === activeRoom)?.img || demoLiving}
                 alt={activeRoom}
                 className="h-full w-full object-cover"
               />
 
               <div className="absolute top-3 left-3 rounded-md bg-black/65 backdrop-blur-md px-2.5 py-1 text-white border border-white/10 text-[10.5px] font-bold tracking-wider uppercase whitespace-nowrap">
-                {ROOM_LIST.find((r) => r.id === activeRoom)?.name} / 01
+                {roomList.find((r) => r.id === activeRoom)?.name} / 01
               </div>
 
               <div className="absolute bottom-3 left-3 right-16 sm:right-auto rounded-xl bg-black/65 backdrop-blur-md p-3.5 text-white border border-white/10 max-w-xs sm:max-w-sm">
                 <p className="text-[15px] font-bold leading-tight truncate">
-                  {ROOM_LIST.find((r) => r.id === activeRoom)?.name}
+                  {roomList.find((r) => r.id === activeRoom)?.name}
                 </p>
                 <p className="text-[12px] text-white/80 mt-0.5 leading-snug">
                   Connected to the entrance hall, kitchen and balcony.

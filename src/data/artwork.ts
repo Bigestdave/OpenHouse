@@ -6,8 +6,21 @@ import propOrchid from '../assets/prop-orchid.jpg'
 import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
 import propBourdillon from '../assets/prop-bourdillon.jpg'
 import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
+import demoLiving from '../assets/demo-living-room.jpg'
+import demoExterior from '../assets/demo-exterior.jpg'
+import demoKitchen from '../assets/demo-kitchen.jpg'
+import demoBed from '../assets/demo-master-bedroom.jpg'
+import demoBath from '../assets/demo-bathroom.jpg'
+import demoBalcony from '../assets/demo-balcony.jpg'
 
 const POSTERS: Record<string, string> = {
+  '72691 homestead road': demoLiving,
+  '72691 homestead road, palm desert': demoLiving,
+  'homestead road': demoLiving,
+  'homestead-pd': demoLiving,
+  '2847 laurel canyon rd, unit 12a': demoLiving,
+  '2847 laurel canyon rd': demoLiving,
+  'laurel-12a': demoLiving,
   '8 admiralty way': propAdmiralty,
   'orchid apartments': propOrchid,
   'orchid apartments, unit 4': propOrchid,
@@ -19,6 +32,13 @@ const POSTERS: Record<string, string> = {
 }
 
 const BANNERS: Record<string, string> = {
+  '72691 homestead road': demoLiving,
+  '72691 homestead road, palm desert': demoLiving,
+  'homestead road': demoLiving,
+  'homestead-pd': demoLiving,
+  '2847 laurel canyon rd, unit 12a': demoLiving,
+  '2847 laurel canyon rd': demoLiving,
+  'laurel-12a': demoLiving,
   '8 admiralty way': propHeroWaterfront,
   'orchid apartments': propOrchid,
   'orchid apartments, unit 4': propOrchid,
@@ -30,16 +50,30 @@ const BANNERS: Record<string, string> = {
 }
 
 const CHARACTER_REFS: Record<string, string> = {
-  'entrance': propOrchid,
-  'living room': propAdmiralty,
-  'living': propAdmiralty,
-  'kitchen': propAdmiralty,
-  'main bedroom': propBourdillon,
-  'bedroom 2': propLekkiGardens,
-  'bedroom 3': propAdmiralty,
-  'balcony': propHeroWaterfront,
-  'terrace': propBourdillon,
-  'foyer': propOrchid,
+  'entrance': demoExterior,
+  'entry & patio': demoExterior,
+  'entry foyer': demoExterior,
+  'patio': demoExterior,
+  'living room': demoLiving,
+  'living': demoLiving,
+  'kitchen': demoKitchen,
+  'dining & kitchen': demoKitchen,
+  'dining': demoKitchen,
+  'primary suite': demoBed,
+  'primary bedroom': demoBed,
+  'main bedroom': demoBed,
+  'bedroom 2': demoBed,
+  'guest suite': demoBed,
+  'bedroom 3': demoBed,
+  'primary bathroom': demoBath,
+  'bathroom': demoBath,
+  'bath': demoBath,
+  'pool & outdoor': demoBalcony,
+  'pool': demoBalcony,
+  'balcony': demoBalcony,
+  'balcony terrace': demoBalcony,
+  'terrace': demoBalcony,
+  'foyer': demoExterior,
 }
 
 export function characterRefImage(name?: string | null): string | undefined {

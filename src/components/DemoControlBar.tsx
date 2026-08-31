@@ -19,12 +19,12 @@ const STAGE_LABELS: Record<DemoStage, string> = {
 }
 
 const STAGE_ROUTES: Partial<Record<DemoStage, string>> = {
-  1: '/property/laurel-12a',
-  2: '/property/laurel-12a',
-  3: '/capture-requests/laurel-balcony',
-  4: '/property/laurel-12a',
+  1: '/property/homestead-pd',
+  2: '/property/homestead-pd',
+  3: '/capture-requests/homestead-pool',
+  4: '/property/homestead-pd',
   5: '/approvals',
-  6: '/view/laurel-12a',
+  6: '/public/homestead-pd',
 }
 
 export function DemoControlBar() {

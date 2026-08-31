@@ -75,12 +75,12 @@ export function ShowsHomeScreen() {
               <div className="relative aspect-[16/10] lg:aspect-auto lg:col-span-6 min-h-[260px] overflow-hidden bg-sidebar">
                 <img
                   src={demoLiving}
-                  alt="2847 Laurel Canyon Rd, Unit 12A"
+                  alt="72691 Homestead Road, Palm Desert"
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute bottom-3.5 left-3.5 rounded-lg bg-black/75 backdrop-blur-md px-3.5 py-2 text-white border border-white/10 shadow-lg">
-                  <p className="text-[13.5px] font-bold leading-tight">2847 Laurel Canyon Rd, Unit 12A</p>
-                  <p className="text-[11.5px] text-white/80 font-normal mt-0.5">Austin, TX 78701</p>
+                  <p className="text-[13.5px] font-bold leading-tight">72691 Homestead Road</p>
+                  <p className="text-[11.5px] text-white/80 font-normal mt-0.5">Palm Desert, CA 92260</p>
                 </div>
               </div>
 
@@ -95,10 +95,10 @@ export function ShowsHomeScreen() {
                   </div>
 
                   <h3 className="text-[21px] font-bold tracking-tight text-ink leading-snug">
-                    Balcony terrace connection missing.
+                    Pool-to-guest house connection missing.
                   </h3>
                   <p className="pt-2 text-[13.5px] text-ink-2 leading-relaxed">
-                    OpenHouse detected an unbridged exterior threshold. A 15-second mobile capture from living room through balcony doors is required.
+                    OpenHouse detected an unbridged outdoor path. A 15-second mobile capture from main patio to the detached guest house is required.
                   </p>
                 </div>
 
@@ -128,13 +128,13 @@ export function ShowsHomeScreen() {
 
                 <div className="flex items-center gap-3 pt-2">
                   <Link
-                    to="/capture/laurel-balcony"
+                    to="/capture/homestead-pool"
                     className="rounded-lg bg-[#17231E] hover:bg-black px-5 py-2.5 text-[13.5px] font-bold text-white shadow-subtle transition-colors"
                   >
                     Record now
                   </Link>
                   <Link
-                    to="/property/laurel-12a"
+                    to="/property/homestead-pd"
                     className="rounded-lg border border-border bg-surface hover:bg-raised-2 px-5 py-2.5 text-[13.5px] font-semibold text-ink transition-colors"
                   >
                     See why

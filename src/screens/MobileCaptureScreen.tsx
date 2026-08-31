@@ -927,7 +927,7 @@ export function MobileCaptureScreen() {
             {/* Action Button */}
             <div className="space-y-2 pt-4">
               <button
-                onClick={() => navigate(isDemo ? '/property/laurel-12a' : (property ? `/show/${property.id}` : '/properties'))}
+                onClick={() => navigate(isDemo ? '/property/homestead-pd' : (property ? `/show/${property.id}` : '/properties'))}
                 className="w-full rounded-xl bg-[#0B1713] py-3.5 text-xs font-bold text-white hover:bg-black active:scale-[0.98] transition-all shadow-sm"
               >
                 Return to Property Overview →
