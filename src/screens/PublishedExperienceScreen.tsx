@@ -21,8 +21,8 @@ import demoBalcony from '../assets/demo-balcony.jpg'
 import { DEMO_PROPERTY_ID, DEMO_PROPERTY_LABEL } from '../context/DemoContext'
 
 const DEMO_ROOMS = [
-  { id: 'entrance', name: 'Entry & Patio', img: demoExterior },
   { id: 'living', name: 'Living room', img: demoLiving },
+  { id: 'entrance', name: 'Entry & Patio', img: demoExterior },
   { id: 'kitchen', name: 'Dining & Kitchen', img: demoKitchen },
   { id: 'main-bed', name: 'Primary Suite', img: demoBed },
   { id: 'bathroom', name: 'Primary Bathroom', img: demoBath },

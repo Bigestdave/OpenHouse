@@ -1,24 +1,24 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { WizardShell, WizardTitle, Field, TextInput, TextArea } from '../components/WizardShell'
-import imgPropAdmiralty from '../assets/prop-admiralty.jpg'
-import imgPropKitchen from '../assets/prop-kitchen.png'
+import imgCapture3D from '../assets/capture-3d-walkthrough.jpg'
+import imgCapturePanoramic from '../assets/capture-panoramic-tour.jpg'
 
 const styles = [
   {
     id: 'lidar',
     title: 'Interactive 3D Walkthrough + Spatial Navigation',
     lines: ['Gaussian Splatting + Room Alignment', 'Fluid real-time room navigation on web & mobile'],
-    image: imgPropAdmiralty,
-    imageAlt: 'High-density spatial capture of waterfront apartment',
+    image: imgCapture3D,
+    imageAlt: 'High-density spatial capture of property',
     recommended: true,
   },
   {
     id: 'panoramic',
     title: 'High-Resolution 360° Guided Spatial Tour',
     lines: ['High dynamic range photography', 'Accurate room dimension verification'],
-    image: imgPropKitchen,
-    imageAlt: 'Contemporary kitchen high dynamic range capture',
+    image: imgCapturePanoramic,
+    imageAlt: 'High-resolution panoramic spatial capture',
     recommended: false,
   },
 ]
