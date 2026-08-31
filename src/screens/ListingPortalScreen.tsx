@@ -1,6 +1,6 @@
 ﻿import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Check, Link as LinkIcon, ShieldCheck, Lock, Sparkles, ArrowRight } from 'lucide-react'
+import { Check, Link as LinkIcon, ShieldCheck, Lock, Sparkles, ArrowRight, Camera, Layers, Video } from 'lucide-react'
 import demoExterior from '../assets/demo-exterior.jpg'
 import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
@@ -111,91 +111,60 @@ export function ListingPortalScreen() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans pb-24 selection:bg-[#194534]/15">
       {/* Top Header */}
-      <header className="border-b border-stone-200 bg-white/80 backdrop-blur-md sticky top-0 z-30">
+      <header className="border-b border-[#DDD7CB] bg-white/90 backdrop-blur-md sticky top-0 z-30">
         <div className="mx-auto max-w-[1400px] px-6 lg:px-12 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2.5">
-              <img src={logoAsset} alt="OpenHouse" className="h-7 w-7 rounded-[8px] object-cover" />
-              <span className="text-[17px] font-bold tracking-tight text-stone-900">OpenHouse</span>
+              <img src={logoAsset} alt="OpenHouse" className="h-7 w-7 rounded-lg object-cover" />
+              <span className="text-[17px] font-bold tracking-tight text-[#17231E]">OpenHouse</span>
             </Link>
-            <span className="text-stone-300">/</span>
-            <span className="text-sm font-medium text-stone-600">Import a Property</span>
+            <span className="text-[#DDD7CB]">/</span>
+            <span className="text-sm font-medium text-[#727A73]">Import a Property</span>
           </div>
 
           <Link
             to="/properties"
-            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-stone-800 bg-white border border-stone-300 rounded-full hover:bg-stone-50 transition-colors shadow-2xs"
+            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#17231E] bg-white border border-[#DDD7CB] rounded-lg hover:bg-[#ECE7DC] transition-colors shadow-subtle"
           >
-            Realtor Workspace <ArrowRight size={13} />
+            <span>Realtor Workspace</span>
+            <ArrowRight size={13} />
           </Link>
         </div>
       </header>
 
       {/* Main Container */}
       <main className="mx-auto max-w-[1400px] px-6 lg:px-12 pt-8">
-        {/* Stepper and AI Spatial Banner */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] items-center justify-between gap-6 mb-8">
-          {/* Stepper */}
-          <div className="flex items-center gap-8 font-medium text-xs">
-            {/* Step 1 */}
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#11231a] text-white text-xs font-bold">
-                1
-              </span>
-              <span className="font-semibold text-stone-900">Import</span>
-            </div>
-
-            <div className="h-px w-10 bg-stone-300" />
-
-            {/* Step 2 */}
-            <div className="flex items-center gap-2.5 text-stone-400">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full border border-stone-300 bg-stone-100 text-stone-500 text-xs">
-                2
-              </span>
-              <span>Review</span>
-            </div>
-
-            <div className="h-px w-10 bg-stone-300" />
-
-            {/* Step 3 */}
-            <div className="flex items-center gap-2.5 text-stone-400">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full border border-stone-300 bg-stone-100 text-stone-500 text-xs">
-                3
-              </span>
-              <span>Publish</span>
-            </div>
+        {/* Top Header Row with Headline on Left and AI Verification Box on Right (NO Stepper) */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] items-start justify-between gap-6 mb-8">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#17231E] mb-2">
+              Import a property listing
+            </h1>
+            <p className="text-sm text-[#727A73] max-w-xl leading-relaxed">
+              Bring in your MLS listing and let OpenHouse prepare the property for a verified 3D experience.
+            </p>
           </div>
 
           {/* AI Spatial Verification Banner */}
-          <div className="bg-white border border-stone-200 rounded-2xl p-4 max-w-[480px] shadow-2xs">
+          <div className="bg-white border border-[#DDD7CB] rounded-xl p-4 max-w-[460px] shadow-subtle">
             <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-stone-900">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#17231E]">
                 <Sparkles size={14} className="text-[#194534]" />
                 <span>AI spatial verification</span>
               </div>
-              <span className="text-[10px] font-bold text-[#194534] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold text-[#194534] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
                 Active
               </span>
             </div>
-            <p className="text-[11.5px] leading-relaxed text-stone-500">
+            <p className="text-[11.5px] leading-relaxed text-[#727A73]">
               OpenHouse checks the listing media for missing spatial connections and automatically requests a short mobile recapture when needed.
             </p>
           </div>
         </div>
 
-        {/* Headline */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-stone-900 mb-2">
-            Import a property listing
-          </h1>
-          <p className="text-sm text-stone-600">
-            Bring in your MLS listing and let OpenHouse prepare the property for a verified 3D experience.
-          </p>
-        </div>
-
         {/* LISTING SOURCE Section */}
         <div className="mb-8">
-          <p className="text-[11px] font-bold tracking-wider uppercase text-stone-500 mb-3">
+          <p className="text-[11px] font-bold tracking-wider uppercase text-[#727A73] mb-3">
             LISTING SOURCE
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -203,27 +172,27 @@ export function ListingPortalScreen() {
             <button
               type="button"
               onClick={() => setSelectedSource('zillow')}
-              className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left cursor-pointer ${
+              className={`flex items-center justify-between p-4 rounded-xl border transition-all text-left cursor-pointer ${
                 selectedSource === 'zillow'
-                  ? 'bg-[#11231a] text-white border-[#11231a] shadow-sm'
-                  : 'bg-white text-stone-900 border-stone-200 hover:border-stone-300'
+                  ? 'bg-[#112019] text-white border-[#112019] shadow-subtle'
+                  : 'bg-white text-[#17231E] border-[#DDD7CB] hover:bg-[#ECE7DC]/40 hover:border-[#C8C2B4]'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className={`h-9 w-9 rounded-xl flex items-center justify-center font-bold text-lg ${
-                  selectedSource === 'zillow' ? 'bg-white/10 text-white' : 'bg-stone-100 text-stone-800'
+                <div className={`h-9 w-9 rounded-lg flex items-center justify-center font-bold text-lg ${
+                  selectedSource === 'zillow' ? 'bg-white/15 text-white' : 'bg-[#FAF8F5] text-stone-800 border border-[#DDD7CB]'
                 }`}>
                   Z
                 </div>
                 <div>
                   <p className="text-sm font-bold leading-tight">Zillow MLS</p>
-                  <p className={`text-[11px] ${selectedSource === 'zillow' ? 'text-white/70' : 'text-stone-500'}`}>
+                  <p className={`text-[11px] ${selectedSource === 'zillow' ? 'text-white/70' : 'text-[#727A73]'}`}>
                     MLS feed
                   </p>
                 </div>
               </div>
               <div className={`h-5 w-5 rounded-full flex items-center justify-center ${
-                selectedSource === 'zillow' ? 'bg-white text-[#11231a]' : 'border border-stone-300'
+                selectedSource === 'zillow' ? 'bg-white text-[#112019]' : 'border border-[#DDD7CB]'
               }`}>
                 {selectedSource === 'zillow' && <Check size={12} strokeWidth={3} />}
               </div>
@@ -233,27 +202,27 @@ export function ListingPortalScreen() {
             <button
               type="button"
               onClick={() => setSelectedSource('realtor')}
-              className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left cursor-pointer ${
+              className={`flex items-center justify-between p-4 rounded-xl border transition-all text-left cursor-pointer ${
                 selectedSource === 'realtor'
-                  ? 'bg-[#11231a] text-white border-[#11231a] shadow-sm'
-                  : 'bg-white text-stone-900 border-stone-200 hover:border-stone-300'
+                  ? 'bg-[#112019] text-white border-[#112019] shadow-subtle'
+                  : 'bg-white text-[#17231E] border-[#DDD7CB] hover:bg-[#ECE7DC]/40 hover:border-[#C8C2B4]'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className={`h-9 w-9 rounded-xl flex items-center justify-center font-bold text-base ${
-                  selectedSource === 'realtor' ? 'bg-white/10 text-white' : 'bg-stone-100 text-stone-800 font-serif'
+                <div className={`h-9 w-9 rounded-lg flex items-center justify-center font-bold text-base ${
+                  selectedSource === 'realtor' ? 'bg-white/15 text-white' : 'bg-[#FAF8F5] text-stone-800 border border-[#DDD7CB] font-serif'
                 }`}>
                   r
                 </div>
                 <div>
                   <p className="text-sm font-bold leading-tight">Realtor.com</p>
-                  <p className={`text-[11px] ${selectedSource === 'realtor' ? 'text-white/70' : 'text-stone-500'}`}>
+                  <p className={`text-[11px] ${selectedSource === 'realtor' ? 'text-white/70' : 'text-[#727A73]'}`}>
                     Feed
                   </p>
                 </div>
               </div>
               <div className={`h-5 w-5 rounded-full flex items-center justify-center ${
-                selectedSource === 'realtor' ? 'bg-white text-[#11231a]' : 'border border-stone-300'
+                selectedSource === 'realtor' ? 'bg-white text-[#112019]' : 'border border-[#DDD7CB]'
               }`}>
                 {selectedSource === 'realtor' && <Check size={12} strokeWidth={3} />}
               </div>
@@ -263,27 +232,27 @@ export function ListingPortalScreen() {
             <button
               type="button"
               onClick={() => setSelectedSource('custom')}
-              className={`flex items-center justify-between p-4 rounded-2xl border transition-all text-left cursor-pointer ${
+              className={`flex items-center justify-between p-4 rounded-xl border transition-all text-left cursor-pointer ${
                 selectedSource === 'custom'
-                  ? 'bg-[#11231a] text-white border-[#11231a] shadow-sm'
-                  : 'bg-white text-stone-900 border-stone-200 hover:border-stone-300'
+                  ? 'bg-[#112019] text-white border-[#112019] shadow-subtle'
+                  : 'bg-white text-[#17231E] border-[#DDD7CB] hover:bg-[#ECE7DC]/40 hover:border-[#C8C2B4]'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className={`h-9 w-9 rounded-xl flex items-center justify-center ${
-                  selectedSource === 'custom' ? 'bg-white/10 text-white' : 'bg-stone-100 text-stone-800'
+                <div className={`h-9 w-9 rounded-lg flex items-center justify-center ${
+                  selectedSource === 'custom' ? 'bg-white/15 text-white' : 'bg-[#FAF8F5] text-stone-800 border border-[#DDD7CB]'
                 }`}>
                   <LinkIcon size={16} />
                 </div>
                 <div>
                   <p className="text-sm font-bold leading-tight">Custom MLS</p>
-                  <p className={`text-[11px] ${selectedSource === 'custom' ? 'text-white/70' : 'text-stone-500'}`}>
+                  <p className={`text-[11px] ${selectedSource === 'custom' ? 'text-white/70' : 'text-[#727A73]'}`}>
                     Webhook connection
                   </p>
                 </div>
               </div>
               <div className={`h-5 w-5 rounded-full flex items-center justify-center ${
-                selectedSource === 'custom' ? 'bg-white text-[#11231a]' : 'border border-stone-300'
+                selectedSource === 'custom' ? 'bg-white text-[#112019]' : 'border border-[#DDD7CB]'
               }`}>
                 {selectedSource === 'custom' && <Check size={12} strokeWidth={3} />}
               </div>
@@ -295,7 +264,7 @@ export function ListingPortalScreen() {
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-start">
           {/* Left Column: Choose Listing */}
           <div>
-            <p className="text-[11px] font-bold tracking-wider uppercase text-stone-500 mb-3">
+            <p className="text-[11px] font-bold tracking-wider uppercase text-[#727A73] mb-3">
               CHOOSE A LISTING TO IMPORT
             </p>
 
@@ -306,41 +275,50 @@ export function ListingPortalScreen() {
                   <div
                     key={item.id}
                     onClick={() => setSelectedListingId(item.id)}
-                    className={`flex items-center justify-between p-4 rounded-2xl bg-white border cursor-pointer transition-all ${
+                    className={`flex items-center justify-between p-4 rounded-xl bg-white border cursor-pointer transition-all ${
                       isSelected
-                        ? 'border-2 border-[#194534] shadow-sm ring-2 ring-[#194534]/10'
-                        : 'border-stone-200 hover:border-stone-300 hover:shadow-2xs'
+                        ? 'border-2 border-[#194534] shadow-subtle ring-2 ring-[#194534]/10'
+                        : 'border-[#DDD7CB] hover:border-[#C8C2B4] hover:bg-[#ECE7DC]/20 shadow-subtle'
                     }`}
                   >
                     <div className="flex items-center gap-4">
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="w-24 h-18 rounded-xl object-cover shrink-0"
+                        className="w-24 h-18 rounded-lg object-cover shrink-0"
                       />
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-sm font-bold text-stone-900">{item.title}</h3>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          <h3 className="text-sm font-bold text-[#17231E]">{item.title}</h3>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                             item.badgeType === 'featured'
                               ? 'bg-[#194534] text-white'
-                              : 'bg-stone-100 text-stone-600'
+                              : 'bg-[#FAF8F5] text-stone-700 border border-[#DDD7CB]'
                           }`}>
                             {item.badge}
                           </span>
                         </div>
-                        <p className="text-xs text-stone-500 mb-1.5">{item.address}</p>
-                        <p className="text-xs font-semibold text-stone-800 mb-2">{item.specs}</p>
-                        <div className="flex items-center gap-3 text-[10.5px] text-stone-500 font-medium">
-                          <span>📷 {item.photosCount} Photos</span>
-                          <span>📐 {item.floorPlansCount} Floor Plan</span>
-                          <span>▶ {item.walkthroughsCount} Walkthrough</span>
+                        <p className="text-xs text-[#727A73] mb-1.5">{item.address}</p>
+                        <p className="text-xs font-semibold text-[#17231E] mb-2">{item.specs}</p>
+                        <div className="flex items-center gap-4 text-[11px] text-[#727A73] font-medium">
+                          <span className="flex items-center gap-1.5">
+                            <Camera size={13} className="text-[#194534]" />
+                            {item.photosCount} Photos
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Layers size={13} className="text-[#194534]" />
+                            {item.floorPlansCount} Floor Plan
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Video size={13} className="text-[#194534]" />
+                            {item.walkthroughsCount} Walkthrough
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className={`h-5 w-5 rounded-full flex items-center justify-center shrink-0 ml-3 ${
-                      isSelected ? 'bg-[#194534] text-white' : 'border border-stone-300'
+                      isSelected ? 'bg-[#194534] text-white' : 'border border-[#DDD7CB]'
                     }`}>
                       {isSelected && <Check size={12} strokeWidth={3} />}
                     </div>
@@ -349,38 +327,38 @@ export function ListingPortalScreen() {
               })}
             </div>
 
-            <p className="text-center text-xs text-stone-400 mt-4">
+            <p className="text-center text-xs text-[#9CA29D] mt-4 font-medium">
               Showing 3 of 24 listings
             </p>
           </div>
 
           {/* Right Column: Preview & Details */}
           <div>
-            <p className="text-[11px] font-bold tracking-wider uppercase text-stone-500 mb-3">
+            <p className="text-[11px] font-bold tracking-wider uppercase text-[#727A73] mb-3">
               PREVIEW & DETAILS
             </p>
 
-            <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-2xs space-y-6">
+            <div className="bg-white border border-[#DDD7CB] rounded-xl p-6 shadow-subtle space-y-6">
               {/* Header Info */}
-              <div className="flex items-start gap-4 pb-5 border-b border-stone-100">
+              <div className="flex items-start gap-4 pb-5 border-b border-[#DDD7CB]">
                 <img
                   src={selectedListing.image}
                   alt={selectedListing.title}
-                  className="w-28 h-20 rounded-xl object-cover shrink-0"
+                  className="w-28 h-20 rounded-lg object-cover shrink-0"
                 />
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-base font-bold text-stone-900">{selectedListing.title}</h2>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    <h2 className="text-base font-bold text-[#17231E]">{selectedListing.title}</h2>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                       selectedListing.badgeType === 'featured'
                         ? 'bg-[#194534] text-white'
-                        : 'bg-stone-100 text-stone-600'
+                        : 'bg-[#FAF8F5] text-stone-700 border border-[#DDD7CB]'
                     }`}>
                       {selectedListing.badge}
                     </span>
                   </div>
-                  <p className="text-xs text-stone-500 mb-2">{selectedListing.address}</p>
-                  <div className="space-y-0.5 text-[11px] text-stone-400">
+                  <p className="text-xs text-[#727A73] mb-2">{selectedListing.address}</p>
+                  <div className="space-y-0.5 text-[11px] text-[#9CA29D]">
                     <p>{selectedListing.sourceText}</p>
                     <p>{selectedListing.updatedDate}</p>
                   </div>
@@ -390,49 +368,52 @@ export function ListingPortalScreen() {
               {/* Spec Details Grid */}
               <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
                 <div>
-                  <p className="text-stone-400 text-[11px] mb-0.5">Property Type</p>
-                  <p className="font-semibold text-stone-800">{selectedListing.propertyType}</p>
+                  <p className="text-[#727A73] text-[11px] mb-0.5">Property Type</p>
+                  <p className="font-semibold text-[#17231E]">{selectedListing.propertyType}</p>
                 </div>
                 <div>
-                  <p className="text-stone-400 text-[11px] mb-0.5">Lot Size</p>
-                  <p className="font-semibold text-stone-800">{selectedListing.lotSize}</p>
+                  <p className="text-[#727A73] text-[11px] mb-0.5">Lot Size</p>
+                  <p className="font-semibold text-[#17231E]">{selectedListing.lotSize}</p>
                 </div>
                 <div>
-                  <p className="text-stone-400 text-[11px] mb-0.5">Bedrooms</p>
-                  <p className="font-semibold text-stone-800">{selectedListing.bedrooms}</p>
+                  <p className="text-[#727A73] text-[11px] mb-0.5">Bedrooms</p>
+                  <p className="font-semibold text-[#17231E]">{selectedListing.bedrooms}</p>
                 </div>
                 <div>
-                  <p className="text-stone-400 text-[11px] mb-0.5">Bathrooms</p>
-                  <p className="font-semibold text-stone-800">{selectedListing.bathrooms}</p>
+                  <p className="text-[#727A73] text-[11px] mb-0.5">Bathrooms</p>
+                  <p className="font-semibold text-[#17231E]">{selectedListing.bathrooms}</p>
                 </div>
                 <div>
-                  <p className="text-stone-400 text-[11px] mb-0.5">Year Built</p>
-                  <p className="font-semibold text-stone-800">{selectedListing.yearBuilt}</p>
+                  <p className="text-[#727A73] text-[11px] mb-0.5">Year Built</p>
+                  <p className="font-semibold text-[#17231E]">{selectedListing.yearBuilt}</p>
                 </div>
                 <div>
-                  <p className="text-stone-400 text-[11px] mb-0.5">Listing Price</p>
-                  <p className="font-bold text-stone-900 text-sm">{selectedListing.price}</p>
+                  <p className="text-[#727A73] text-[11px] mb-0.5">Listing Price</p>
+                  <p className="font-bold text-[#17231E] text-sm">{selectedListing.price}</p>
                 </div>
               </div>
 
               {/* Attached Media */}
               <div>
-                <p className="text-[11px] font-medium text-stone-400 mb-2">Attached Media</p>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <span className="px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 font-medium text-stone-700">
-                    📷 {selectedListing.photosCount} Photos
+                <p className="text-[11px] font-medium text-[#727A73] mb-2">Attached Media</p>
+                <div className="flex flex-wrap gap-2.5 text-xs">
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#DDD7CB] bg-[#FAF8F5] font-medium text-[#17231E]">
+                    <Camera size={13} className="text-[#194534]" />
+                    {selectedListing.photosCount} Photos
                   </span>
-                  <span className="px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 font-medium text-stone-700">
-                    📐 {selectedListing.floorPlansCount} Floor Plan
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#DDD7CB] bg-[#FAF8F5] font-medium text-[#17231E]">
+                    <Layers size={13} className="text-[#194534]" />
+                    {selectedListing.floorPlansCount} Floor Plan
                   </span>
-                  <span className="px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 font-medium text-stone-700">
-                    ▶ {selectedListing.walkthroughsCount} Walkthrough
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#DDD7CB] bg-[#FAF8F5] font-medium text-[#17231E]">
+                    <Video size={13} className="text-[#194534]" />
+                    {selectedListing.walkthroughsCount} Walkthrough
                   </span>
                 </div>
               </div>
 
               {/* Verification Callout */}
-              <div className="bg-[#f0f6f2] border border-[#d2e5d7] rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-[#f0f6f2] border border-[#d2e5d7] rounded-lg p-4 flex items-center gap-3">
                 <ShieldCheck size={18} className="text-[#194534] shrink-0" />
                 <p className="text-xs text-[#194534] font-medium leading-relaxed">
                   This listing will be verified and optimized before we create your 3D tour.
@@ -444,16 +425,16 @@ export function ListingPortalScreen() {
       </main>
 
       {/* Bottom Sticky Action Bar */}
-      <footer className="fixed bottom-0 inset-x-0 bg-white/95 border-t border-stone-200 py-3.5 px-6 lg:px-12 backdrop-blur-md z-30">
+      <footer className="fixed bottom-0 inset-x-0 bg-white/95 border-t border-[#DDD7CB] py-3.5 px-6 lg:px-12 backdrop-blur-md z-30 shadow-subtle">
         <div className="mx-auto max-w-[1400px] flex items-center justify-between">
           <Link
             to="/properties"
-            className="px-5 py-2 text-xs font-semibold text-stone-700 bg-white border border-stone-300 rounded-xl hover:bg-stone-50 transition-colors shadow-2xs"
+            className="px-5 py-2.5 text-xs font-semibold text-[#17231E] bg-white border border-[#DDD7CB] rounded-lg hover:bg-[#ECE7DC] transition-colors shadow-subtle"
           >
             Cancel
           </Link>
 
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-stone-400">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#727A73]">
             <Lock size={12} />
             <span>Your data is secure and never shared without permission.</span>
           </div>
@@ -462,11 +443,11 @@ export function ListingPortalScreen() {
             type="button"
             disabled={isProcessing}
             onClick={handleContinue}
-            className="flex items-center gap-2 px-6 py-2.5 text-xs font-semibold text-white bg-[#11231a] hover:bg-[#194534] rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-75"
+            className="flex items-center gap-2 px-7 py-2.5 text-xs font-bold text-white bg-[#194534] hover:bg-[#123A2B] rounded-lg transition-all shadow-subtle cursor-pointer disabled:opacity-75"
           >
             {isProcessing ? (
               <>
-                <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 <span>Preparing Ingestion...</span>
               </>
             ) : (
