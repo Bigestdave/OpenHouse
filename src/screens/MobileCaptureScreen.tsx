@@ -4,12 +4,11 @@ import { OpenHouseLogoMark } from '../components/WorkspaceShell'
 import { useStore, resolveCaptureRequest } from '../data/store'
 import { resumePropertyWorkflow } from '../data/workflow'
 import { uploadCaptureVideo } from '../lib/storage'
-import { useDemoContext } from '../context/DemoContext'
+import { useDemoContext, DEMO_PROPERTY_LABEL } from '../context/DemoContext'
 import demoLiving from '../assets/demo-living-room.jpg'
 import demoExterior from '../assets/demo-exterior.jpg'
 import propLivingPreviewImg from '../assets/prop-living-preview.png'
 import propAdmiraltyThumbImg from '../assets/prop-admiralty-thumb.png'
-import cameraViewfinderBg from '../assets/camera-viewfinder-bg.png'
 
 // Crisp custom SVG icons matching reference exactly
 function GreenCheckCircle({ className = 'h-4 w-4' }: { className?: string }) {
@@ -108,13 +107,14 @@ export function MobileCaptureScreen() {
 
   const [seconds, setSeconds] = useState(0)
   const [isRecording, setIsRecording] = useState(false)
+  const [customVideoUrl, setCustomVideoUrl] = useState<string | null>(null)
   const [blurPrivate, setBlurPrivate] = useState(true)
   const [showExampleModal, setShowExampleModal] = useState(false)
   const [showHelpModal, setShowHelpModal] = useState(false)
   const [isPlayingCheck, setIsPlayingCheck] = useState(false)
 
-  const propertyTitle = isDemo ? '2847 Laurel Canyon Rd, Unit 12A' : (property?.title || '8 Admiralty Way')
-  const propertyLocation = isDemo ? 'Austin, TX 78701' : (property?.address || 'Lekki, Lagos')
+  const propertyTitle = isDemo ? DEMO_PROPERTY_LABEL : (property?.title || '8 Admiralty Way')
+  const propertyLocation = isDemo ? 'Palm Desert, CA 92260' : (property?.address || 'Lekki, Lagos')
   const propertyThumb = isDemo ? demoExterior : propAdmiraltyThumbImg
   const targetPreviewImg = isDemo ? demoLiving : propLivingPreviewImg
 
@@ -367,6 +367,30 @@ export function MobileCaptureScreen() {
                 <span>Start capture</span>
               </button>
 
+              {/* Optional: Load custom video file */}
+              <div className="pt-1">
+                <label className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-stone-300 py-2.5 text-[11.5px] font-medium text-stone-600 hover:bg-stone-50 cursor-pointer transition-colors">
+                  <svg className="h-3.5 w-3.5 text-stone-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                  <span>{customVideoUrl ? '✓ Custom video loaded' : 'Load pre-recorded video (optional)'}</span>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        const url = URL.createObjectURL(file)
+                        setCustomVideoUrl(url)
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+
               <div className="flex items-center justify-center gap-1.5 pt-1 text-[11px] text-stone-500">
                 <svg className="h-3.5 w-3.5 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -426,9 +450,18 @@ export function MobileCaptureScreen() {
                   muted
                   className="h-full w-full object-cover"
                 />
+              ) : customVideoUrl ? (
+                <video
+                  src={customVideoUrl}
+                  autoPlay
+                  loop
+                  playsInline
+                  muted
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <img
-                  src={cameraViewfinderBg}
+                  src={demoLiving}
                   alt="AR Viewfinder"
                   className={`h-full w-full object-cover transition-transform duration-10000 ease-linear ${
                     isRecording ? 'scale-115 translate-y-[-10px]' : ''
