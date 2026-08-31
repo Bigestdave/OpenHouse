@@ -1,32 +1,428 @@
-import { Nav } from "../app/components/Nav";
-import { Hero } from "../app/components/Hero";
-import { NotAnotherGenerator } from "../app/components/NotAnotherGenerator";
-import { StickyPipeline } from "../app/components/StickyPipeline";
-import { OneShot } from "../app/components/OneShot";
-import { Continuity } from "../app/components/Continuity";
-import { CTA, Footer } from "../app/components/CTA";
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ArrowRight, Check, CircleHelp, Eye, Menu, Network, PanelTop, X } from 'lucide-react'
+import heroVisual from '../assets/landing-hero.png'
+import listingToOpenhouse from '../assets/landing-flow.png'
+import visitorExperience from '../assets/landing-experience.png'
+import propertyProcess from '../assets/landing-process.png'
+import closingVisual from '../assets/landing-closing.png'
+import logoAsset from '../assets/landing-logo.png'
+
+function useReveal<T extends HTMLElement>() {
+  const ref = useRef<T>(null)
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        node.classList.add('is-visible')
+        observer.disconnect()
+      }
+    }, { threshold: 0.12 })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+  return ref
+}
+
+function Logo({ light = false }: { light?: boolean }) {
+  return (
+    <span className={`flex items-center gap-2.5 ${light ? 'text-[#efeee9]' : 'text-stone-900'}`} data-testid="display-brand">
+      {light ? (
+        <span className="relative block h-7 w-7" aria-hidden="true">
+          <span className="absolute bottom-0 left-0 h-5 w-2.5 rotate-45 bg-[#efeee9]" />
+          <span className="absolute bottom-0 right-0 h-5 w-2.5 -rotate-45 bg-[#efeee9]" />
+          <span className="absolute bottom-0 left-[9px] h-3.5 w-2.5 bg-[#11120f]" />
+        </span>
+      ) : (
+        <img src={logoAsset} alt="OpenHouse" className="h-7 w-7 rounded-[8px] object-cover" />
+      )}
+      <span className="text-[17px] font-semibold tracking-[-.04em]">OpenHouse</span>
+    </span>
+  )
+}
+
+function Header({ onInterest }: { onInterest: () => void }) {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const close = () => setMobileOpen(false)
+  return (
+    <header className="sticky top-0 z-40 border-b border-black/10 bg-[#f8f7f3]/90 backdrop-blur-md" data-testid="site-header">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4 lg:px-12">
+        <a href="#top" onClick={close} data-testid="link-brand-home"><Logo /></a>
+        <nav className="hidden items-center gap-9 md:flex" aria-label="Primary navigation" data-testid="nav-primary">
+          <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#system" data-testid="link-product">Product</a>
+          <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#process" data-testid="link-how-it-works">How it works</a>
+          <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#professionals" data-testid="link-professionals">For professionals</a>
+          <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#trust" data-testid="link-trust">Trust</a>
+          <Link className="text-[12px] font-semibold text-[#194534] bg-emerald-50 px-2.5 py-1 rounded-md transition-colors hover:bg-emerald-100" to="/portal">MLS Gateway</Link>
+        </nav>
+        <div className="hidden items-center gap-5 md:flex">
+          <button onClick={onInterest} className="text-[12px] font-medium text-black/65 transition-colors hover:text-black cursor-pointer" data-testid="link-early-access">Early Access</button>
+          <Link to="/login" className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" data-testid="link-sign-in">Sign in</Link>
+          <Link to="/public/homestead-pd" className="bg-[#11120f] px-5 py-2.5 text-[11px] font-medium text-[#f7f6f1] transition-transform hover:-translate-y-0.5 rounded-lg" data-testid="button-header-see-home">See a home</Link>
+        </div>
+        <button className="md:hidden p-1 text-stone-800" onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? 'Close menu' : 'Open menu'} aria-expanded={mobileOpen} data-testid="button-mobile-menu">
+          {mobileOpen ? <X size={21} strokeWidth={1.5} /> : <Menu size={21} strokeWidth={1.5} />}
+        </button>
+      </div>
+      {mobileOpen && (
+        <nav className="border-t border-black/10 px-6 pb-6 pt-4 md:hidden bg-[#f8f7f3]" aria-label="Mobile navigation" data-testid="nav-mobile">
+          <div className="flex flex-col gap-1">
+            {[
+              ['Product', '#system', 'link-mobile-product'],
+              ['How it works', '#process', 'link-mobile-process'],
+              ['For professionals', '#professionals', 'link-mobile-professionals'],
+              ['Trust', '#trust', 'link-mobile-trust'],
+            ].map(([label, href, testId]) => (
+              <a key={href} href={href} onClick={close} className="flex items-center justify-between border-b border-black/10 py-3 text-sm font-medium text-stone-800" data-testid={testId}>
+                {label}<ArrowRight size={14} />
+              </a>
+            ))}
+            <Link to="/portal" onClick={close} className="flex items-center justify-between border-b border-black/10 py-3 text-sm font-bold text-[#194534]">
+              MLS Gateway Simulator <ArrowRight size={14} />
+            </Link>
+            <Link to="/login" onClick={close} className="flex items-center justify-between border-b border-black/10 py-3 text-sm font-medium text-stone-700">
+              Sign In to Workspace <ArrowRight size={14} />
+            </Link>
+            <Link to="/public/homestead-pd" onClick={close} className="mt-4 flex items-center justify-center bg-[#11120f] py-3 text-xs font-semibold text-[#f7f6f1] rounded-lg" data-testid="button-mobile-see-home">
+              See Live 3D Experience
+            </Link>
+          </div>
+        </nav>
+      )}
+    </header>
+  )
+}
+
+function InterestPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [sent, setSent] = useState(false)
+  const navigate = useNavigate()
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#11120f]/50 p-3 sm:items-center backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="interest-title" data-testid="dialog-interest">
+      <div className="relative w-full max-w-[520px] bg-[#f8f7f3] p-7 shadow-2xl sm:p-10 rounded-2xl border border-stone-300">
+        <button className="absolute right-5 top-5 text-black/55 hover:text-black cursor-pointer" onClick={onClose} aria-label="Close interest panel" data-testid="button-close-interest"><X size={18} /></button>
+        {!sent ? (
+          <>
+            <p className="mono-label mb-4 text-[#4d7145] font-bold">OpenHouse / early access</p>
+            <h2 id="interest-title" className="max-w-[380px] text-3xl tracking-[-.05em] sm:text-4xl font-semibold text-stone-900 leading-tight">Bring the next home to life.</h2>
+            <p className="mt-3 max-w-[390px] text-sm leading-6 text-black/60">Tell us where you work and we’ll show you how an autonomous experience agent fits your listings.</p>
+            <form className="mt-6 space-y-4" onSubmit={(event) => { event.preventDefault(); setSent(true); }} data-testid="form-interest">
+              <label className="block">
+                <span className="mono-label mb-2 block text-black/60">Work email</span>
+                <input required type="email" placeholder="you@company.com" className="w-full border border-black/20 bg-white px-3.5 py-2.5 text-sm rounded-lg outline-none transition-colors focus:border-[#4d7145]" data-testid="input-interest-email" />
+              </label>
+              <label className="block">
+                <span className="mono-label mb-2 block text-black/60">I am a</span>
+                <select className="w-full appearance-none border border-black/20 bg-white px-3.5 py-2.5 text-sm rounded-lg outline-none focus:border-[#4d7145]" data-testid="select-interest-role">
+                  <option>Property professional / Broker</option>
+                  <option>Realtor / Listing Agent</option>
+                  <option>Curious buyer / Tenant</option>
+                  <option>Technology partner</option>
+                </select>
+              </label>
+              <button type="submit" className="mt-2 flex w-full items-center justify-center gap-2 bg-[#11120f] py-3.5 text-xs font-semibold text-[#f7f6f1] transition-transform hover:-translate-y-0.5 rounded-lg cursor-pointer" data-testid="button-submit-interest">
+                Request an introduction <ArrowRight size={14} />
+              </button>
+            </form>
+          </>
+        ) : (
+          <div className="py-8 text-center">
+            <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-[#dfe9db] text-[#4d7145]"><Check size={22} /></div>
+            <h2 className="text-3xl tracking-[-.05em] font-semibold text-stone-900">You’re on the list.</h2>
+            <p className="mx-auto mt-3 max-w-[320px] text-sm leading-6 text-black/60">Ready to explore now? Jump into the live interactive Palm Desert inspection experience.</p>
+            <div className="mt-6 flex flex-col gap-2.5">
+              <button onClick={() => navigate('/public/homestead-pd')} className="w-full bg-[#11120f] py-3 text-xs font-semibold text-[#f7f6f1] rounded-lg cursor-pointer">
+                Enter Live 3D Experience →
+              </button>
+              <button onClick={onClose} className="border border-black/20 py-2.5 text-xs text-stone-700 rounded-lg hover:bg-black/5 cursor-pointer" data-testid="button-dismiss-interest">
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Hero({ onInterest }: { onInterest: () => void }) {
+  const ref = useReveal<HTMLElement>()
+  return (
+    <section id="top" ref={ref} className="reveal page-grid relative mx-auto max-w-[1440px] px-6 pb-8 pt-12 lg:px-12 lg:pb-11 lg:pt-20" data-testid="section-hero">
+      <div className="grid items-center gap-10 lg:grid-cols-[.85fr_1.15fr] lg:gap-5">
+        <div className="max-w-[580px]">
+          <p className="mono-label mb-6 text-black/50" data-testid="text-hero-eyebrow">The property-experience agent</p>
+          <h1 className="text-balance text-[clamp(2.9rem,6vw,6.2rem)] leading-[.92] tracking-[-.075em] font-semibold text-stone-900" data-testid="text-hero-title">
+            Every listing becomes<br />a 24/7 <span className="serif italic font-normal">open house.</span>
+          </h1>
+          <p className="mt-6 max-w-[420px] text-[15px] leading-relaxed text-black/65" data-testid="text-hero-description">
+            OpenHouse turns listing media and a guided phone capture into a verified, interactive home anyone can enter from the browser.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <Link to="/public/homestead-pd" className="group flex items-center gap-3 bg-[#11120f] px-6 py-3.5 text-xs font-semibold text-[#f7f6f1] rounded-lg shadow-sm hover:bg-black" data-testid="button-hero-see-home">
+              See a home <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+            <Link to="/portal" className="group flex items-center gap-2 text-xs font-medium text-black/70 hover:text-black px-4 py-3.5 rounded-lg border border-stone-300 hover:bg-stone-100/60" data-testid="link-hero-professionals">
+              For property professionals <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+            <button onClick={onInterest} className="text-xs font-medium text-[#194534] hover:underline underline-offset-4 cursor-pointer">
+              Get Early Access →
+            </button>
+          </div>
+          <p className="mt-5 font-mono text-[9.5px] text-black/45">No specialist camera&nbsp; · &nbsp;No app required for visitors</p>
+        </div>
+        <div className="relative flex min-h-[340px] items-center justify-center lg:min-h-[480px]" data-testid="display-hero-visual">
+          <div className="architectural-door flex w-full items-center justify-center">
+            <div className="dot-field absolute inset-x-3 top-[12%] h-[77%] opacity-70" />
+            <img src={heroVisual} alt="Open doorway revealing a living room by the water" className="relative z-10 mt-6 h-full max-h-[480px] w-full max-w-[740px] object-contain" data-testid="img-hero-property" />
+          </div>
+          <span className="absolute bottom-2 left-0 font-mono text-[9px] text-black/45">CAPTURE 01&nbsp;&nbsp; / &nbsp;&nbsp;SPATIAL ENTRY</span>
+        </div>
+      </div>
+      <div className="mt-12 hidden items-center gap-4 border-t border-black/15 pt-4 md:flex" data-testid="display-hero-flow">
+        {['Listing', 'Evidence', 'Capture', 'Experience', 'Verification', 'Open house'].map((item, index) => (
+          <div key={item} className="flex flex-1 items-center gap-3">
+            <span className={`font-mono text-[9.5px] uppercase font-medium ${index === 1 ? 'text-[#4d7145]' : 'text-black/55'}`}>{item}</span>
+            {index < 5 && (
+              <span className="h-px flex-1 bg-black/20">
+                <span className={`block h-1 w-1 -translate-y-1/2 rounded-full ${index === 0 ? 'bg-[#4d7145]' : 'bg-black/30'}`} />
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function FlowSection() {
+  const ref = useReveal<HTMLElement>()
+  return (
+    <section id="process" ref={ref} className="reveal border-t border-black/10 px-6 py-20 lg:px-12 lg:py-28" data-testid="section-process">
+      <div className="mx-auto max-w-[1440px]">
+        <div className="mb-12 grid gap-8 lg:grid-cols-[1fr_1fr]">
+          <div><h2 className="max-w-[540px] text-4xl leading-[.98] tracking-[-.06em] font-semibold text-stone-900 sm:text-6xl">One listing in.<br />A verified <span className="serif italic font-normal">open house</span> out.</h2></div>
+          <p className="max-w-[340px] self-end text-sm leading-relaxed text-black/60 lg:ml-auto">OpenHouse organizes the property evidence, handles missing coverage, prepares the spatial experience and asks for approval before it goes live.</p>
+        </div>
+        <div className="overflow-hidden border border-black/15 bg-[#eeece5] rounded-xl shadow-xs" data-testid="display-process-pipeline">
+          <img src={listingToOpenhouse} alt="OpenHouse listing, evidence, and publishing workflow" className="block h-auto w-full object-contain" data-testid="img-listing-to-openhouse" />
+        </div>
+        <div className="mt-6 grid gap-8 border-t border-black/15 pt-6 md:grid-cols-3">
+          {[
+            ['01', 'Listing detected', 'We automatically detect new listings and ingest media, tours and plans.'],
+            ['02', 'Evidence checked', 'Gemini 3.7 Flash maps the spaces, verifies coverage and flags what’s missing.'],
+            ['03', 'Human approval preserved', 'You review the confidence ledger and approve it with one click.'],
+          ].map(([num, title, copy], index) => (
+            <div key={num} className={`reveal reveal-delay-${index + 1}`}>
+              <div className="mb-3 flex items-center gap-3">
+                <span className="h-1.5 w-1.5 bg-[#4d7145] rounded-full" />
+                <span className="mono-label text-[#4d7145] font-bold">{num}</span>
+              </div>
+              <h3 className="text-sm font-bold text-stone-900">{title}</h3>
+              <p className="mt-1.5 max-w-[280px] text-xs leading-relaxed text-black/60">{copy}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ExperienceSection() {
+  const ref = useReveal<HTMLElement>()
+  return (
+    <section id="system" ref={ref} className="reveal dark-panel px-6 py-20 lg:px-12 lg:py-28" data-testid="section-experience">
+      <div className="mx-auto max-w-[1440px]">
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_.95fr]">
+          <div>
+            <h2 className="max-w-[700px] text-4xl leading-[.95] tracking-[-.06em] sm:text-6xl font-semibold">
+              Let people enter the home<br />before they <span className="serif italic font-normal">schedule it.</span>
+            </h2>
+          </div>
+          <p className="max-w-[320px] text-sm leading-relaxed text-white/60 lg:ml-auto">
+            Visitors can take a guided tour, explore freely, ask about the property with grounded AI, and book an inspection—all in the browser.
+          </p>
+        </div>
+        <div className="mt-12 overflow-hidden border border-white/20 rounded-xl" data-testid="display-visitor-experience">
+          <img src={visitorExperience} alt="OpenHouse browser-based visitor experience with rooms, guided tour, and inspection controls" className="block h-auto w-full object-contain" data-testid="img-visitor-experience" />
+        </div>
+        <div className="mt-8 grid divide-y divide-white/15 border-t border-white/15 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+          {[
+            [Network, 'Guided tour', 'Follow a tour with a structured, story-led flow.'],
+            [Eye, 'Free exploration', 'Move freely through every space at your own pace.'],
+            [CircleHelp, 'Grounded questions', 'Ask Gemini 3.7 Flash about the home grounded strictly in spatial facts.'],
+            [PanelTop, 'Book inspection', 'Choose a time that works and confirm viewings instantly.'],
+          ].map(([Icon, title, copy]) => (
+            <div key={title as string} className="flex gap-4 py-6 first:pr-5 sm:px-5 lg:px-4">
+              <Icon size={24} strokeWidth={1.5} className="shrink-0 text-white/75" />
+              <div>
+                <p className="text-[12px] font-bold uppercase tracking-wider text-white">{title as string}</p>
+                <p className="mt-1.5 max-w-[200px] text-[11.5px] leading-relaxed text-white/55">{copy as string}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function EvidenceSection() {
+  const ref = useReveal<HTMLElement>()
+  return (
+    <section id="trust" ref={ref} className="reveal px-6 py-20 lg:px-12 lg:py-28" data-testid="section-evidence">
+      <div className="mx-auto max-w-[1440px]">
+        <div className="grid gap-10 lg:grid-cols-[1.25fr_.75fr]">
+          <div>
+            <h2 className="max-w-[690px] text-4xl leading-[.96] tracking-[-.06em] font-semibold text-stone-900 sm:text-6xl">
+              From property evidence<br />to a <span className="serif italic font-normal">verified</span> place.
+            </h2>
+            <span className="mt-6 block h-px w-12 bg-black/30" />
+            <p className="mt-4 text-sm leading-relaxed text-black/65">
+              Code controls the process.<br />Gemini 3.7 Flash handles spatial ambiguity.<br />Gaussian Splatting resolves the property.
+            </p>
+          </div>
+          <div className="lg:pt-6">
+            <p className="mono-label mb-4 text-[#4d7145] font-bold">Evidence status</p>
+            <div className="border-l border-black/15 pl-5 space-y-4">
+              {['Listing collected via webhook', 'Seven spaces identified', 'Balcony capture link dispatched', 'Recaptured footage received', 'Building interactive experience'].map((status, i) => (
+                <div key={status} className="relative flex items-center gap-3 text-[12px] font-medium text-black/70">
+                  <span className={`-ml-[27px] flex h-4 w-4 items-center justify-center rounded-full border ${i < 4 ? 'border-[#4d7145] bg-[#4d7145] text-[#f7f6f1]' : 'border-black/35 bg-[#f8f7f3]'}`}>
+                    {i < 4 ? <Check size={10} /> : <span className="h-1.5 w-1.5 rounded-full bg-[#4d7145]" />}
+                  </span>
+                  {status}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="relative mt-14 overflow-hidden border-y border-black/15 bg-[#f2f1ec] py-8 rounded-xl" data-testid="display-evidence-timeline">
+          <img src={propertyProcess} alt="OpenHouse property process from listing detected through published experience" className="block h-auto w-full object-contain" data-testid="img-property-process" />
+        </div>
+        <div className="mt-10 flex flex-col items-start justify-between gap-5 border-b border-black/15 pb-5 font-mono text-[10px] uppercase tracking-[.1em] sm:flex-row sm:items-center">
+          <span>One listing went in.</span>
+          <span className="hidden h-px flex-1 bg-black/15 sm:block" />
+          <span className="text-[#4d7145] font-bold">A verified mobile</span>
+          <span className="serif text-3xl normal-case tracking-[-.04em] font-serif">Open house</span>
+          <span>came out.</span>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ProfessionalsSection({ onInterest }: { onInterest: () => void }) {
+  const ref = useReveal<HTMLElement>()
+  return (
+    <section id="professionals" ref={ref} className="reveal border-t border-black/10 bg-[#e9e8e1] px-6 py-20 lg:px-12 lg:py-24" data-testid="section-professionals">
+      <div className="mx-auto grid max-w-[1440px] items-end gap-10 lg:grid-cols-[1.1fr_.9fr]">
+        <div>
+          <p className="mono-label mb-4 text-[#4d7145] font-bold">For property professionals</p>
+          <h2 className="max-w-[630px] text-4xl leading-[.97] tracking-[-.06em] font-semibold text-stone-900 sm:text-6xl">
+            Your listing should<br />stay <span className="serif italic font-normal">open</span>.
+          </h2>
+        </div>
+        <div className="lg:pl-10">
+          <p className="max-w-[400px] text-sm leading-relaxed text-black/65">
+            OpenHouse gives every property a persistent, evidence-backed place online—ready when a buyer is, without asking your team to rebuild the experience by hand.
+          </p>
+          <div className="mt-6 flex items-center gap-4">
+            <Link to="/portal" className="group inline-flex items-center gap-2 bg-[#11120f] px-5 py-3 text-xs font-semibold text-[#f7f6f1] rounded-lg hover:bg-black" data-testid="button-professional-intro">
+              Simulate Ingestion Gateway <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+            <button onClick={onInterest} className="text-xs font-medium text-stone-700 hover:text-stone-900 underline underline-offset-4 cursor-pointer">
+              Talk to OpenHouse
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Footer({ onInterest }: { onInterest: () => void }) {
+  return (
+    <footer className="relative overflow-hidden bg-[#f8f7f3] px-6 pt-16 lg:px-12 lg:pt-20" data-testid="site-footer">
+      <div className="relative z-10 mx-auto max-w-[1440px] overflow-hidden rounded-2xl border border-stone-200">
+        <img src={closingVisual} alt="OpenHouse closing visual showing a home opening into a persistent open house" className="block h-auto w-full object-contain" data-testid="img-closing-visual" />
+      </div>
+      <div className="relative z-10 mx-auto mt-8 max-w-[900px] text-center">
+        <p className="mono-label text-[#4d7145] font-bold">OpenHouse&nbsp; / &nbsp;Ready when the listing is</p>
+        <h2 className="mt-5 text-4xl leading-[.92] tracking-[-.065em] font-semibold text-stone-900 sm:text-6xl">
+          Your next open house<br /><span className="serif italic font-normal">never has to close.</span>
+        </h2>
+        <p className="mx-auto mt-4 max-w-[500px] text-sm leading-relaxed text-black/65">
+          Add the property. OpenHouse prepares the experience and brings you in only when evidence or approval is needed.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link to="/portal" className="bg-[#11120f] px-7 py-3 text-xs font-semibold text-[#f7f6f1] hover:bg-black rounded-lg shadow-sm" data-testid="button-footer-add-property">
+            Simulate Ingestion
+          </Link>
+          <Link to="/public/homestead-pd" className="border border-black/25 px-7 py-3 text-xs font-semibold text-stone-900 hover:bg-black/5 rounded-lg" data-testid="link-footer-see-experience">
+            See the live experience
+          </Link>
+        </div>
+        <p className="mt-5 font-mono text-[9.5px] text-black/45">Guided phone capture&nbsp; · &nbsp;Browser-based viewing&nbsp; · &nbsp;Approval before publishing</p>
+      </div>
+
+      <div className="relative z-10 mx-auto mt-16 grid max-w-[1440px] gap-8 border-t border-black/15 py-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+        <div>
+          <Logo />
+          <p className="mt-3 max-w-[200px] text-[11.5px] leading-relaxed text-black/60">
+            Every listing becomes<br />a 24/7 open house.
+          </p>
+          <p className="mt-4 font-mono text-[9px] font-bold text-[#4d7145]">● &nbsp;SYSTEM / EXPERIENCE READY</p>
+        </div>
+        <div>
+          <p className="mono-label mb-3 text-black/50 font-bold">Product</p>
+          <div className="space-y-2 text-[11.5px] text-black/65">
+            <a className="block hover:text-black" href="#process" data-testid="link-footer-how-it-works">How it works</a>
+            <a className="block hover:text-black" href="#professionals" data-testid="link-footer-professionals">For professionals</a>
+            <Link className="block hover:text-black" to="/public/homestead-pd" data-testid="link-footer-experience">See an experience</Link>
+            <a className="block hover:text-black" href="#trust" data-testid="link-footer-trust">Trust</a>
+          </div>
+        </div>
+        <div>
+          <p className="mono-label mb-3 text-black/50 font-bold">App & Demo</p>
+          <div className="space-y-2 text-[11.5px] text-black/65">
+            <Link className="block hover:text-black font-semibold text-[#194534]" to="/portal">MLS Ingestion Gateway</Link>
+            <Link className="block hover:text-black" to="/login">Realtor Sign In</Link>
+            <Link className="block hover:text-black" to="/properties">Properties Dashboard</Link>
+            <Link className="block hover:text-black" to="/capture/homestead-pool">Mobile Capture View</Link>
+          </div>
+        </div>
+        <div>
+          <p className="mono-label mb-3 text-black/50 font-bold">Hackathon</p>
+          <div className="space-y-2 text-[11.5px] text-black/65">
+            <a className="block hover:text-black" href="https://github.com/Bigestdave/OpenHouse" target="_blank" rel="noreferrer">GitHub Repository</a>
+            <span className="block text-[11px] text-stone-500 font-mono">#AllThingsAgentic</span>
+            <button onClick={onInterest} className="block text-left hover:text-black text-[#194534] font-medium" data-testid="button-footer-contact">Request Early Access</button>
+          </div>
+        </div>
+      </div>
+      <div id="contact" className="relative z-10 mx-auto flex max-w-[1440px] justify-between border-t border-black/15 py-4 font-mono text-[9px] text-black/45">
+        <span>OPENHOUSE SYSTEMS INC.</span>
+        <span>© 2026 OpenHouse · Powered by Google Gemini 3.7 Flash & Cloud Run</span>
+      </div>
+    </footer>
+  )
+}
 
 export function LandingScreen() {
+  const [interestOpen, setInterestOpen] = useState(false)
   return (
-    <div className="min-h-screen w-full bg-app text-ink font-sans">
-      <Nav />
+    <div className="site-shell min-h-screen bg-[#f8f7f3] text-stone-900 font-sans selection:bg-[#4d7145]/20">
+      <Header onInterest={() => setInterestOpen(true)} />
       <main>
-        <Hero />
-        <div id="product">
-          <NotAnotherGenerator />
-        </div>
-        <div id="how-it-works">
-          <StickyPipeline />
-        </div>
-        <div id="examples">
-          <OneShot />
-        </div>
-        <div id="technology">
-          <Continuity />
-        </div>
-        <CTA />
+        <Hero onInterest={() => setInterestOpen(true)} />
+        <FlowSection />
+        <ExperienceSection />
+        <EvidenceSection />
+        <ProfessionalsSection onInterest={() => setInterestOpen(true)} />
       </main>
-      <Footer />
+      <Footer onInterest={() => setInterestOpen(true)} />
+      <InterestPanel open={interestOpen} onClose={() => setInterestOpen(false)} />
     </div>
-  );
+  )
 }
