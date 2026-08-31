@@ -201,22 +201,54 @@ function FlowSection() {
   return (
     <section id="process" ref={ref} className="reveal border-t border-black/10 px-6 py-20 lg:px-12 lg:py-28" data-testid="section-process">
       <div className="mx-auto max-w-[1440px]">
-        <div className="mb-12 grid gap-8 lg:grid-cols-[1fr_1fr]">
-          <div><h2 className="max-w-[540px] text-4xl leading-[.98] tracking-[-.06em] font-semibold text-stone-900 sm:text-6xl">One listing in.<br />A verified <span className="serif italic font-normal">open house</span> out.</h2></div>
-          <p className="max-w-[340px] self-end text-sm leading-relaxed text-black/60 lg:ml-auto">OpenHouse organizes the property evidence, handles missing coverage, prepares the spatial experience and asks for approval before it goes live.</p>
+        <div className="mb-10">
+          <p className="mono-label mb-4 text-[#4d7145] font-bold flex items-center gap-2">
+            <span className="inline-block h-2 w-2 bg-[#4d7145]" />
+            01 / FROM LISTING TO EXPERIENCE
+          </p>
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+            <h2 className="text-4xl leading-[.98] tracking-[-.06em] font-semibold text-stone-900 sm:text-6xl">
+              One listing in.<br />A verified <span className="serif italic font-normal">open house</span> out.
+            </h2>
+            <p className="max-w-[360px] self-end text-sm leading-relaxed text-black/60 lg:ml-auto">
+              OpenHouse organizes the property evidence, handles missing coverage, prepares the spatial experience and asks for approval before it goes live.
+            </p>
+          </div>
         </div>
-        <div className="overflow-hidden border border-black/15 bg-[#eeece5] rounded-xl shadow-xs" data-testid="display-process-pipeline">
+
+        {/* Seamless Diagram Visual */}
+        <div className="overflow-hidden bg-transparent my-6" data-testid="display-process-pipeline">
           <img src={listingToOpenhouse} alt="OpenHouse listing, evidence, and publishing workflow" className="block h-auto w-full object-contain" data-testid="img-listing-to-openhouse" />
         </div>
-        <div className="mt-6 grid gap-8 border-t border-black/15 pt-6 md:grid-cols-3">
+
+        {/* Pipeline Bar */}
+        <div className="hidden sm:flex items-center justify-between font-mono text-[10px] uppercase text-black/50 border-t border-black/15 pt-3 pb-6">
+          <div className="flex items-center gap-3">
+            <span className="font-bold text-black/70">INGEST</span>
+            <span className="h-px w-24 bg-black/20" />
+            <span className="h-1.5 w-1.5 rounded-full bg-black/40" />
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#4d7145]" />
+            <span className="font-bold text-[#4d7145]">VERIFY</span>
+            <span className="h-px w-24 bg-black/20" />
+            <span className="h-2 w-2 bg-black/80" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-black/70">PUBLISH</span>
+          </div>
+        </div>
+
+        {/* 3 Step Cards */}
+        <div className="grid gap-8 border-t border-black/15 pt-8 md:grid-cols-3">
           {[
             ['01', 'Listing detected', 'We automatically detect new listings and ingest media, tours and plans.'],
-            ['02', 'Evidence checked', 'Gemini 3.7 Flash maps the spaces, verifies coverage and flags what’s missing.'],
-            ['03', 'Human approval preserved', 'You review the confidence ledger and approve it with one click.'],
+            ['02', 'Evidence checked', 'We map the spaces, verify coverage and resolve what’s missing.'],
+            ['03', 'Human approval preserved', 'You review the experience and approve it before it goes live.'],
           ].map(([num, title, copy], index) => (
             <div key={num} className={`reveal reveal-delay-${index + 1}`}>
-              <div className="mb-3 flex items-center gap-3">
-                <span className="h-1.5 w-1.5 bg-[#4d7145] rounded-full" />
+              <div className="mb-3 flex items-center gap-2 text-stone-400">
+                <span className="text-[13px] font-light text-stone-500">+</span>
                 <span className="mono-label text-[#4d7145] font-bold">{num}</span>
               </div>
               <h3 className="text-sm font-bold text-stone-900">{title}</h3>
@@ -241,24 +273,24 @@ function ExperienceSection() {
             </h2>
           </div>
           <p className="max-w-[320px] text-sm leading-relaxed text-white/60 lg:ml-auto">
-            Visitors can take a guided tour, explore freely, ask about the property with grounded AI, and book an inspection—all in the browser.
+            Visitors can take a guided tour, explore freely, ask about the property and book an inspection—all from the browser.
           </p>
         </div>
-        <div className="mt-12 overflow-hidden border border-white/20 rounded-xl" data-testid="display-visitor-experience">
+        <div className="mt-12 overflow-hidden border border-white/15 rounded-lg" data-testid="display-visitor-experience">
           <img src={visitorExperience} alt="OpenHouse browser-based visitor experience with rooms, guided tour, and inspection controls" className="block h-auto w-full object-contain" data-testid="img-visitor-experience" />
         </div>
         <div className="mt-8 grid divide-y divide-white/15 border-t border-white/15 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
           {[
             [Network, 'Guided tour', 'Follow a tour with a structured, story-led flow.'],
             [Eye, 'Free exploration', 'Move freely through every space at your own pace.'],
-            [CircleHelp, 'Grounded questions', 'Ask Gemini 3.7 Flash about the home grounded strictly in spatial facts.'],
-            [PanelTop, 'Book inspection', 'Choose a time that works and confirm viewings instantly.'],
+            [CircleHelp, 'Grounded questions', 'Ask about the home with context from real property data.'],
+            [PanelTop, 'Book inspection', 'Choose a time that works and confirm instantly.'],
           ].map(([Icon, title, copy]) => (
             <div key={title as string} className="flex gap-4 py-6 first:pr-5 sm:px-5 lg:px-4">
-              <Icon size={24} strokeWidth={1.5} className="shrink-0 text-white/75" />
+              <Icon size={24} strokeWidth={1.2} className="shrink-0 text-white/75" />
               <div>
                 <p className="text-[12px] font-bold uppercase tracking-wider text-white">{title as string}</p>
-                <p className="mt-1.5 max-w-[200px] text-[11.5px] leading-relaxed text-white/55">{copy as string}</p>
+                <p className="mt-1.5 max-w-[200px] text-[11.5px] leading-relaxed text-white/50">{copy as string}</p>
               </div>
             </div>
           ))}
@@ -273,39 +305,75 @@ function EvidenceSection() {
   return (
     <section id="trust" ref={ref} className="reveal px-6 py-20 lg:px-12 lg:py-28" data-testid="section-evidence">
       <div className="mx-auto max-w-[1440px]">
-        <div className="grid gap-10 lg:grid-cols-[1.25fr_.75fr]">
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_.8fr]">
           <div>
+            <p className="mono-label mb-4 text-[#4d7145] font-bold">06 / FROM EVENT TO EXPERIENCE</p>
             <h2 className="max-w-[690px] text-4xl leading-[.96] tracking-[-.06em] font-semibold text-stone-900 sm:text-6xl">
               From property evidence<br />to a <span className="serif italic font-normal">verified</span> place.
             </h2>
             <span className="mt-6 block h-px w-12 bg-black/30" />
             <p className="mt-4 text-sm leading-relaxed text-black/65">
-              Code controls the process.<br />Gemini 3.7 Flash handles spatial ambiguity.<br />Gaussian Splatting resolves the property.
+              Code controls the process.<br />The agent handles ambiguity.<br />Spatial software resolves the property.
             </p>
           </div>
-          <div className="lg:pt-6">
-            <p className="mono-label mb-4 text-[#4d7145] font-bold">Evidence status</p>
-            <div className="border-l border-black/15 pl-5 space-y-4">
-              {['Listing collected via webhook', 'Seven spaces identified', 'Balcony capture link dispatched', 'Recaptured footage received', 'Building interactive experience'].map((status, i) => (
-                <div key={status} className="relative flex items-center gap-3 text-[12px] font-medium text-black/70">
-                  <span className={`-ml-[27px] flex h-4 w-4 items-center justify-center rounded-full border ${i < 4 ? 'border-[#4d7145] bg-[#4d7145] text-[#f7f6f1]' : 'border-black/35 bg-[#f8f7f3]'}`}>
-                    {i < 4 ? <Check size={10} /> : <span className="h-1.5 w-1.5 rounded-full bg-[#4d7145]" />}
-                  </span>
-                  {status}
+
+          <div className="lg:pt-2 border-l border-black/15 pl-6">
+            <p className="mono-label mb-4 text-black/60 font-bold">EVIDENCE STATUS</p>
+            <div className="space-y-3.5 text-[12px]">
+              <div className="flex items-center gap-2.5 text-black/75">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#11120f] text-white"><Check size={10} /></span>
+                <span>Listing collected</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-black/75">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#11120f] text-white"><Check size={10} /></span>
+                <span>Seven spaces identified</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-black/75">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#11120f] text-white"><Check size={10} /></span>
+                <span>Balcony capture requested</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-black/75">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#11120f] text-white"><Check size={10} /></span>
+                <span>New footage received</span>
+              </div>
+              <div className="flex items-start gap-2.5 text-black/90 font-medium">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#11120f] text-white mt-0.5"><ArrowRight size={10} /></span>
+                <div>
+                  <p>Building interactive experience</p>
+                  <p className="text-[10px] text-stone-500 font-normal">In progress</p>
                 </div>
-              ))}
+              </div>
+              <div className="flex items-start gap-2.5 text-black/45">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full border border-black/30 mt-0.5" />
+                <div>
+                  <p>Final review</p>
+                  <p className="text-[10px] text-stone-400 font-normal">Pending</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5 text-black/45">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full border border-black/30 mt-0.5" />
+                <div>
+                  <p>Ready for your approval</p>
+                  <p className="text-[10px] text-stone-400 font-normal">Pending</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="relative mt-14 overflow-hidden border-y border-black/15 bg-[#f2f1ec] py-8 rounded-xl" data-testid="display-evidence-timeline">
+
+        {/* Seamless Horizontal Flow Visual */}
+        <div className="relative mt-12 overflow-hidden bg-transparent py-4" data-testid="display-evidence-timeline">
           <img src={propertyProcess} alt="OpenHouse property process from listing detected through published experience" className="block h-auto w-full object-contain" data-testid="img-property-process" />
         </div>
-        <div className="mt-10 flex flex-col items-start justify-between gap-5 border-b border-black/15 pb-5 font-mono text-[10px] uppercase tracking-[.1em] sm:flex-row sm:items-center">
-          <span>One listing went in.</span>
+
+        {/* Dotted Headline Banner */}
+        <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-black/15 pt-6 font-mono text-[10px] uppercase tracking-[.08em] sm:flex-row sm:items-center">
+          <span>ONE LISTING WENT IN.</span>
           <span className="hidden h-px flex-1 bg-black/15 sm:block" />
-          <span className="text-[#4d7145] font-bold">A verified mobile</span>
-          <span className="serif text-3xl normal-case tracking-[-.04em] font-serif">Open house</span>
-          <span>came out.</span>
+          <span className="h-1.5 w-1.5 bg-[#4d7145]" />
+          <span>A VERIFIED MOBILE</span>
+          <span className="serif text-3xl normal-case tracking-[-.04em] font-serif font-semibold text-stone-900">OPEN HOUSE</span>
+          <span>CAME OUT.</span>
         </div>
       </div>
     </section>
@@ -343,67 +411,102 @@ function ProfessionalsSection({ onInterest }: { onInterest: () => void }) {
 
 function Footer({ onInterest }: { onInterest: () => void }) {
   return (
-    <footer className="relative overflow-hidden bg-[#f8f7f3] px-6 pt-16 lg:px-12 lg:pt-20" data-testid="site-footer">
-      <div className="relative z-10 mx-auto max-w-[1440px] overflow-hidden rounded-2xl border border-stone-200">
-        <img src={closingVisual} alt="OpenHouse closing visual showing a home opening into a persistent open house" className="block h-auto w-full object-contain" data-testid="img-closing-visual" />
-      </div>
-      <div className="relative z-10 mx-auto mt-8 max-w-[900px] text-center">
-        <p className="mono-label text-[#4d7145] font-bold">OpenHouse&nbsp; / &nbsp;Ready when the listing is</p>
-        <h2 className="mt-5 text-4xl leading-[.92] tracking-[-.065em] font-semibold text-stone-900 sm:text-6xl">
-          Your next open house<br /><span className="serif italic font-normal">never has to close.</span>
-        </h2>
-        <p className="mx-auto mt-4 max-w-[500px] text-sm leading-relaxed text-black/65">
-          Add the property. OpenHouse prepares the experience and brings you in only when evidence or approval is needed.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to="/portal" className="bg-[#11120f] px-7 py-3 text-xs font-semibold text-[#f7f6f1] hover:bg-black rounded-lg shadow-sm" data-testid="button-footer-add-property">
-            Simulate Ingestion
-          </Link>
-          <Link to="/public/homestead-pd" className="border border-black/25 px-7 py-3 text-xs font-semibold text-stone-900 hover:bg-black/5 rounded-lg" data-testid="link-footer-see-experience">
-            See the live experience
-          </Link>
+    <footer className="relative overflow-hidden bg-[#f8f7f3] pt-12" data-testid="site-footer">
+      
+      {/* Seamless Closing Hero Illustration with integrated text inside */}
+      <div className="relative mx-auto max-w-[1440px] px-6 lg:px-12">
+        <div className="relative w-full">
+          <img
+            src={closingVisual}
+            alt="OpenHouse closing visual showing an architectural home opening into a persistent open house"
+            className="block w-full h-auto object-contain pointer-events-none"
+            data-testid="img-closing-visual"
+          />
+
+          {/* Text positioned cleanly inside the lower clearing */}
+          <div className="text-center pt-4 pb-8 max-w-[900px] mx-auto">
+            <p className="mono-label text-[#4d7145] font-bold mb-3">OPENHOUSE &nbsp;/ &nbsp;READY WHEN THE LISTING IS</p>
+            <h2 className="text-4xl sm:text-6xl lg:text-[72px] leading-[.93] tracking-[-.065em] font-normal text-stone-900">
+              Your next open house<br />
+              <span className="serif italic font-normal">never has to close.</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-[520px] text-xs sm:text-sm leading-relaxed text-black/65">
+              Add the property. OpenHouse prepares the experience and brings you in only when evidence or approval is needed.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <Link to="/portal" className="bg-[#11120f] px-6 sm:px-7 py-3 sm:py-3.5 text-xs font-semibold text-[#f7f6f1] hover:bg-black rounded-lg shadow-sm" data-testid="button-footer-add-property">
+                Add a property
+              </Link>
+              <Link to="/public/homestead-pd" className="border border-black/25 bg-[#f8f7f3] px-6 sm:px-7 py-3 sm:py-3.5 text-xs font-semibold text-stone-900 hover:bg-black/5 rounded-lg" data-testid="link-footer-see-experience">
+                See the experience
+              </Link>
+            </div>
+            <p className="mt-4 font-mono text-[9px] sm:text-[10px] text-black/45">
+              Guided phone capture&nbsp; · &nbsp;Browser-based viewing&nbsp; · &nbsp;Approval before publishing
+            </p>
+          </div>
         </div>
-        <p className="mt-5 font-mono text-[9.5px] text-black/45">Guided phone capture&nbsp; · &nbsp;Browser-based viewing&nbsp; · &nbsp;Approval before publishing</p>
       </div>
 
-      <div className="relative z-10 mx-auto mt-16 grid max-w-[1440px] gap-8 border-t border-black/15 py-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
-        <div>
-          <Logo />
-          <p className="mt-3 max-w-[200px] text-[11.5px] leading-relaxed text-black/60">
-            Every listing becomes<br />a 24/7 open house.
-          </p>
-          <p className="mt-4 font-mono text-[9px] font-bold text-[#4d7145]">● &nbsp;SYSTEM / EXPERIENCE READY</p>
-        </div>
-        <div>
-          <p className="mono-label mb-3 text-black/50 font-bold">Product</p>
-          <div className="space-y-2 text-[11.5px] text-black/65">
-            <a className="block hover:text-black" href="#process" data-testid="link-footer-how-it-works">How it works</a>
-            <a className="block hover:text-black" href="#professionals" data-testid="link-footer-professionals">For professionals</a>
-            <Link className="block hover:text-black" to="/public/homestead-pd" data-testid="link-footer-experience">See an experience</Link>
-            <a className="block hover:text-black" href="#trust" data-testid="link-footer-trust">Trust</a>
+      {/* Footer Navigation Bar matching Reference Screenshot 3 */}
+      <div className="mx-auto max-w-[1440px] px-6 lg:px-12">
+        <div className="border-t border-black/15 pt-12 pb-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr]">
+          <div>
+            <Logo />
+            <p className="mt-3 max-w-[190px] text-[11px] leading-5 text-black/55">
+              Every listing becomes<br />a 24/7 open house.
+            </p>
+            <div className="mt-4 text-[9px] font-mono text-black/50 space-y-1">
+              <p className="text-[#4d7145] font-bold">● &nbsp;SYSTEM / EXPERIENCE READY</p>
+              <p>LAST ENTRY / 8 ADMIRALTY WAY</p>
+            </div>
+          </div>
+
+          <div>
+            <p className="mono-label mb-3 text-black/50 font-bold">PRODUCT</p>
+            <div className="space-y-2 text-[11.5px] text-black/65">
+              <a className="block hover:text-black" href="#process">How it works</a>
+              <a className="block hover:text-black" href="#professionals">For professionals</a>
+              <Link className="block hover:text-black" to="/public/homestead-pd">See an experience</Link>
+              <a className="block hover:text-black" href="#trust">Trust</a>
+              <Link className="block hover:text-black font-semibold text-[#194534]" to="/portal">MLS Ingestion Simulator</Link>
+            </div>
+          </div>
+
+          <div>
+            <p className="mono-label mb-3 text-black/50 font-bold">COMPANY</p>
+            <div className="space-y-2 text-[11.5px] text-black/65">
+              <a className="block hover:text-black" href="#top">About</a>
+              <button onClick={onInterest} className="block text-left hover:text-black">Contact</button>
+              <a className="block hover:text-black" href="#top">Privacy</a>
+              <a className="block hover:text-black" href="#top">Terms</a>
+            </div>
+          </div>
+
+          <div>
+            <p className="mono-label mb-3 text-black/50 font-bold">RESOURCES</p>
+            <div className="space-y-2 text-[11.5px] text-black/65">
+              <a className="block hover:text-black" href="https://github.com/Bigestdave/OpenHouse" target="_blank" rel="noreferrer">Documentation</a>
+              <a className="block hover:text-black" href="https://github.com/Bigestdave/OpenHouse" target="_blank" rel="noreferrer">GitHub</a>
+              <span className="block text-stone-500">Capture guide</span>
+              <span className="block text-stone-500">System status</span>
+            </div>
+          </div>
+
+          <div>
+            <p className="mono-label mb-3 text-black/50 font-bold">DEMO</p>
+            <div className="space-y-2 text-[11.5px] text-black/65">
+              <Link className="block hover:text-black font-semibold text-stone-900" to="/public/homestead-pd">See a home</Link>
+              <button onClick={onInterest} className="block text-left hover:text-black text-[#194534]">Request a demo</button>
+              <button onClick={onInterest} className="block text-left hover:text-black">Talk to sales</button>
+            </div>
           </div>
         </div>
-        <div>
-          <p className="mono-label mb-3 text-black/50 font-bold">App & Demo</p>
-          <div className="space-y-2 text-[11.5px] text-black/65">
-            <Link className="block hover:text-black font-semibold text-[#194534]" to="/portal">MLS Ingestion Gateway</Link>
-            <Link className="block hover:text-black" to="/login">Realtor Sign In</Link>
-            <Link className="block hover:text-black" to="/properties">Properties Dashboard</Link>
-            <Link className="block hover:text-black" to="/capture/homestead-pool">Mobile Capture View</Link>
-          </div>
+
+        <div id="contact" className="flex flex-col sm:flex-row items-center justify-between border-t border-black/15 py-4 font-mono text-[9px] text-black/45 gap-2">
+          <span>OPENHOUSE SYSTEMS INC.</span>
+          <span>© 2026 OpenHouse</span>
         </div>
-        <div>
-          <p className="mono-label mb-3 text-black/50 font-bold">Hackathon</p>
-          <div className="space-y-2 text-[11.5px] text-black/65">
-            <a className="block hover:text-black" href="https://github.com/Bigestdave/OpenHouse" target="_blank" rel="noreferrer">GitHub Repository</a>
-            <span className="block text-[11px] text-stone-500 font-mono">#AllThingsAgentic</span>
-            <button onClick={onInterest} className="block text-left hover:text-black text-[#194534] font-medium" data-testid="button-footer-contact">Request Early Access</button>
-          </div>
-        </div>
-      </div>
-      <div id="contact" className="relative z-10 mx-auto flex max-w-[1440px] justify-between border-t border-black/15 py-4 font-mono text-[9px] text-black/45">
-        <span>OPENHOUSE SYSTEMS INC.</span>
-        <span>© 2026 OpenHouse · Powered by Google Gemini 3.7 Flash & Cloud Run</span>
       </div>
     </footer>
   )
