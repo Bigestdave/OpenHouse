@@ -11,31 +11,31 @@ import { useDemoContext } from '../context/DemoContext'
 export function ListingPortalScreen() {
   const navigate = useNavigate()
   const { setStage } = useDemoContext()
-  const [selectedPreset, setSelectedPreset] = useState<'laurel_12a' | 'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom'>('laurel_12a')
+  const [selectedPreset, setSelectedPreset] = useState<'homestead_pd' | 'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom'>('homestead_pd')
 
-  const [title, setTitle] = useState('2847 Laurel Canyon Rd, Unit 12A')
-  const [address, setAddress] = useState('Austin, TX 78701')
-  const [type, setType] = useState('3-Bedroom Luxury Condo')
-  const [bedrooms, setBedrooms] = useState(3)
-  const [bathrooms, setBathrooms] = useState(2)
-  const [price, setPrice] = useState('$6,400 / month')
-  const [description, setDescription] = useState('Corner-unit high-rise condo with panoramic Lady Bird Lake views, chef kitchen with island, and wraparound balcony terrace.')
+  const [title, setTitle] = useState('72691 Homestead Road')
+  const [address, setAddress] = useState('Palm Desert, CA 92260')
+  const [type, setType] = useState('4-Bedroom Estate with Guest House')
+  const [bedrooms, setBedrooms] = useState(4)
+  const [bathrooms, setBathrooms] = useState(4)
+  const [price, setPrice] = useState('$1,495,000')
+  const [description, setDescription] = useState('Stunning mid-century modern estate in South Palm Desert with 2 bedroom suites, a detached guest house, resort-style pool, and 3-car garage on a 10,454 sqft lot.')
   const [missingSpaceFlag, setMissingSpaceFlag] = useState(true)
   const [coverImage, setCoverImage] = useState<string>(demoExterior)
 
   const [isPublishing, setIsPublishing] = useState(false)
   const [webhookSent, setWebhookSent] = useState(false)
 
-  const handleSelectPreset = (preset: 'laurel_12a' | 'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom') => {
+  const handleSelectPreset = (preset: 'homestead_pd' | 'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom') => {
     setSelectedPreset(preset)
-    if (preset === 'laurel_12a') {
-      setTitle('2847 Laurel Canyon Rd, Unit 12A')
-      setAddress('Austin, TX 78701')
-      setType('3-Bedroom Luxury Condo')
-      setBedrooms(3)
-      setBathrooms(2)
-      setPrice('$6,400 / month')
-      setDescription('Corner-unit high-rise condo with panoramic Lady Bird Lake views, chef kitchen with island, and wraparound balcony terrace.')
+    if (preset === 'homestead_pd') {
+      setTitle('72691 Homestead Road')
+      setAddress('Palm Desert, CA 92260')
+      setType('4-Bedroom Estate with Guest House')
+      setBedrooms(4)
+      setBathrooms(4)
+      setPrice('$1,495,000')
+      setDescription('Stunning mid-century modern estate in South Palm Desert with 2 bedroom suites, a detached guest house, resort-style pool, and 3-car garage on a 10,454 sqft lot.')
       setMissingSpaceFlag(true)
       setCoverImage(demoExterior)
     } else if (preset === 'park_ave') {
@@ -75,11 +75,11 @@ export function ListingPortalScreen() {
     setIsPublishing(true)
 
     // For demo preset: fire Stage 1, navigate to demo property
-    if (selectedPreset === 'laurel_12a') {
+    if (selectedPreset === 'homestead_pd') {
       setWebhookSent(true)
       setTimeout(() => {
         setStage(1)
-        navigate('/property/laurel-12a')
+        navigate('/property/homestead-pd')
       }, 1800)
       return
     }
@@ -174,12 +174,12 @@ export function ListingPortalScreen() {
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-            {/* DEMO PRESET — Laurel Canyon */}
+            {/* DEMO PRESET — Homestead Palm Desert */}
             <button
               type="button"
-              onClick={() => handleSelectPreset('laurel_12a')}
+              onClick={() => handleSelectPreset('homestead_pd')}
               className={`p-4 rounded-xl border text-left transition-all cursor-pointer relative ${
-                selectedPreset === 'laurel_12a'
+                selectedPreset === 'homestead_pd'
                   ? 'border-[#194534] bg-emerald-50/50 ring-2 ring-[#194534]/20'
                   : 'border-stone-200 bg-white hover:border-stone-300'
               }`}
@@ -188,11 +188,11 @@ export function ListingPortalScreen() {
                 Demo
               </div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-bold text-stone-900">2847 Laurel Canyon Rd</span>
+                <span className="text-xs font-bold text-stone-900">72691 Homestead Road</span>
               </div>
-              <p className="text-xs text-stone-500">Austin, TX · \$6,400/mo</p>
+              <p className="text-xs text-stone-500">Palm Desert, CA · $1,495,000</p>
               <p className="text-[11px] text-amber-700 font-medium mt-2">
-                Simulates missing balcony terrace footage — full demo flow.
+                Simulates missing pool-to-guest house footage — full demo flow.
               </p>
             </button>
 

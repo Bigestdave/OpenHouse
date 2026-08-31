@@ -9,13 +9,13 @@ export function CaptureRequestDetailScreen() {
   const { id } = useParams()
   const [copied, setCopied] = useState(false)
 
-  const isDemo = id === 'laurel-balcony' || id?.includes('laurel') || id?.includes('balcony') || !id || id === '1'
+  const isDemo = id === 'homestead-pool' || id?.includes('homestead') || id?.includes('pool') || !id || id === '1'
 
-  const propTitle = isDemo ? '2847 Laurel Canyon Rd, Unit 12A' : '14 Cooper Road'
-  const propLocation = isDemo ? 'Austin, TX' : 'Ikoyi, Lagos'
-  const captureTitle = isDemo ? 'Balcony-to-living connection' : 'Kitchen-to-dining connection'
+  const propTitle = isDemo ? '72691 Homestead Road, Palm Desert' : '14 Cooper Road'
+  const propLocation = isDemo ? 'Palm Desert, CA' : 'Ikoyi, Lagos'
+  const captureTitle = isDemo ? 'Pool-to-guest house connection' : 'Kitchen-to-dining connection'
   const captureImg = isDemo ? demoBalcony : '/src/assets/prop-kitchen.png'
-  const captureRouteId = isDemo ? 'laurel-balcony' : '14-cooper'
+  const captureRouteId = isDemo ? 'homestead-pool' : '14-cooper'
 
   return (
     <WorkspaceShell

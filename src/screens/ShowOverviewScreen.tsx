@@ -24,15 +24,15 @@ import demoExterior from '../assets/demo-exterior.jpg'
 const tabs = ['Overview', 'Evidence', 'Experience', 'Activity'] as const
 type TabType = (typeof tabs)[number]
 
-// Demo property rooms (US property with AI-generated images)
+// Demo property rooms (Palm Desert estate with real Matterport images)
 const DEMO_ROOMS = [
-  { id: 'entrance',  name: 'Entry Foyer',      img: demoExterior },
-  { id: 'living',    name: 'Living Room',       img: demoLiving   },
-  { id: 'kitchen',   name: 'Kitchen',           img: demoKitchen  },
-  { id: 'main-bed',  name: 'Primary Bedroom',   img: demoBed      },
-  { id: 'bathroom',  name: 'Primary Bathroom',  img: demoBath     },
-  { id: 'bed-2',     name: 'Bedroom 2',         img: demoBed      },
-  { id: 'balcony',   name: 'Balcony Terrace',   img: demoBalcony  },
+  { id: 'entrance',  name: 'Entry & Patio',       img: demoExterior },
+  { id: 'living',    name: 'Living Room',          img: demoLiving   },
+  { id: 'kitchen',   name: 'Dining & Kitchen',     img: demoKitchen  },
+  { id: 'main-bed',  name: 'Primary Suite',        img: demoBed      },
+  { id: 'bathroom',  name: 'Primary Bathroom',     img: demoBath     },
+  { id: 'bed-2',     name: 'Guest Suite',          img: demoBed      },
+  { id: 'balcony',   name: 'Pool & Outdoor',       img: demoBalcony  },
 ]
 
 // Fallback rooms for non-demo properties
@@ -49,7 +49,7 @@ const ROOM_LIST = [
 export function ShowOverviewScreen() {
   const { id } = useParams()
   const demoStage = useDemoStage()
-  const isDemoProperty = id === DEMO_PROPERTY_ID || id === 'laurel-12a'
+  const isDemoProperty = id === DEMO_PROPERTY_ID || id === 'homestead-pd'
   const roomList = isDemoProperty ? DEMO_ROOMS : ROOM_LIST
 
   const [tab, setTab] = useState<TabType>('Overview')
@@ -78,10 +78,10 @@ export function ShowOverviewScreen() {
           setShow({
             id: id,
             title: isDemoProperty
-              ? '2847 Laurel Canyon Rd, Unit 12A'
+              ? '72691 Homestead Road, Palm Desert'
               : id.includes('admiralty') ? '8 Admiralty Way' : id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
             premise: isDemoProperty
-              ? '3-bed · 2-bath condo · Austin, TX 78701'
+              ? '4-bed · 4-bath estate · Palm Desert, CA 92260'
               : '3-bedroom apartment · Lekki, Lagos',
             status: 'Preparing experience',
             created_at: '2026-08-25T10:00:00Z',
@@ -278,7 +278,7 @@ export function ShowOverviewScreen() {
                       </h2>
                       <p className="pt-2 text-[13.5px] text-text-secondary leading-relaxed">
                         {isDemoProperty
-                          ? 'Collecting and processing all spaces for 2847 Laurel Canyon Rd. Estimated 18–25 minutes.'
+                          ? 'Collecting and processing all spaces for 72691 Homestead Road. Estimated 18–25 minutes.'
                           : 'The additional balcony capture passed its quality check. OpenHouse is now preparing the connected experience.'}
                       </p>
                     </>

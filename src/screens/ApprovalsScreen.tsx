@@ -44,14 +44,14 @@ export function ApprovalsScreen() {
   // Featured Property (matches reference hero card)
   const featuredProperty: ApprovalItem = {
     id: DEMO_PROPERTY_ID,
-    title: '2847 Laurel Canyon Rd, Unit 12A',
-    subtitle: '3-bedroom luxury condo · Austin, TX 78701',
+    title: '72691 Homestead Road, Palm Desert',
+    subtitle: '4-bedroom estate with guest house · Palm Desert, CA 92260',
     image: demoLiving,
-    representation: '7 of 7 advertised rooms represented',
+    representation: '7 of 7 advertised spaces represented',
     status: 'READY TO PUBLISH',
     checklist: [
       '7 of 7 advertised spaces represented',
-      'Balcony recapture verified & integrated',
+      'Pool-to-guest house recapture verified & integrated',
       'Gemini spatial continuity validated',
     ],
   }

@@ -43,8 +43,8 @@ export interface DemoNotification {
   read: boolean
 }
 
-export const DEMO_PROPERTY_ID = 'laurel-12a'
-export const DEMO_PROPERTY_LABEL = '2847 Laurel Canyon Rd, Unit 12A'
+export const DEMO_PROPERTY_ID = 'homestead-pd'
+export const DEMO_PROPERTY_LABEL = '72691 Homestead Road, Palm Desert'
 
 export const DEMO_SCRIPT: Record<DemoStage, {
   toast?: Omit<Toast, 'id'>
@@ -84,30 +84,30 @@ export const DEMO_SCRIPT: Record<DemoStage, {
   3: {
     toast: {
       kind: 'warning',
-      title: 'Recapture needed — Balcony connection',
+      title: 'Recapture needed — Pool-to-guest house transition',
       body: `Gemini detected a missing angle on ${DEMO_PROPERTY_LABEL}. A guide has been prepared.`,
-      action: { label: 'View capture request', route: `/capture-requests/orchid-balcony` },
+      action: { label: 'View capture request', route: `/capture-requests/homestead-pool` },
       duration: 10000,
     },
     notification: {
       kind: 'warning',
       title: 'Missing capture detected',
-      body: `Balcony connection missing on ${DEMO_PROPERTY_LABEL}. Recapture guide ready.`,
-      route: `/capture-requests/orchid-balcony`,
+      body: `Pool-to-guest house transition missing on ${DEMO_PROPERTY_LABEL}. Recapture guide ready.`,
+      route: `/capture-requests/homestead-pool`,
     },
   },
   4: {
     toast: {
       kind: 'success',
       title: 'Recapture received',
-      body: `Balcony footage uploaded for ${DEMO_PROPERTY_LABEL}. OpenHouse is resuming build.`,
+      body: `Pool transition footage uploaded for ${DEMO_PROPERTY_LABEL}. OpenHouse is resuming build.`,
       action: { label: 'View experience', route: `/property/${DEMO_PROPERTY_ID}` },
       duration: 8000,
     },
     notification: {
       kind: 'success',
       title: 'Recapture received',
-      body: `${DEMO_PROPERTY_LABEL} — balcony footage approved. Resuming synthesis.`,
+      body: `${DEMO_PROPERTY_LABEL} — pool footage approved. Resuming synthesis.`,
       route: `/property/${DEMO_PROPERTY_ID}`,
     },
   },
