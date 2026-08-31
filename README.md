@@ -1,4 +1,4 @@
-﻿# OpenHouse 🏡
+# OpenHouse 🏡
 ### Autonomous 3D Real Estate Inspection Layer Powered by Google Gemini & Google Cloud
 
 > **Winner Submission for #AllThingsAgenticHackathon**  
@@ -11,7 +11,7 @@ The biggest bottleneck in modern real estate is physical viewings. Prospective t
 
 **OpenHouse solves this autonomously:**
 1. **Zero New Workflow for Realtors:** Realtors upload photos & floor plans to their existing listing portals (MLS, Zillow, Redfin, Airbnb).
-2. **Autonomous Gemini Ingestion:** OpenHouse ingests the listing webhook, uses **Gemini 2.5 Flash / 3.5** to validate spatial room continuity, and identifies missing spatial angles (e.g., unbridged balcony transitions).
+2. **Autonomous Gemini Ingestion:** OpenHouse ingests the listing webhook, uses **Gemini 3.7 Flash** to validate spatial room continuity, and identifies missing spatial angles (e.g., unbridged balcony transitions).
 3. **Instant Mobile Recapture Guide:** If an angle is missing, a 15-second guided mobile capture request is automatically dispatched to the agent’s phone.
 4. **Interactive 3D Virtual Open House:** Once verified, OpenHouse publishes a photorealistic 3D inspection viewer with an interactive **Ask OpenHouse** multimodal AI assistant and direct inspection booking.
 
@@ -20,7 +20,7 @@ The biggest bottleneck in modern real estate is physical viewings. Prospective t
 ## 🛠️ Google Technologies Required & Disclosed
 
 ### 1. Google Gemini Models
-- **Gemini 2.5 Flash & Gemini 3.5 Pro:** Multi-modal vision analysis evaluating room coverage, boundary transitions, daylight orientations, and spatial cross-referencing against architectural floor plans.
+- **Gemini 3.7 Flash:** Multi-modal vision analysis evaluating room coverage, boundary transitions, daylight orientations, and spatial cross-referencing against architectural floor plans.
 - **Multimodal Spatial QA:** Powers the *Ask OpenHouse* prospective buyer assistant in the 3D viewer.
 
 ### 2. Google Agent Framework
@@ -38,7 +38,7 @@ The biggest bottleneck in modern real estate is physical viewings. Prospective t
 ```mermaid
 graph TD
     A[Realtor Listing Portals: Zillow / MLS / Redfin] -->|Listing Webhook| B[Google Cloud Run: Ingestion Engine]
-    B --> C[Gemini 2.5 / 3.5 Spatial Intelligence Agent]
+    B --> C[Gemini 3.7 Flash Spatial Intelligence Agent]
     
     C -->|Continuity Check Passed| D[OpenHouse 3D Spatial Reconstruction]
     C -->|Incomplete Angle Flagged| E[Autonomous Mobile Capture Dispatch]

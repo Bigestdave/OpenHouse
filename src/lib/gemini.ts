@@ -1,6 +1,6 @@
-﻿/**
+/**
  * OpenHouse Gemini AI Spatial Intelligence Agent
- * Powered by Google Gen AI SDK (@google/genai) & Gemini 2.5 Flash / Gemini 3.5 Pro
+ * Powered by Google Gen AI SDK (@google/genai) & Gemini 3.7 Flash
  * 
  * Functions:
  * 1. Autonomous Room & Spatial Continuity Validator (Flags missing connections like Balcony Terrace)
@@ -35,7 +35,7 @@ export async function validatePropertySpatialContinuity(
   if (ai) {
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.7-flash',
         contents: `You are the OpenHouse Spatial Intelligence Agent analyzing uploaded real estate media for "${propertyTitle}".
 Spaces provided: ${spacesList.join(', ')}.
 Evaluate spatial continuity and identify if the balcony or exterior connections are adequately bridged to interior living areas. Return a JSON structure.`,
@@ -80,7 +80,7 @@ export async function askOpenHouseAssistant(
   if (ai) {
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.7-flash',
         contents: `You are OpenHouse AI, a spatial real estate assistant for ${propertyContext.title} in ${propertyContext.location}.
 Available rooms: ${propertyContext.rooms.join(', ')}.
 Answer the buyer's question accurately based only on observable spatial and listing facts:
@@ -89,7 +89,7 @@ Question: "${question}"`,
       if (response.text) {
         return {
           answer: response.text,
-          badge: 'Analyzed with Gemini 2.5 Flash from spatial media',
+          badge: 'Analyzed with Gemini 3.7 Flash from spatial media',
         }
       }
     } catch (e) {
