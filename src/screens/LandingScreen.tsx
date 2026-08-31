@@ -57,7 +57,8 @@ function Header() {
         </nav>
         <div className="hidden items-center gap-5 md:flex">
           <Link to="/portal" className="text-[12px] font-medium text-[#4d7145] transition-colors hover:text-black" data-testid="link-portal">MLS Gateway</Link>
-          <Link to="/public/homestead-pd" className="bg-[#11120f] px-5 py-2.5 text-[11px] font-medium text-[#f7f6f1] transition-transform hover:-translate-y-0.5 rounded-lg" data-testid="button-header-see-home">See a home</Link>
+          <Link to="/login" className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" data-testid="link-signin">Sign in</Link>
+          <Link to="/login" className="bg-[#11120f] px-5 py-2.5 text-[11px] font-medium text-[#f7f6f1] transition-transform hover:-translate-y-0.5 rounded-lg shadow-xs" data-testid="button-header-signup">Sign up</Link>
         </div>
         <button className="md:hidden p-1 text-stone-800" onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? 'Close menu' : 'Open menu'} aria-expanded={mobileOpen} data-testid="button-mobile-menu">
           {mobileOpen ? <X size={21} strokeWidth={1.5} /> : <Menu size={21} strokeWidth={1.5} />}
@@ -155,11 +156,11 @@ function Hero() {
             OpenHouse turns listing media and a guided phone capture into a verified, interactive home anyone can enter from the browser.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Link to="/public/homestead-pd" className="group flex items-center gap-3 bg-[#11120f] px-6 py-3.5 text-xs font-semibold text-[#f7f6f1] rounded-lg shadow-sm hover:bg-black" data-testid="button-hero-see-home">
-              See a home <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            <Link to="/login" className="group flex items-center gap-3 bg-[#11120f] px-6 py-3.5 text-xs font-semibold text-[#f7f6f1] rounded-lg shadow-sm hover:bg-black" data-testid="button-hero-signup">
+              Sign up for OpenHouse <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link to="/portal" className="group flex items-center gap-2 text-xs font-medium text-black/70 hover:text-black px-4 py-3.5 rounded-lg border border-stone-300 hover:bg-stone-100/60" data-testid="link-hero-professionals">
-              For property professionals <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
+            <Link to="/login" className="group flex items-center gap-2 text-xs font-medium text-black/70 hover:text-black px-4 py-3.5 rounded-lg border border-stone-300 hover:bg-stone-100/60" data-testid="link-hero-signin">
+              Sign in to Workspace <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
           <p className="mt-5 font-mono text-[9.5px] text-black/45">No specialist camera&nbsp; · &nbsp;No app required for visitors</p>
