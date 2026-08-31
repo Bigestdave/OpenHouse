@@ -7,14 +7,25 @@ import propOrchidImg from '../assets/prop-orchid.jpg'
 import propLekkiImg from '../assets/prop-lekkigardens.jpg'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
 import demoLiving from '../assets/demo-living-room.jpg'
+import { useDemoStage } from '../context/DemoContext'
 
 const filterOptions = ['All', 'Preparing', 'Needs attention', 'Ready', 'Live'] as const
 type FilterType = (typeof filterOptions)[number]
 
 export function ShowsHomeScreen() {
+  const demoStage = useDemoStage()
   const [filter, setFilter] = useState<FilterType>('All')
   const [query, setQuery] = useState('')
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
+
+  // Derive Homestead status from demo stage
+  const homesteadStatus =
+    demoStage === 0 ? null :
+    demoStage <= 2 ? 'building' :
+    demoStage === 3 ? 'attention' :
+    demoStage === 4 ? 'building' :
+    demoStage === 5 ? 'ready' :
+    'live'
 
   return (
     <WorkspaceShell>
@@ -62,9 +73,9 @@ export function ShowsHomeScreen() {
         </div>
 
         {/* ========================================================================= */}
-        {/* SECTION 1: NEEDS YOUR ATTENTION / 1 */}
+        {/* SECTION 1: NEEDS YOUR ATTENTION */}
         {/* ========================================================================= */}
-        {(filter === 'All' || filter === 'Needs attention') && (
+        {(filter === 'All' || filter === 'Needs attention') && homesteadStatus === 'attention' && (
           <section className="mb-9">
             <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-ink-2 pb-3">
               NEEDS YOUR ATTENTION / 1
@@ -128,10 +139,10 @@ export function ShowsHomeScreen() {
 
                 <div className="flex items-center gap-3 pt-2">
                   <Link
-                    to="/capture/homestead-pool"
+                    to="/capture-requests/homestead-pool"
                     className="rounded-lg bg-[#17231E] hover:bg-black px-5 py-2.5 text-[13.5px] font-bold text-white shadow-subtle transition-colors"
                   >
-                    Record now
+                    View recapture request
                   </Link>
                   <Link
                     to="/property/homestead-pd"
@@ -145,17 +156,77 @@ export function ShowsHomeScreen() {
           </section>
         )}
 
+
         {/* ========================================================================= */}
-        {/* SECTION 2: IN PROGRESS / 2 */}
+        {/* SECTION 2: IN PROGRESS */}
         {/* ========================================================================= */}
-        {(filter === 'All' || filter === 'Preparing') && (
+        {(filter === 'All' || filter === 'Preparing') && (homesteadStatus === 'building' || true) && (
           <section className="mb-9">
             <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-ink-2 pb-3">
-              IN PROGRESS / 2
+              IN PROGRESS / {homesteadStatus === 'building' ? 3 : 2}
             </h2>
 
             <div className="space-y-2.5">
-              {/* Row 1: Orchid Apartments */}
+
+              {/* Homestead Road — only when building */}
+              {homesteadStatus === 'building' && (
+                <div className="flex items-center justify-between rounded-xl border border-amber-200/40 bg-amber-50/30 px-4 py-3.5 shadow-subtle hover:border-amber-300/60 transition-all">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <img
+                      src={demoLiving}
+                      alt="Homestead Road"
+                      className="h-11 w-16 rounded-lg object-cover border border-border shrink-0"
+                    />
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <Link to="/property/homestead-pd" className="text-[14px] font-bold text-ink hover:underline">
+                        72691 Homestead Road, Palm Desert
+                      </Link>
+                      <div className="flex items-center gap-1.5 text-xs text-ink-2">
+                        <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
+                        <span>{demoStage === 4 ? 'Resuming reconstruction' : 'Building experience'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    <span className="text-[13px] text-ink-2 hidden sm:inline-block">
+                      {demoStage === 4 ? 'Integrating recapture footage…' : 'Expected in 18–25 minutes'}
+                    </span>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-dashed border-[#194534] border-t-transparent" />
+                  </div>
+                </div>
+              )}
+
+              {/* Homestead Road — ready for approval (stage 5) */}
+              {homesteadStatus === 'ready' && (
+                <div className="flex items-center justify-between rounded-xl border border-success/30 bg-success/5 px-4 py-3.5 shadow-subtle transition-all">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <img
+                      src={demoLiving}
+                      alt="Homestead Road"
+                      className="h-11 w-16 rounded-lg object-cover border border-border shrink-0"
+                    />
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <Link to="/property/homestead-pd" className="text-[14px] font-bold text-ink hover:underline">
+                        72691 Homestead Road, Palm Desert
+                      </Link>
+                      <div className="flex items-center gap-1.5 text-xs text-success font-semibold">
+                        <span className="h-2 w-2 rounded-full bg-success" />
+                        <span>Ready for your approval</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <Link
+                      to="/approvals"
+                      className="rounded-lg bg-[#17231E] hover:bg-black px-4 py-2 text-[13px] font-bold text-white shadow-subtle transition-colors"
+                    >
+                      Approve &amp; publish →
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Row: Orchid Apartments */}
               <div className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3.5 shadow-subtle hover:border-line-strong transition-all">
                 <div className="flex items-center gap-3.5 min-w-0">
                   <img
@@ -173,7 +244,6 @@ export function ShowsHomeScreen() {
                     </div>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-4 shrink-0">
                   <span className="text-[13px] text-ink-2 hidden sm:inline-block">
                     Expected in 18–25 minutes
@@ -188,7 +258,7 @@ export function ShowsHomeScreen() {
                 </div>
               </div>
 
-              {/* Row 2: Lekki Gardens */}
+              {/* Row: Lekki Gardens */}
               <div className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3.5 shadow-subtle hover:border-line-strong transition-all">
                 <div className="flex items-center gap-3.5 min-w-0">
                   <img
@@ -206,7 +276,6 @@ export function ShowsHomeScreen() {
                     </div>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-4 shrink-0">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-dashed border-[#194534] border-t-transparent" />
                   <button
@@ -230,7 +299,44 @@ export function ShowsHomeScreen() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {/* Card 1: Orchid Apartments */}
+
+            {/* Homestead Road card — shows at stage 6 as Live */}
+            {homesteadStatus === 'live' && (
+              <div className="group flex flex-col overflow-hidden rounded-xl border border-success/30 bg-surface shadow-subtle hover:shadow-card hover:border-success/50 transition-all">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-sidebar">
+                  <img
+                    src={demoLiving}
+                    alt="72691 Homestead Road"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
+                  <div className="absolute top-2.5 right-2.5 rounded-md bg-success px-2.5 py-1 text-[11px] font-bold text-white">
+                    ● LIVE
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col justify-between p-4 bg-surface">
+                  <div>
+                    <Link to="/property/homestead-pd" className="text-[14.5px] font-bold text-ink hover:underline block">
+                      72691 Homestead Road
+                    </Link>
+                    <p className="text-[12.5px] text-ink-2 mt-0.5">Palm Desert, CA · 4-bed estate</p>
+                    <div className="flex items-center gap-1.5 text-xs text-success font-semibold mt-2">
+                      <span className="h-2 w-2 rounded-full bg-success" />
+                      <span>Published · Live</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-4 mt-2 border-t border-border/60 text-[12px] text-ink-3">
+                    <Link to="/public/homestead-pd" className="text-primary font-semibold hover:underline">
+                      View live experience →
+                    </Link>
+                    <button className="text-ink-3 hover:text-ink">
+                      <Ellipsis size={15} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Card: Orchid Apartments */}
             <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-subtle hover:shadow-card hover:border-line-strong transition-all">
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-sidebar">
                 <img
@@ -239,20 +345,17 @@ export function ShowsHomeScreen() {
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 />
               </div>
-
               <div className="flex flex-1 flex-col justify-between p-4 bg-surface">
                 <div>
                   <Link to="/property/prop-02" className="text-[14.5px] font-bold text-ink hover:underline block">
                     Orchid Apartments
                   </Link>
                   <p className="text-[12.5px] text-ink-2 mt-0.5">2-bedroom apartment</p>
-                  
                   <div className="flex items-center gap-1.5 text-xs text-ink-2 mt-2">
                     <span className="h-2 w-2 rounded-full bg-[#194534]" />
                     <span>Preparing experience</span>
                   </div>
                 </div>
-
                 <div className="flex items-center justify-between pt-4 mt-2 border-t border-border/60 text-[12px] text-ink-3">
                   <span>Updated 4 minutes ago</span>
                   <button className="text-ink-3 hover:text-ink">
@@ -262,7 +365,7 @@ export function ShowsHomeScreen() {
               </div>
             </div>
 
-            {/* Card 2: Lekki Gardens */}
+            {/* Card: Lekki Gardens */}
             <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-subtle hover:shadow-card hover:border-line-strong transition-all">
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-sidebar">
                 <img
@@ -271,20 +374,17 @@ export function ShowsHomeScreen() {
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 />
               </div>
-
               <div className="flex flex-1 flex-col justify-between p-4 bg-surface">
                 <div>
                   <Link to="/property/prop-03" className="text-[14.5px] font-bold text-ink hover:underline block">
                     Lekki Gardens
                   </Link>
                   <p className="text-[12.5px] text-ink-2 mt-0.5">3-bedroom terrace</p>
-                  
                   <div className="flex items-center gap-1.5 text-xs text-ink-2 mt-2">
                     <span className="h-2 w-2 rounded-full bg-[#194534]" />
                     <span>Ready for review</span>
                   </div>
                 </div>
-
                 <div className="flex items-center justify-between pt-4 mt-2 border-t border-border/60 text-[12px] text-ink-3">
                   <span>Updated 18 minutes ago</span>
                   <button className="text-ink-3 hover:text-ink">
@@ -294,7 +394,7 @@ export function ShowsHomeScreen() {
               </div>
             </div>
 
-            {/* Card 3: Bourdillon Court */}
+            {/* Card: Bourdillon Court */}
             <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-subtle hover:shadow-card hover:border-line-strong transition-all">
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-sidebar">
                 <img
@@ -303,20 +403,17 @@ export function ShowsHomeScreen() {
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                 />
               </div>
-
               <div className="flex flex-1 flex-col justify-between p-4 bg-surface">
                 <div>
                   <Link to="/property/prop-04" className="text-[14.5px] font-bold text-ink hover:underline block">
                     Bourdillon Court
                   </Link>
                   <p className="text-[12.5px] text-ink-2 mt-0.5">4-bedroom apartment</p>
-                  
                   <div className="flex items-center gap-1.5 text-xs text-ink-2 mt-2">
                     <span className="h-2 w-2 rounded-full bg-[#194534]" />
                     <span>Live</span>
                   </div>
                 </div>
-
                 <div className="flex items-center justify-between pt-4 mt-2 border-t border-border/60 text-[12px] text-ink-3">
                   <span>Published yesterday</span>
                   <button className="text-ink-3 hover:text-ink">

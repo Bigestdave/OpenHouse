@@ -6,7 +6,7 @@ import propBourdillonImg from '../assets/prop-bourdillon.jpg'
 import propLekkiImg from '../assets/prop-lekkigardens.jpg'
 import propOrchidImg from '../assets/prop-orchid.jpg'
 import demoLiving from '../assets/demo-living-room.jpg'
-import { DEMO_PROPERTY_ID } from '../context/DemoContext'
+import { DEMO_PROPERTY_ID, useDemoContext } from '../context/DemoContext'
 
 // SVGs matching the reference UI
 function CheckCircleIcon({ className = 'h-4 w-4' }: { className?: string }) {
@@ -38,6 +38,7 @@ interface ApprovalItem {
 
 export function ApprovalsScreen() {
   const navigate = useNavigate()
+  const { stage, setStage } = useDemoContext()
   const [filter, setFilter] = useState<'Ready' | 'Changes requested' | 'Published'>('Ready')
   const [query, setQuery] = useState('')
 
@@ -222,9 +223,9 @@ export function ApprovalsScreen() {
               <div className="space-y-4">
                 {/* Status tag */}
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#194534]" />
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#194534] font-mono">
-                    READY TO PUBLISH
+                  <span className={`h-2 w-2 rounded-full ${stage >= 6 ? 'bg-success' : 'bg-[#194534]'}`} />
+                  <span className={`text-[11px] font-bold uppercase tracking-wider font-mono ${stage >= 6 ? 'text-success' : 'text-[#194534]'}`}>
+                    {stage >= 6 ? '● LIVE · PUBLISHED' : 'READY TO PUBLISH'}
                   </span>
                 </div>
 
@@ -253,19 +254,41 @@ export function ApprovalsScreen() {
 
               {/* Action buttons */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-6 mt-6 border-t border-border/50">
-                <button
-                  onClick={() => navigate(`/show/${featuredProperty.id}`)}
-                  className="w-full rounded-xl bg-[#0B1713] px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-black transition-all shadow-subtle text-center whitespace-nowrap"
-                >
-                  Review experience
-                </button>
+                {stage >= 6 ? (
+                  <>
+                    <Link
+                      to={`/public/${featuredProperty.id}`}
+                      className="w-full rounded-xl bg-primary px-4 py-2.5 text-[13px] font-bold text-white hover:bg-primary-hover transition-all shadow-subtle text-center whitespace-nowrap"
+                    >
+                      View live experience →
+                    </Link>
+                    <Link
+                      to={`/property/${featuredProperty.id}`}
+                      className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-[13px] font-semibold text-ink hover:bg-stone-50 transition-all text-center whitespace-nowrap"
+                    >
+                      Property overview
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        setStage(6)
+                        setTimeout(() => navigate(`/public/${featuredProperty.id}`), 500)
+                      }}
+                      className="w-full rounded-xl bg-[#0B1713] px-4 py-2.5 text-[13px] font-bold text-white hover:bg-black transition-all shadow-subtle text-center whitespace-nowrap"
+                    >
+                      Approve &amp; Publish ✓
+                    </button>
 
-                <Link
-                  to={`/experience/${featuredProperty.id}/published`}
-                  className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-[13px] font-semibold text-ink hover:bg-stone-50 transition-all text-center whitespace-nowrap"
-                >
-                  Preview as visitor
-                </Link>
+                    <Link
+                      to={`/property/${featuredProperty.id}`}
+                      className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-[13px] font-semibold text-ink hover:bg-stone-50 transition-all text-center whitespace-nowrap"
+                    >
+                      Review experience
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
