@@ -89,6 +89,8 @@ export default function App() {
         <Route path="/experience/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
 
         {/* Public 3D Property Tour & Inspection Booking */}
+        <Route path="/public/:id" element={<PublicPropertyViewerScreen />} />
+        <Route path="/public" element={<PublicPropertyViewerScreen />} />
         <Route path="/view/:id" element={<PublicPropertyViewerScreen />} />
         <Route path="/view" element={<PublicPropertyViewerScreen />} />
         <Route path="/viewer" element={<PublicPropertyViewerScreen />} />

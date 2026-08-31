@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { SearchIcon, PlusIcon, LightBulbIcon } from '../components/icons2'
 
-import propKitchen from '../assets/prop-kitchen.png'
 import propOrchid from '../assets/prop-orchid.jpg'
 import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
 import propAdmiralty from '../assets/prop-admiralty.jpg'
+import demoBalcony from '../assets/demo-balcony.jpg'
 
 interface CaptureRequestItem {
   id: string
@@ -22,12 +22,12 @@ interface CaptureRequestItem {
 
 const REQUESTS_DATA: CaptureRequestItem[] = [
   {
-    id: '1',
-    propertyTitle: '14 Cooper Road',
-    propertyLocation: 'Ikoyi, Lagos',
-    propertyImg: propKitchen,
-    captureNeeded: 'Kitchen-to-dining connection',
-    recipient: 'Kiki Casa',
+    id: 'homestead-pool',
+    propertyTitle: '72691 Homestead Road, Palm Desert',
+    propertyLocation: 'Palm Desert, CA 92260',
+    propertyImg: demoBalcony,
+    captureNeeded: 'Pool-to-guest house connection',
+    recipient: 'Sarah Jenkins',
     status: 'Awaiting capture',
     updated: '12 minutes ago',
     actionLabel: 'View request',

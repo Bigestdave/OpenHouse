@@ -92,7 +92,7 @@ export function MobileCaptureScreen() {
   const { properties, captureRequests } = useStore()
   const [mode, setMode] = useState<'intro' | 'recording' | 'checking' | 'submitted'>('intro')
 
-  const isDemo = id === 'laurel-balcony' || id === 'orchid-balcony' || id?.includes('laurel') || id?.includes('balcony') || !id
+  const isDemo = id === 'homestead-pool' || id === 'homestead-pd' || id?.includes('homestead') || id?.includes('pool') || id === 'laurel-balcony' || id === 'orchid-balcony' || id?.includes('laurel') || id?.includes('balcony') || !id
 
   // Find associated capture request or property
   const request = captureRequests.find(r => r.id === id || r.propertyId === id || r.status !== 'resolved') || captureRequests[0]
@@ -113,8 +113,8 @@ export function MobileCaptureScreen() {
   const [showHelpModal, setShowHelpModal] = useState(false)
   const [isPlayingCheck, setIsPlayingCheck] = useState(false)
 
-  const propertyTitle = isDemo ? DEMO_PROPERTY_LABEL : (property?.title || '8 Admiralty Way')
-  const propertyLocation = isDemo ? 'Palm Desert, CA 92260' : (property?.address || 'Lekki, Lagos')
+  const propertyTitle = isDemo ? DEMO_PROPERTY_LABEL : (property?.title || '72691 Homestead Road, Palm Desert')
+  const propertyLocation = isDemo ? 'Palm Desert, CA 92260' : (property?.address || 'Palm Desert, CA 92260')
   const propertyThumb = isDemo ? demoExterior : propAdmiraltyThumbImg
   const targetPreviewImg = isDemo ? demoLiving : propLivingPreviewImg
 
@@ -283,18 +283,20 @@ export function MobileCaptureScreen() {
                   </span>
                 </div>
                 <h1 className="text-[22px] font-bold text-stone-900 tracking-tight leading-tight mt-1.5">
-                  Capture the balcony entrance
+                  {isDemo ? 'Capture the pool & guest house path' : 'Capture the balcony entrance'}
                 </h1>
                 <p className="text-xs text-stone-500 mt-1 leading-relaxed">
-                  OpenHouse needs to see how the living room connects to the balcony.
+                  {isDemo
+                    ? 'OpenHouse needs to see how the main patio connects to the detached guest house.'
+                    : 'OpenHouse needs to see how the living room connects to the balcony.'}
                 </p>
               </div>
 
-              {/* Living Room Perspective Preview with Orange Reticle */}
+              {/* Living Room / Patio Perspective Preview with Orange Reticle */}
               <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden shadow-xs bg-stone-100">
                 <img
                   src={targetPreviewImg}
-                  alt="Balcony entrance target preview"
+                  alt="Target preview"
                   className="h-full w-full object-cover"
                 />
                 {/* Glowing Orange Target Bounding Reticle */}
@@ -309,7 +311,9 @@ export function MobileCaptureScreen() {
                 <div className="space-y-0.5">
                   <h3 className="text-[13px] font-bold text-stone-900">How to capture</h3>
                   <p className="text-xs text-stone-500 leading-relaxed">
-                    Start in the living room. Walk slowly through the balcony doorway and finish after showing the full balcony.
+                    {isDemo
+                      ? 'Start at the main living room patio. Walk slowly past the pool towards the guest house entrance.'
+                      : 'Start in the living room. Walk slowly through the balcony doorway and finish after showing the full balcony.'}
                   </p>
                   <div className="flex items-center gap-1.5 text-[11px] text-stone-500 font-medium pt-0.5">
                     <svg className="h-3.5 w-3.5 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -321,25 +325,21 @@ export function MobileCaptureScreen() {
                 </div>
               </div>
 
-              {/* Capture Checklist Card */}
-              <div className="rounded-2xl bg-[#F5F4EE] p-4 border border-stone-200/40 space-y-2.5">
-                <h4 className="text-xs font-bold text-stone-900">Capture checklist</h4>
-                <div className="space-y-2 text-xs text-stone-700 font-medium">
+              {/* Key points checklist */}
+              <div className="rounded-2xl border border-stone-200/80 bg-[#FDFDFD] p-4 space-y-2 shadow-xs">
+                <h3 className="text-xs font-bold text-stone-900">Key points</h3>
+                <div className="space-y-2 text-xs text-stone-600">
                   <div className="flex items-center gap-2">
                     <GreenCheckCircle className="h-4 w-4 shrink-0" />
-                    <span>Begin several steps from the doorway</span>
+                    <span>{isDemo ? 'Show the patio pathway clearly' : 'Show the doorway clearly'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <GreenCheckCircle className="h-4 w-4 shrink-0" />
-                    <span>Keep the full doorway visible</span>
+                    <span>{isDemo ? 'Walk smoothly past the pool terrace' : 'Walk smoothly through'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <GreenCheckCircle className="h-4 w-4 shrink-0" />
-                    <span>Move slowly and continuously</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <GreenCheckCircle className="h-4 w-4 shrink-0" />
-                    <span>Finish with a view of the balcony</span>
+                    <span>{isDemo ? 'Finish with a view of the guest house' : 'Finish with a view of the balcony'}</span>
                   </div>
                 </div>
               </div>
@@ -557,7 +557,7 @@ export function MobileCaptureScreen() {
                 {/* Gallery Thumbnail */}
                 <div className="flex flex-col items-center">
                   <img
-                    src={propAdmiraltyThumbImg}
+                    src={propertyThumb}
                     alt="Gallery"
                     className="h-11 w-11 rounded-xl object-cover border border-white/30 shadow-md"
                   />
@@ -684,7 +684,7 @@ export function MobileCaptureScreen() {
               {/* Property Row */}
               <div className="flex items-center gap-3 pt-0.5">
                 <img
-                  src={propAdmiraltyThumbImg}
+                  src={propertyThumb}
                   alt={propertyTitle}
                   className="h-11 w-14 rounded-lg object-cover shadow-xs shrink-0"
                 />
@@ -707,7 +707,7 @@ export function MobileCaptureScreen() {
                   />
                 ) : (
                   <img
-                    src={propLivingPreviewImg}
+                    src={targetPreviewImg}
                     alt="Captured video playback"
                     className="h-full w-full object-cover"
                   />
