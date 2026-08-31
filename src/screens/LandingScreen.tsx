@@ -202,10 +202,6 @@ function FlowSection() {
     <section id="process" ref={ref} className="reveal border-t border-black/10 px-6 py-20 lg:px-12 lg:py-28" data-testid="section-process">
       <div className="mx-auto max-w-[1440px]">
         <div className="mb-10">
-          <p className="mono-label mb-4 text-[#4d7145] font-bold flex items-center gap-2">
-            <span className="inline-block h-2 w-2 bg-[#4d7145]" />
-            01 / FROM LISTING TO EXPERIENCE
-          </p>
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <h2 className="text-4xl leading-[.98] tracking-[-.06em] font-semibold text-stone-900 sm:text-6xl">
               One listing in.<br />A verified <span className="serif italic font-normal">open house</span> out.
@@ -307,7 +303,6 @@ function EvidenceSection() {
       <div className="mx-auto max-w-[1440px]">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_.8fr]">
           <div>
-            <p className="mono-label mb-4 text-[#4d7145] font-bold">06 / FROM EVENT TO EXPERIENCE</p>
             <h2 className="max-w-[690px] text-4xl leading-[.96] tracking-[-.06em] font-semibold text-stone-900 sm:text-6xl">
               From property evidence<br />to a <span className="serif italic font-normal">verified</span> place.
             </h2>
