@@ -1,6 +1,6 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Check, Link as LinkIcon, ShieldCheck, Lock, Sparkles, ArrowRight, Camera, Layers, Video } from 'lucide-react'
+import { Check, Link as LinkIcon, ShieldCheck, Lock, ArrowRight, Camera, Layers, Video } from 'lucide-react'
 import demoExterior from '../assets/demo-exterior.jpg'
 import propAdmiraltyImg from '../assets/prop-admiralty.jpg'
 import propBourdillonImg from '../assets/prop-bourdillon.jpg'
@@ -134,32 +134,14 @@ export function ListingPortalScreen() {
 
       {/* Main Container */}
       <main className="mx-auto max-w-[1400px] px-6 lg:px-12 pt-8">
-        {/* Top Header Row with Headline on Left and AI Verification Box on Right (NO Stepper) */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] items-start justify-between gap-6 mb-8">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#17231E] mb-2">
-              Import a property listing
-            </h1>
-            <p className="text-sm text-[#727A73] max-w-xl leading-relaxed">
-              Bring in your MLS listing and let OpenHouse prepare the property for a verified 3D experience.
-            </p>
-          </div>
-
-          {/* AI Spatial Verification Banner */}
-          <div className="bg-white border border-[#DDD7CB] rounded-xl p-4 max-w-[460px] shadow-subtle">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#17231E]">
-                <Sparkles size={14} className="text-[#194534]" />
-                <span>AI spatial verification</span>
-              </div>
-              <span className="text-[10px] font-bold text-[#194534] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-                Active
-              </span>
-            </div>
-            <p className="text-[11.5px] leading-relaxed text-[#727A73]">
-              OpenHouse checks the listing media for missing spatial connections and automatically requests a short mobile recapture when needed.
-            </p>
-          </div>
+        {/* Top Header Headline */}
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#17231E] mb-2">
+            Import a property listing
+          </h1>
+          <p className="text-sm text-[#727A73] max-w-2xl leading-relaxed">
+            Bring in your MLS listing and let OpenHouse prepare the property for a verified 3D experience.
+          </p>
         </div>
 
         {/* LISTING SOURCE Section */}
