@@ -72,7 +72,7 @@ export function CreateShowCharactersScreen() {
         bedrooms: 3,
         bathrooms: 3,
         description: proposal.premise || 'Luxury waterfront apartment in Lekki.',
-        status: 'detected',
+        status: 'LISTING_RECEIVED',
         spaces: formattedSpaces,
         sourceMedia: [],
         timeline: [],

@@ -1,33 +1,39 @@
 export type PropertyStatus =
-  | 'detected'
-  | 'checking_media'
-  | 'preparing'
-  | 'quality_check'
-  | 'ready_for_review'
-  | 'live'
-  | 'needs_recapture'
-  | 'paused'
-  | 'failed';
+  | 'LISTING_RECEIVED'
+  | 'ANALYZING'
+  | 'NEEDS_CAPTURE'
+  | 'CAPTURE_REQUESTED'
+  | 'CAPTURE_RECEIVED'
+  | 'VERIFYING'
+  | 'NEEDS_MORE_CAPTURE'
+  | 'READY'
+  | 'EXPERIENCE_BUILT'
+  | 'PUBLISHED';
 
 export const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
-  detected: 'Property detected',
-  checking_media: 'Checking media',
-  preparing: 'Preparing experience',
-  quality_check: 'Quality check',
-  ready_for_review: 'Ready for review',
-  live: 'Live',
-  needs_recapture: 'Needs recapture',
-  paused: 'Paused',
-  failed: 'Failed',
+  LISTING_RECEIVED: 'Listing received',
+  ANALYZING: 'Analyzing media',
+  NEEDS_CAPTURE: 'Needs capture',
+  CAPTURE_REQUESTED: 'Capture requested',
+  CAPTURE_RECEIVED: 'Capture received',
+  VERIFYING: 'Verifying media',
+  NEEDS_MORE_CAPTURE: 'Needs more capture',
+  READY: 'Ready',
+  EXPERIENCE_BUILT: 'Experience built',
+  PUBLISHED: 'Published',
 };
 
 export const PROPERTY_STATUS_ORDER: PropertyStatus[] = [
-  'detected',
-  'checking_media',
-  'preparing',
-  'quality_check',
-  'ready_for_review',
-  'live',
+  'LISTING_RECEIVED',
+  'ANALYZING',
+  'NEEDS_CAPTURE',
+  'CAPTURE_REQUESTED',
+  'CAPTURE_RECEIVED',
+  'VERIFYING',
+  'NEEDS_MORE_CAPTURE',
+  'READY',
+  'EXPERIENCE_BUILT',
+  'PUBLISHED',
 ];
 
 export type CaptureRequestStatus =

@@ -286,10 +286,10 @@ export function getPropertyStats() {
   const stats = { total: 0, live: 0, preparing: 0, needsAttention: 0, readyForReview: 0 };
   state.properties.forEach((p) => {
     stats.total++;
-    if (p.status === 'live') stats.live++;
-    if (p.status === 'preparing') stats.preparing++;
-    if (p.status === 'needs_recapture' || p.status === 'failed') stats.needsAttention++;
-    if (p.status === 'ready_for_review') stats.readyForReview++;
+    if (p.status === 'PUBLISHED') stats.live++;
+    if (p.status === 'ANALYZING' || p.status === 'VERIFYING' || p.status === 'CAPTURE_RECEIVED') stats.preparing++;
+    if (p.status === 'NEEDS_CAPTURE' || p.status === 'NEEDS_MORE_CAPTURE' || p.status === 'CAPTURE_REQUESTED') stats.needsAttention++;
+    if (p.status === 'READY' || p.status === 'EXPERIENCE_BUILT') stats.readyForReview++;
   });
   return stats;
 }
@@ -381,8 +381,8 @@ export function resolveCaptureRequest(id: string, media?: MediaItem[]): void {
         });
 
         const newStatus =
-          p.status === 'needs_recapture' && otherPendingRequests.length === 0
-            ? 'checking_media'
+          (p.status === 'CAPTURE_REQUESTED' || p.status === 'NEEDS_CAPTURE' || p.status === 'NEEDS_MORE_CAPTURE') && otherPendingRequests.length === 0
+            ? 'CAPTURE_RECEIVED'
             : p.status;
 
         modifiedProperty = {
@@ -473,10 +473,10 @@ export function usePropertyStats() {
   const stats = { total: 0, live: 0, preparing: 0, needsAttention: 0, readyForReview: 0 };
   currentStore.properties.forEach((p) => {
     stats.total++;
-    if (p.status === 'live') stats.live++;
-    if (p.status === 'preparing') stats.preparing++;
-    if (p.status === 'needs_recapture' || p.status === 'failed') stats.needsAttention++;
-    if (p.status === 'ready_for_review') stats.readyForReview++;
+    if (p.status === 'PUBLISHED') stats.live++;
+    if (p.status === 'ANALYZING' || p.status === 'VERIFYING' || p.status === 'CAPTURE_RECEIVED') stats.preparing++;
+    if (p.status === 'NEEDS_CAPTURE' || p.status === 'NEEDS_MORE_CAPTURE' || p.status === 'CAPTURE_REQUESTED') stats.needsAttention++;
+    if (p.status === 'READY' || p.status === 'EXPERIENCE_BUILT') stats.readyForReview++;
   });
   return stats;
 }
@@ -489,4 +489,3 @@ export function useCaptureRequests(): CaptureRequest[] {
 export async function syncWithSupabase(): Promise<void> {
   // Graceful no-op when Supabase is not configured or in local demo mode
 }
-

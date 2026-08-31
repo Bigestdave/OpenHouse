@@ -117,7 +117,7 @@ export function AddPropertyScreen() {
       bedrooms: Number(bedrooms) || 3,
       bathrooms: Number(bathrooms) || 3,
       description: description.trim() || 'Modern residential property in prime location.',
-      status: 'detected',
+      status: 'LISTING_RECEIVED',
       spaces: formattedSpaces,
       sourceMedia: [],
       timeline: [],

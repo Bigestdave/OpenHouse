@@ -95,7 +95,10 @@ export function MobileCaptureScreen() {
   const isDemo = id === 'homestead-pool' || id === 'homestead-pd' || id?.includes('homestead') || id?.includes('pool') || id === 'laurel-balcony' || id === 'orchid-balcony' || id?.includes('laurel') || id?.includes('balcony') || !id
 
   // Find associated capture request or property
-  const request = captureRequests.find(r => r.id === id || r.propertyId === id || r.status !== 'resolved') || captureRequests[0]
+  const request =
+    captureRequests.find((r) => r.id === id || r.propertyId === id)
+    || captureRequests.find((r) => r.status !== 'resolved')
+    || captureRequests[0]
   const property = properties.find(p => p.id === request?.propertyId || p.id === id) || properties[0]
 
   // Recording & Media state

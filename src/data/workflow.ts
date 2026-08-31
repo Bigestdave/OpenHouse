@@ -1,5 +1,6 @@
 import { getProperty, updatePropertyStatus, addCaptureRequest, addTimelineEvent, addProperty } from './store';
 import type { Property, Space } from './types';
+import { validatePropertySpatialContinuity } from '../lib/gemini';
 
 // Store active timers
 const activeTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -33,85 +34,89 @@ export function startPropertyWorkflow(propertyId: string): void {
   const property = getProperty(propertyId);
   if (!property) return;
 
-  updatePropertyStatus(propertyId, 'detected');
+  updatePropertyStatus(propertyId, 'LISTING_RECEIVED');
   addTimelineEvent(propertyId, {
     type: 'detection',
-    event: 'New listing detected',
+    event: 'Listing received',
     detail: 'Property information collected from listing portal',
   });
 
-  setWorkflowTimer(propertyId, 2000, () => {
+  setWorkflowTimer(propertyId, 1200, async () => {
     const currentProp = getProperty(propertyId);
     if (!currentProp) return;
 
-    updatePropertyStatus(propertyId, 'checking_media');
-    const mediaCount = currentProp.sourceMedia?.length || 0;
-    const spaceCount = currentProp.spaces?.length || 0;
+    updatePropertyStatus(propertyId, 'ANALYZING');
+    const analysis = await validatePropertySpatialContinuity(
+      currentProp.title,
+      currentProp.spaces.map((space) => space.name)
+    );
     addTimelineEvent(propertyId, {
       type: 'analysis',
-      event: 'Checking media quality and coverage',
-      detail: `Evaluating ${mediaCount} source images across ${spaceCount} advertised spaces`,
+      event: `Spatial analysis complete (${analysis.model})`,
+      detail: analysis.passed
+        ? `Coverage confidence ${(analysis.confidenceScore * 100).toFixed(0)}%`
+        : `Missing ${analysis.missingConnections[0]?.toRoom || 'required'} coverage`,
     });
 
-    // If insufficient, needs recapture in 3s; if sufficient, prepares in 4s.
-    const missingSpace = currentProp.spaces.find((s) => s.captured === false);
-    const delay = missingSpace ? 3000 : 4000;
+    const missingSpace = currentProp.spaces.find((s) => s.captured === false)
+      || (analysis.missingConnections[0]
+        ? currentProp.spaces.find((s) => s.name.toLowerCase().includes(analysis.missingConnections[0].toRoom.toLowerCase().split(' ')[0]))
+        : undefined);
 
-    setWorkflowTimer(propertyId, delay, () => {
+    setWorkflowTimer(propertyId, 1800, () => {
       const propToCheck = getProperty(propertyId);
       if (!propToCheck) return;
 
-      const stillMissingSpace = propToCheck.spaces.find((s) => s.captured === false);
-
-      if (stillMissingSpace) {
-        updatePropertyStatus(propertyId, 'needs_recapture');
+      if (missingSpace) {
+        updatePropertyStatus(propertyId, 'NEEDS_CAPTURE');
         addTimelineEvent(propertyId, {
           type: 'capture_request',
-          event: `Coverage insufficient for ${stillMissingSpace.name}`,
-          detail: 'Capture request sent to Property Manager',
+          event: `Coverage insufficient for ${missingSpace.name}`,
+          detail: 'Recapture required before build can continue',
         });
 
         if (typeof addCaptureRequest === 'function') {
           addCaptureRequest({
             propertyId,
             propertyTitle: propToCheck.title,
-            room: stillMissingSpace.name,
+            room: missingSpace.name,
             reason: 'Insufficient coverage',
-            instructions: `Please provide a 360 panorama or clear photos of the ${stillMissingSpace.name}`,
-            estimatedTime: '5 mins',
+            instructions: `Please record a continuous 15-second pass covering ${missingSpace.name}`,
+            estimatedTime: '1 min',
             recipientName: 'Property Manager',
             status: 'sent',
           });
         }
+        updatePropertyStatus(propertyId, 'CAPTURE_REQUESTED');
       } else {
-        startPreparing(propertyId);
+        startVerifying(propertyId);
       }
     });
   });
 }
 
-function startPreparing(propertyId: string) {
-  updatePropertyStatus(propertyId, 'preparing');
+function startVerifying(propertyId: string) {
+  updatePropertyStatus(propertyId, 'VERIFYING');
   addTimelineEvent(propertyId, {
-    type: 'reconstruction',
-    event: 'Evidence requirements satisfied',
-    detail: 'Building interactive experience',
+    type: 'verification',
+    event: 'Verifying evidence quality',
+    detail: 'Checking room continuity and media quality thresholds',
   });
 
-  setWorkflowTimer(propertyId, 8000, () => {
-    updatePropertyStatus(propertyId, 'quality_check');
+  setWorkflowTimer(propertyId, 2200, () => {
+    updatePropertyStatus(propertyId, 'READY');
     addTimelineEvent(propertyId, {
-      type: 'verification',
-      event: 'Reconstruction complete',
-      detail: 'Comparing result against source evidence',
+      type: 'approval',
+      event: 'Verification passed',
+      detail: 'Property is ready to build buyer-facing experience',
     });
 
-    setWorkflowTimer(propertyId, 5000, () => {
-      updatePropertyStatus(propertyId, 'ready_for_review');
+    setWorkflowTimer(propertyId, 1800, () => {
+      updatePropertyStatus(propertyId, 'EXPERIENCE_BUILT');
       addTimelineEvent(propertyId, {
-        type: 'approval',
-        event: 'Quality verification passed',
-        detail: 'Publication approval requested',
+        type: 'reconstruction',
+        event: 'Buyer experience built',
+        detail: 'Interactive property experience available for publish action',
       });
     });
   });
@@ -125,24 +130,24 @@ export function resumePropertyWorkflow(propertyId: string): void {
   const property = getProperty(propertyId);
   if (!property) return;
 
-  updatePropertyStatus(propertyId, 'checking_media');
+  updatePropertyStatus(propertyId, 'CAPTURE_RECEIVED');
   addTimelineEvent(propertyId, {
-    type: 'analysis',
-    event: 'Checking media quality and coverage',
-    detail: 'Evaluating newly uploaded media',
+    type: 'capture_received',
+    event: 'Capture upload received',
+    detail: 'Running verification on newly uploaded footage',
   });
 
-  setWorkflowTimer(propertyId, 4000, () => {
+  setWorkflowTimer(propertyId, 1600, () => {
     const currentProp = getProperty(propertyId);
     if (!currentProp) return;
 
     const missingSpace = currentProp.spaces.find((s) => s.captured === false);
     if (missingSpace) {
-      updatePropertyStatus(propertyId, 'needs_recapture');
+      updatePropertyStatus(propertyId, 'NEEDS_MORE_CAPTURE');
       addTimelineEvent(propertyId, {
         type: 'capture_request',
         event: `Coverage insufficient for ${missingSpace.name}`,
-        detail: 'Capture request sent to Property Manager',
+        detail: 'Additional capture is still required',
       });
 
       if (typeof addCaptureRequest === 'function') {
@@ -157,8 +162,9 @@ export function resumePropertyWorkflow(propertyId: string): void {
           status: 'sent',
         });
       }
+      updatePropertyStatus(propertyId, 'CAPTURE_REQUESTED');
     } else {
-      startPreparing(propertyId);
+      startVerifying(propertyId);
     }
   });
 }
@@ -169,11 +175,11 @@ export function resumePropertyWorkflow(propertyId: string): void {
  */
 export function approveProperty(propertyId: string): void {
   cancelWorkflow(propertyId);
-  updatePropertyStatus(propertyId, 'live');
+  updatePropertyStatus(propertyId, 'PUBLISHED');
   addTimelineEvent(propertyId, {
     type: 'publication',
     event: 'Publication approved by Agent',
-    detail: 'Experience is now live',
+    detail: 'Experience is now live and shareable',
   });
 }
 
@@ -192,7 +198,8 @@ export function handleNewListing(listing: {
   coverImage?: string;
   spaces?: Array<{ name: string; captured?: boolean }>;
 }): string {
-  const propertyId = 'prop-' + Math.random().toString(36).substring(2, 11);
+  const baseId = `prop-${listing.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'listing'}`;
+  const propertyId = getProperty(baseId) ? `${baseId}-${Date.now().toString().slice(-4)}` : baseId;
 
   const spaces: Space[] = (listing.spaces || []).map((s, idx) => ({
     id: `space-${Date.now()}-${idx}`,
@@ -211,7 +218,7 @@ export function handleNewListing(listing: {
     bathrooms: listing.bathrooms,
     price: listing.price,
     description: listing.description,
-    status: 'detected',
+    status: 'LISTING_RECEIVED',
     spaces,
     sourceMedia: [],
     timeline: [],
@@ -230,4 +237,3 @@ export function handleNewListing(listing: {
   startPropertyWorkflow(propertyId);
   return propertyId;
 }
-

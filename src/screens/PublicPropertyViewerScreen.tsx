@@ -34,6 +34,7 @@ import propBourdillon from '../assets/prop-bourdillon.jpg'
 import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
 import propKitchen from '../assets/prop-kitchen.png'
 import { DEMO_PROPERTY_ID } from '../context/DemoContext'
+import { askOpenHouseAssistant } from '../lib/gemini'
 
 interface Room {
   id: string
@@ -168,8 +169,6 @@ export function PublicPropertyViewerScreen() {
   const { properties } = useStore()
 
   const isDemo = id === DEMO_PROPERTY_ID || id === 'homestead-pd' || id === 'laurel-12a' || id?.includes('homestead') || id?.includes('laurel') || !id || id === 'demo'
-  const propertyRooms = isDemo ? DEMO_PROPERTY_ROOMS : PROPERTY_ROOMS
-
   const property = properties.find((p) =>
     p.id === id ||
     p.title.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(id?.toLowerCase() || '') ||
@@ -178,6 +177,21 @@ export function PublicPropertyViewerScreen() {
     (id?.includes('orchid') && p.title.includes('Orchid')) ||
     (id?.includes('lekki') && p.title.includes('Lekki'))
   ) || properties[0]
+
+  const propertyRooms = isDemo
+    ? DEMO_PROPERTY_ROOMS
+    : (property?.spaces?.length
+      ? property.spaces.map((space, index) => ({
+          id: space.id || `room-${index}`,
+          name: space.name,
+          img: PROPERTY_ROOMS[index % PROPERTY_ROOMS.length]?.img || propHeroWaterfront,
+          description: space.issues?.length
+            ? `${space.name} requires additional verification`
+            : `${space.name} is connected and represented in captured media.`,
+          hotspotTarget: PROPERTY_ROOMS[(index + 1) % PROPERTY_ROOMS.length]?.id,
+          hotspotLabel: PROPERTY_ROOMS[(index + 1) % PROPERTY_ROOMS.length]?.name,
+        }))
+      : PROPERTY_ROOMS)
 
   const propertyTitle = isDemo ? '72691 Homestead Road, Palm Desert' : (property?.title || '8 Admiralty Way')
   const propertyLocation = isDemo ? 'Palm Desert, CA 92260' : (property?.address || 'Lekki, Lagos')
@@ -241,7 +255,7 @@ export function PublicPropertyViewerScreen() {
     }
   }
 
-  const handleSendMessage = (textToSend?: string) => {
+  const handleSendMessage = async (textToSend?: string) => {
     const q = textToSend || chatInput.trim()
     if (!q) return
 
@@ -249,38 +263,21 @@ export function PublicPropertyViewerScreen() {
     setMessages(newMsgs)
     setChatInput('')
 
-    setTimeout(() => {
-      let aiReply = 'OpenHouse has cross-referenced the property captures and verified listing details.'
-      let badge = 'Observed from property capture'
+    const response = await askOpenHouseAssistant(q, {
+      title: propertyTitle,
+      location: propertyLocation,
+      rooms: propertyRooms.map((room) => room.name),
+    })
 
-      const lower = q.toLowerCase()
-      if (lower.includes('light') || lower.includes('sun')) {
-        aiReply = 'The living room and balcony receive optimal southern natural exposure throughout the day.'
-        badge = 'Observed from daytime property capture'
-      } else if (lower.includes('park') || lower.includes('car') || lower.includes('garage')) {
-        aiReply = 'Yes, this property includes 2 dedicated covered parking spaces and guest parking on the ground level.'
-        badge = 'Verified in listing specifications'
-      } else if (lower.includes('balcony') || lower.includes('terrace') || lower.includes('connect')) {
-        aiReply = 'The living room connects directly to the private balcony through sliding acoustic glass doors.'
-        badge = 'Observed from spatial reconstruction'
-      } else if (lower.includes('dimension') || lower.includes('size') || lower.includes('sqft')) {
-        aiReply = 'The living room measures approximately 6.8m × 4.5m with a 3.1m high ceiling.'
-        badge = 'Calculated from architectural survey'
-      } else if (lower.includes('bedroom') || lower.includes('main')) {
-        aiReply = 'The main bedroom is located down the private hallway with uninterrupted skyline views and en-suite bath.'
-        badge = 'Observed from property capture'
-      }
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: 'ai',
-          text: aiReply,
-          badge,
-          subtext: 'Measurements are shown only when supported by a floor plan or reference scale.',
-        },
-      ])
-    }, 400)
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: 'ai',
+        text: response.answer,
+        badge: response.badge,
+        subtext: 'Measurements are shown only when supported by a floor plan or reference scale.',
+      },
+    ])
   }
 
   return (
