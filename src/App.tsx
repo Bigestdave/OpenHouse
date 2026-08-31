@@ -52,14 +52,19 @@ export default function App() {
         {/* Add Property — 3-step Create Show wizard */}
         <Route path="/add-property" element={<Navigate to="/create-show" replace />} />
         <Route path="/create-show" element={<AuthGate><CreateShowBasicsScreen /></AuthGate>} />
+        <Route path="/create-show/basics" element={<AuthGate><CreateShowBasicsScreen /></AuthGate>} />
+        <Route path="/create-show/style" element={<AuthGate><CreateShowStyleScreen /></AuthGate>} />
         <Route path="/create-show/capture" element={<AuthGate><CreateShowStyleScreen /></AuthGate>} />
+        <Route path="/create-show/characters" element={<AuthGate><CreateShowCharactersScreen /></AuthGate>} />
         <Route path="/create-show/publish" element={<AuthGate><CreateShowCharactersScreen /></AuthGate>} />
+        <Route path="/create-show/spaces" element={<AuthGate><CreateShowCharactersScreen /></AuthGate>} />
 
         {/* MLS & Listing Intake Feeds */}
         <Route path="/import" element={<ListingPortalScreen />} />
         <Route path="/portal" element={<ListingPortalScreen />} />
         <Route path="/listing-portal" element={<ListingPortalScreen />} />
         <Route path="/demo-portal" element={<ListingPortalScreen />} />
+        <Route path="/mls" element={<ListingPortalScreen />} />
 
         {/* Realtor Onboarding & Setup */}
         <Route path="/setup" element={<AuthGate><InitialSetupScreen /></AuthGate>} />
@@ -71,7 +76,10 @@ export default function App() {
         <Route path="/shows" element={<Navigate to="/properties" replace />} />
         <Route path="/capture-requests" element={<AuthGate><CaptureRequestsScreen /></AuthGate>} />
         <Route path="/capture-requests/:id" element={<AuthGate><CaptureRequestDetailScreen /></AuthGate>} />
+        <Route path="/capture-request/:id" element={<AuthGate><CaptureRequestDetailScreen /></AuthGate>} />
+        <Route path="/capture-request" element={<AuthGate><CaptureRequestsScreen /></AuthGate>} />
         <Route path="/experiences" element={<AuthGate><ProductionsScreen /></AuthGate>} />
+        <Route path="/experiences/:id" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
         <Route path="/productions" element={<Navigate to="/experiences" replace />} />
         <Route path="/approvals" element={<AuthGate><ApprovalsScreen /></AuthGate>} />
         <Route path="/activity" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
@@ -91,8 +99,10 @@ export default function App() {
 
         {/* Property Inspector & Overview */}
         <Route path="/property/:id" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
+        <Route path="/properties/:id" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
         <Route path="/show/:id" element={<AuthGate><ShowOverviewScreen /></AuthGate>} />
         <Route path="/property/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
+        <Route path="/properties/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
         <Route path="/show/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
         <Route path="/experience/:id/published" element={<AuthGate><PublishedExperienceScreen /></AuthGate>} />
 
