@@ -7,11 +7,9 @@ import { uploadCaptureVideo } from '../lib/storage'
 import { useDemoContext } from '../context/DemoContext'
 import demoLiving from '../assets/demo-living-room.jpg'
 import demoExterior from '../assets/demo-exterior.jpg'
-
-// Asset paths
-const propLivingPreviewImg = '/src/assets/prop-living-preview.png'
-const propAdmiraltyThumbImg = '/src/assets/prop-admiralty-thumb.png'
-const cameraViewfinderBg = '/src/assets/camera-viewfinder-bg.png'
+import propLivingPreviewImg from '../assets/prop-living-preview.png'
+import propAdmiraltyThumbImg from '../assets/prop-admiralty-thumb.png'
+import cameraViewfinderBg from '../assets/camera-viewfinder-bg.png'
 
 // Crisp custom SVG icons matching reference exactly
 function GreenCheckCircle({ className = 'h-4 w-4' }: { className?: string }) {

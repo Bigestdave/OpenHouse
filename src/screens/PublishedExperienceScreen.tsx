@@ -145,7 +145,7 @@ export function PublishedExperienceScreen() {
 
             {/* Room Selector Strip Carousel */}
             <div className="flex items-center gap-3 overflow-x-auto pb-2">
-              {ROOM_LIST.map((room) => (
+              {roomList.map((room) => (
                 <button
                   key={room.id}
                   onClick={() => setActiveRoom(room.id)}

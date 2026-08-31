@@ -4,6 +4,12 @@ import { WorkspaceShell } from '../components/WorkspaceShell'
 import { SearchIcon, PlusIcon, LockIcon, GlobeIcon } from '../components/icons2'
 import { Ellipsis } from '../components/icons'
 
+import propAdmiralty from '../assets/prop-admiralty.jpg'
+import propOrchid from '../assets/prop-orchid.jpg'
+import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
+import propBourdillon from '../assets/prop-bourdillon.jpg'
+import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
+
 interface ExperienceItem {
   id: string
   propertyTitle: string
@@ -11,7 +17,7 @@ interface ExperienceItem {
   propertyImg: string
   stateTitle: string
   stateSub: string
-  stateKind: 'ready' | 'preparing' | 'live' | 'changes'
+  stateKind: 'ready' | 'preparing' | 'live' | 'changes' | 'failed'
   visibility: 'Unlisted' | 'Public' | 'Not published'
   updated: string
   actionLabel: string
@@ -24,7 +30,7 @@ const EXPERIENCES_DATA: ExperienceItem[] = [
     id: 'exp-1',
     propertyTitle: '8 Admiralty Way',
     propertyPremise: '3-bedroom apartment · Lekki, Lagos',
-    propertyImg: '/src/assets/prop-admiralty.jpg',
+    propertyImg: propAdmiralty,
     stateTitle: 'Ready for review',
     stateSub: '6 of 6 advertised rooms represented · 2 issues resolved',
     stateKind: 'ready',
@@ -38,7 +44,7 @@ const EXPERIENCES_DATA: ExperienceItem[] = [
     id: 'exp-2',
     propertyTitle: 'Orchid Apartments, Unit 4',
     propertyPremise: '2-bedroom apartment · Lekki, Lagos',
-    propertyImg: '/src/assets/prop-orchid.jpg',
+    propertyImg: propOrchid,
     stateTitle: 'Preparing experience',
     stateSub: 'Building connected room views',
     stateKind: 'preparing',
@@ -52,7 +58,7 @@ const EXPERIENCES_DATA: ExperienceItem[] = [
     id: 'exp-3',
     propertyTitle: 'Lekki Gardens, Unit 12',
     propertyPremise: '3-bedroom terrace · Lekki, Lagos',
-    propertyImg: '/src/assets/prop-lekkigardens.jpg',
+    propertyImg: propLekkiGardens,
     stateTitle: 'Running final checks',
     stateSub: 'Checking room coverage and visual quality',
     stateKind: 'preparing',
@@ -66,7 +72,7 @@ const EXPERIENCES_DATA: ExperienceItem[] = [
     id: 'exp-4',
     propertyTitle: 'Bourdillon Court, Unit 8',
     propertyPremise: '4-bedroom apartment · Ikoyi, Lagos',
-    propertyImg: '/src/assets/prop-bourdillon.jpg',
+    propertyImg: propBourdillon,
     stateTitle: 'Live',
     stateSub: 'Published yesterday',
     stateKind: 'live',
@@ -80,7 +86,7 @@ const EXPERIENCES_DATA: ExperienceItem[] = [
     id: 'exp-5',
     propertyTitle: 'Palm View Residence, Unit 5',
     propertyPremise: '2-bedroom apartment · Victoria Island, Lagos',
-    propertyImg: '/src/assets/prop-hero-waterfront.jpg',
+    propertyImg: propHeroWaterfront,
     stateTitle: 'Changes requested',
     stateSub: 'Bedroom 2 connection needs review',
     stateKind: 'changes',

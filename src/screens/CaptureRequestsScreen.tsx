@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom'
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { SearchIcon, PlusIcon, LightBulbIcon } from '../components/icons2'
 
+import propKitchen from '../assets/prop-kitchen.png'
+import propOrchid from '../assets/prop-orchid.jpg'
+import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
+import propAdmiralty from '../assets/prop-admiralty.jpg'
+
 interface CaptureRequestItem {
   id: string
   propertyTitle: string
@@ -20,7 +25,7 @@ const REQUESTS_DATA: CaptureRequestItem[] = [
     id: '1',
     propertyTitle: '14 Cooper Road',
     propertyLocation: 'Ikoyi, Lagos',
-    propertyImg: '/src/assets/prop-kitchen.png',
+    propertyImg: propKitchen,
     captureNeeded: 'Kitchen-to-dining connection',
     recipient: 'Kiki Casa',
     status: 'Awaiting capture',
@@ -31,7 +36,7 @@ const REQUESTS_DATA: CaptureRequestItem[] = [
     id: '2',
     propertyTitle: 'Orchid Apartments, Unit 4',
     propertyLocation: 'Lekki, Lagos',
-    propertyImg: '/src/assets/prop-orchid.jpg',
+    propertyImg: propOrchid,
     captureNeeded: 'Bedroom 2 doorway',
     recipient: 'Tola Adeyemi',
     status: 'Footage received',
@@ -42,7 +47,7 @@ const REQUESTS_DATA: CaptureRequestItem[] = [
     id: '3',
     propertyTitle: 'Lekki Gardens, Unit 12',
     propertyLocation: 'Lekki, Lagos',
-    propertyImg: '/src/assets/prop-lekkigardens.jpg',
+    propertyImg: propLekkiGardens,
     captureNeeded: 'Front entrance approach',
     recipient: 'Kiki Casa',
     status: 'Checking',
@@ -53,7 +58,7 @@ const REQUESTS_DATA: CaptureRequestItem[] = [
     id: '4',
     propertyTitle: '8 Admiralty Way',
     propertyLocation: 'Lekki, Lagos',
-    propertyImg: '/src/assets/prop-admiralty.jpg',
+    propertyImg: propAdmiralty,
     captureNeeded: 'Living-room-to-balcony connection',
     recipient: 'Kiki Casa',
     status: 'Resolved',

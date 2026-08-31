@@ -1,6 +1,11 @@
 import { WorkspaceShell } from '../components/WorkspaceShell'
 import { Ellipsis } from '../components/icons'
 import { CreditCardIcon, StarIcon } from '../components/icons2'
+import propAdmiralty from '../assets/prop-admiralty.jpg'
+import propKitchen from '../assets/prop-kitchen.png'
+import propOrchid from '../assets/prop-orchid.jpg'
+import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
+import propBourdillon from '../assets/prop-bourdillon.jpg'
 
 export function UsageScreen() {
   return (
@@ -89,7 +94,7 @@ export function UsageScreen() {
               <div className="divide-y divide-border/60">
                 <div className="grid grid-cols-[2.4fr_1.4fr_1.4fr_1.5fr_1fr_40px] items-center gap-4 px-5 py-3.5 hover:bg-surface-elevated/40 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <img src="/src/assets/prop-admiralty.jpg" alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
+                    <img src={propAdmiralty} alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
                     <span className="font-bold text-text-primary text-[13.5px] truncate">8 Admiralty Way</span>
                   </div>
                   <div className="text-[13px] text-text-secondary whitespace-nowrap">42 minutes</div>
@@ -108,7 +113,7 @@ export function UsageScreen() {
 
                 <div className="grid grid-cols-[2.4fr_1.4fr_1.4fr_1.5fr_1fr_40px] items-center gap-4 px-5 py-3.5 hover:bg-surface-elevated/40 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <img src="/src/assets/prop-kitchen.png" alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
+                    <img src={propKitchen} alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
                     <span className="font-bold text-text-primary text-[13.5px] truncate">14 Cooper Road</span>
                   </div>
                   <div className="text-[13px] text-text-secondary whitespace-nowrap">31 minutes</div>
@@ -127,7 +132,7 @@ export function UsageScreen() {
 
                 <div className="grid grid-cols-[2.4fr_1.4fr_1.4fr_1.5fr_1fr_40px] items-center gap-4 px-5 py-3.5 hover:bg-surface-elevated/40 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <img src="/src/assets/prop-orchid.jpg" alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
+                    <img src={propOrchid} alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
                     <span className="font-bold text-text-primary text-[13.5px] truncate">Orchid Apartments, Unit 4</span>
                   </div>
                   <div className="text-[13px] text-text-secondary whitespace-nowrap">36 minutes</div>
@@ -146,7 +151,7 @@ export function UsageScreen() {
 
                 <div className="grid grid-cols-[2.4fr_1.4fr_1.4fr_1.5fr_1fr_40px] items-center gap-4 px-5 py-3.5 hover:bg-surface-elevated/40 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <img src="/src/assets/prop-lekkigardens.jpg" alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
+                    <img src={propLekkiGardens} alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
                     <span className="font-bold text-text-primary text-[13.5px] truncate">Lekki Gardens, Unit 12</span>
                   </div>
                   <div className="text-[13px] text-text-secondary whitespace-nowrap">49 minutes</div>
@@ -165,7 +170,7 @@ export function UsageScreen() {
 
                 <div className="grid grid-cols-[2.4fr_1.4fr_1.4fr_1.5fr_1fr_40px] items-center gap-4 px-5 py-3.5 hover:bg-surface-elevated/40 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
-                    <img src="/src/assets/prop-bourdillon.jpg" alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
+                    <img src={propBourdillon} alt="" className="h-10 w-14 rounded-lg object-cover border border-border shrink-0" />
                     <span className="font-bold text-text-primary text-[13.5px] truncate">Bourdillon Court, Unit 8</span>
                   </div>
                   <div className="text-[13px] text-text-secondary whitespace-nowrap">55 minutes</div>

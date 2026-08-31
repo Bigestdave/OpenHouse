@@ -4,6 +4,7 @@ import { WorkspaceShell } from '../components/WorkspaceShell'
 import { CopyIcon, PersonIcon, MailIcon, ClockIcon, LinkIcon } from '../components/icons2'
 import { Ellipsis, CheckCircle } from '../components/icons'
 import demoBalcony from '../assets/demo-balcony.jpg'
+import propKitchen from '../assets/prop-kitchen.png'
 
 export function CaptureRequestDetailScreen() {
   const { id } = useParams()
@@ -14,7 +15,7 @@ export function CaptureRequestDetailScreen() {
   const propTitle = isDemo ? '72691 Homestead Road, Palm Desert' : '14 Cooper Road'
   const propLocation = isDemo ? 'Palm Desert, CA' : 'Ikoyi, Lagos'
   const captureTitle = isDemo ? 'Pool-to-guest house connection' : 'Kitchen-to-dining connection'
-  const captureImg = isDemo ? demoBalcony : '/src/assets/prop-kitchen.png'
+  const captureImg = isDemo ? demoBalcony : propKitchen
   const captureRouteId = isDemo ? 'homestead-pool' : '14-cooper'
 
   return (

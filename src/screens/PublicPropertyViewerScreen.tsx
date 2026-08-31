@@ -19,6 +19,7 @@ import {
   NavArrowUpIcon,
 } from '../components/icons2'
 import { Ellipsis, FullscreenIcon, CloseIcon } from '../components/icons'
+import { OpenHouseLogoMark } from '../components/WorkspaceShell'
 import demoLiving from '../assets/demo-living-room.jpg'
 import demoKitchen from '../assets/demo-kitchen.jpg'
 import demoBed from '../assets/demo-master-bedroom.jpg'
@@ -32,7 +33,7 @@ import propLekkiGardens from '../assets/prop-lekkigardens.jpg'
 import propBourdillon from '../assets/prop-bourdillon.jpg'
 import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
 import propKitchen from '../assets/prop-kitchen.png'
-import { DEMO_PROPERTY_ID, DEMO_PROPERTY_LABEL } from '../context/DemoContext'
+import { DEMO_PROPERTY_ID } from '../context/DemoContext'
 
 interface Room {
   id: string

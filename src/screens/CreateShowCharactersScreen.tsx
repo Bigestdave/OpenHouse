@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { WizardShell, WizardTitle } from '../components/WizardShell'
 import { UploadCloud, PlusIcon } from '../components/icons2'
+import propAdmiralty from '../assets/prop-admiralty.jpg'
 import { addProperty } from '../data/store'
 import { startPropertyWorkflow } from '../data/workflow'
 import type { Space } from '../data/types'
@@ -75,7 +76,7 @@ export function CreateShowCharactersScreen() {
         spaces: formattedSpaces,
         sourceMedia: [],
         timeline: [],
-        coverImage: '/src/assets/prop-admiralty.jpg',
+        coverImage: propAdmiralty,
         workspaceId: 'default',
       })
 

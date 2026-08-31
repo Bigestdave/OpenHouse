@@ -6,12 +6,17 @@ import { startPropertyWorkflow } from '../data/workflow'
 import { Button, Input, Select, Textarea } from '../components/ui'
 import type { Space } from '../data/types'
 
+import propAdmiralty from '../assets/prop-admiralty.jpg'
+import propBourdillon from '../assets/prop-bourdillon.jpg'
+import propHeroWaterfront from '../assets/prop-hero-waterfront.jpg'
+
 const PROPERTY_TYPES = [
   '3-bedroom apartment',
   '2-bedroom apartment',
-  '4-bedroom detached duplex',
-  '3-bedroom terrace',
-  '5-bedroom luxury penthouse',
+  '4-bedroom terrace',
+  '5-bedroom detached duplex',
+  'Studio apartment',
+  'Penthouse',
   'Commercial space',
 ]
 
@@ -24,7 +29,7 @@ const SAMPLE_LEKKI = {
   bathrooms: 3,
   description:
     'Spacious 3-bedroom apartment with panoramic lagoon views, contemporary kitchen, fitted wardrobes, and private balcony overlooking Lekki Phase 1.',
-  coverImage: '/src/assets/prop-admiralty.jpg',
+  coverImage: propAdmiralty,
   spaces: [
     { name: 'Living room', captured: true },
     { name: 'Kitchen', captured: true },
@@ -44,7 +49,7 @@ const SAMPLE_IKOYI = {
   bathrooms: 4,
   description:
     'Ultra-luxury 4-bedroom residence in the heart of Ikoyi featuring floor-to-ceiling windows, imported Italian finishes, swimming pool, and 24/7 power.',
-  coverImage: '/src/assets/prop-bourdillon.jpg',
+  coverImage: propBourdillon,
   spaces: [
     { name: 'Living room', captured: true },
     { name: 'Kitchen', captured: true },
@@ -64,7 +69,7 @@ export function AddPropertyScreen() {
   const [bedrooms, setBedrooms] = useState(3)
   const [bathrooms, setBathrooms] = useState(3)
   const [description, setDescription] = useState('')
-  const [coverImage, setCoverImage] = useState('/src/assets/prop-hero-waterfront.jpg')
+  const [coverImage, setCoverImage] = useState(propHeroWaterfront)
   const [spaces, setSpaces] = useState<Array<{ name: string; captured: boolean }>>([
     { name: 'Living room', captured: true },
     { name: 'Kitchen', captured: true },
@@ -116,7 +121,7 @@ export function AddPropertyScreen() {
       spaces: formattedSpaces,
       sourceMedia: [],
       timeline: [],
-      coverImage: coverImage || '/src/assets/prop-hero-waterfront.jpg',
+      coverImage: coverImage || propHeroWaterfront,
       workspaceId: 'default',
     })
 
