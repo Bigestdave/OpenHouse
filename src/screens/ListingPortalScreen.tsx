@@ -11,11 +11,12 @@ import { useDemoContext } from '../context/DemoContext'
 export function ListingPortalScreen() {
   const navigate = useNavigate()
   const { setStage } = useDemoContext()
+  const [selectedSource, setSelectedSource] = useState<'zillow' | 'realtor' | 'mls'>('zillow')
   const [selectedPreset, setSelectedPreset] = useState<'homestead_pd' | 'park_ave' | 'ocean_dr' | 'beverly_glen' | 'custom'>('homestead_pd')
 
   const [title, setTitle] = useState('72691 Homestead Road')
   const [address, setAddress] = useState('Palm Desert, CA 92260')
-  const [type, setType] = useState('4-Bedroom Estate with Guest House')
+  const [type, setType] = useState('4-Bedroom Luxury Estate with Guest House')
   const [bedrooms, setBedrooms] = useState(4)
   const [bathrooms, setBathrooms] = useState(4)
   const [price, setPrice] = useState('$1,495,000')
@@ -31,7 +32,7 @@ export function ListingPortalScreen() {
     if (preset === 'homestead_pd') {
       setTitle('72691 Homestead Road')
       setAddress('Palm Desert, CA 92260')
-      setType('4-Bedroom Estate with Guest House')
+      setType('4-Bedroom Luxury Estate with Guest House')
       setBedrooms(4)
       setBathrooms(4)
       setPrice('$1,495,000')
@@ -80,7 +81,7 @@ export function ListingPortalScreen() {
       setTimeout(() => {
         setStage(1)
         navigate('/property/homestead-pd')
-      }, 1800)
+      }, 1600)
       return
     }
 
@@ -110,251 +111,368 @@ export function ListingPortalScreen() {
 
     setTimeout(() => {
       navigate(`/property/${newPropId}`)
-    }, 1800)
+    }, 1600)
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans antialiased">
-      {/* Top Banner */}
-      <header className="border-b border-stone-200/80 bg-white/90 backdrop-blur-md px-6 py-4 sticky top-0 z-30 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#194534] text-white font-bold text-xs">
-            MLS
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-stone-900">MLS Syndication & Ingestion Gateway</span>
-              <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-600/20">
-                Connected
-              </span>
-            </div>
-            <p className="text-xs text-stone-500">
-              Live automated listing intake pipeline for OpenHouse
-            </p>
+    <div className="min-h-screen bg-[#FAF8F5] text-stone-900 font-sans antialiased selection:bg-stone-200">
+      
+      {/* Top Navbar */}
+      <header className="border-b border-[#E5E0D8] bg-white/90 backdrop-blur-md px-6 lg:px-10 py-3.5 sticky top-0 z-30 flex items-center justify-between">
+        <div className="flex items-center gap-3.5">
+          <Link to="/properties" className="flex items-center gap-2 group">
+            <OpenHouseLogoMark className="h-6 w-6 object-contain" />
+            <span className="text-[17px] font-extrabold tracking-tight text-[#0B1713]">
+              OpenHouse
+            </span>
+          </Link>
+          <span className="text-stone-300">/</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] font-bold text-stone-900">MLS Syndication & Ingestion Gateway</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#EBF2EC] px-2.5 py-0.5 text-[11px] font-bold text-[#2F613D]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2F613D] animate-pulse" />
+              Live Webhook Connected
+            </span>
           </div>
         </div>
 
-        <Link
-          to="/properties"
-          className="inline-flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-stone-800 transition-colors"
-        >
-          <OpenHouseLogoMark className="h-4 w-4 fill-white" />
-          <span>Open Realtor Inbox</span>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/properties"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[#E5E0D8] bg-white px-3.5 py-2 text-[12.5px] font-semibold text-stone-800 shadow-xs hover:bg-stone-50 transition-colors"
+          >
+            <span>Realtor Workspace</span>
+            <span>→</span>
+          </Link>
+        </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-10">
+      {/* Main Container */}
+      <main className="max-w-4xl mx-auto px-5 sm:px-8 py-8 sm:py-10 space-y-8">
         
-        {/* Editorial Context */}
-        <div className="mb-8 rounded-2xl bg-white border border-stone-200/80 p-6 shadow-xs">
-          <div className="flex items-start gap-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#194534]/10 text-[#194534]">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
+        {/* Page Top Header */}
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#0B1713]/5 px-3 py-1 text-[11.5px] font-bold text-[#0B1713] uppercase tracking-wider">
+            <span>⚡ MLS Integration Simulator</span>
+          </div>
+          <h1 className="text-[28px] sm:text-[34px] font-extrabold tracking-tight text-[#0B1713] leading-tight">
+            Publish New Property Listing
+          </h1>
+          <p className="text-[14px] text-stone-500 max-w-2xl leading-relaxed">
+            Realtors publish their listings on standard portals (Zillow, Realtor.com, MLS feeds). 
+            OpenHouse automatically intercepts the listing webhook, triggers multimodal Gemini 3.7 Flash spatial analysis, 
+            and prepares the verified 3D open house.
+          </p>
+        </div>
+
+        {/* Existing Listing Platform Selector */}
+        <div className="rounded-2xl border border-[#E5E0D8] bg-white p-5 sm:p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-stone-900">
-                How OpenHouse Autonomous Processing Begins
-              </h2>
-              <p className="mt-1 text-sm text-stone-600 leading-relaxed">
-                OpenHouse connects once to your listing source (MLS, Zillow feed, or brokerage CRM). 
-                When a new listing is published, OpenHouse automatically detects the media, validates room coverage, 
-                generates 3D Gaussian Splats in the background, and prompts for your approval when the virtual open house is ready.
-              </p>
+              <h2 className="text-[14px] font-bold text-stone-900">Source Platform</h2>
+              <p className="text-[12px] text-stone-500 mt-0.5">Choose which feed OpenHouse is currently listening to</p>
             </div>
+            <span className="text-[11px] font-mono font-medium text-stone-400 bg-stone-100 px-2 py-0.5 rounded-md">
+              POST /api/webhook/listing.published
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedSource('zillow')}
+              className={`flex items-center justify-center gap-2.5 rounded-xl border p-3 text-center transition-all cursor-pointer ${
+                selectedSource === 'zillow'
+                  ? 'border-[#0B1713] bg-[#0B1713] text-white shadow-sm'
+                  : 'border-[#E5E0D8] bg-stone-50/70 text-stone-700 hover:bg-stone-100 hover:border-stone-300'
+              }`}
+            >
+              <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />
+              </svg>
+              <span className="text-[13px] font-bold">Zillow MLS</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedSource('realtor')}
+              className={`flex items-center justify-center gap-2.5 rounded-xl border p-3 text-center transition-all cursor-pointer ${
+                selectedSource === 'realtor'
+                  ? 'border-[#0B1713] bg-[#0B1713] text-white shadow-sm'
+                  : 'border-[#E5E0D8] bg-stone-50/70 text-stone-700 hover:bg-stone-100 hover:border-stone-300'
+              }`}
+            >
+              <span className="text-[13px] font-bold">realtor.com</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedSource('mls')}
+              className={`flex items-center justify-center gap-2.5 rounded-xl border p-3 text-center transition-all cursor-pointer ${
+                selectedSource === 'mls'
+                  ? 'border-[#0B1713] bg-[#0B1713] text-white shadow-sm'
+                  : 'border-[#E5E0D8] bg-stone-50/70 text-stone-700 hover:bg-stone-100 hover:border-stone-300'
+              }`}
+            >
+              <span className="text-[13px] font-bold">Custom Webhook / MLS</span>
+            </button>
           </div>
         </div>
 
-        {/* Source Presets */}
-        <div className="mb-6">
-          <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">
-            Select Active Listing Feed:
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Demo Listing Presets */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-[12px] font-bold uppercase tracking-wider text-stone-500">
+              Select Sample Property Dataset
+            </label>
+            <span className="text-[11.5px] text-stone-500 font-medium">Click to populate listing form</span>
+          </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            
             {/* DEMO PRESET — Homestead Palm Desert */}
             <button
               type="button"
               onClick={() => handleSelectPreset('homestead_pd')}
-              className={`p-4 rounded-xl border text-left transition-all cursor-pointer relative ${
+              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative flex gap-3.5 ${
                 selectedPreset === 'homestead_pd'
-                  ? 'border-[#194534] bg-emerald-50/50 ring-2 ring-[#194534]/20'
-                  : 'border-stone-200 bg-white hover:border-stone-300'
+                  ? 'border-[#0B1713] bg-white ring-2 ring-[#0B1713] shadow-md'
+                  : 'border-[#E5E0D8] bg-white hover:border-stone-300 shadow-xs'
               }`}
             >
-              <div className="absolute top-2 right-2 text-[10px] font-bold bg-[#194534] text-white px-2 py-0.5 rounded-full uppercase tracking-wide">
-                Demo
+              <img
+                src={demoExterior}
+                alt="72691 Homestead Road"
+                className="h-16 w-20 rounded-xl object-cover shrink-0 border border-stone-200"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <span className="text-[13.5px] font-extrabold text-stone-900 truncate">72691 Homestead Road</span>
+                  <span className="text-[10px] font-extrabold bg-[#2F613D] text-white px-2 py-0.5 rounded-full shrink-0 uppercase tracking-wide">
+                    Featured Demo
+                  </span>
+                </div>
+                <p className="text-[12px] text-stone-500 truncate">Palm Desert, CA · $1,495,000</p>
+                <p className="text-[11px] text-[#D97945] font-semibold mt-1">
+                  Simulates missing pool connection → full agentic loop
+                </p>
               </div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-bold text-stone-900">72691 Homestead Road</span>
-              </div>
-              <p className="text-xs text-stone-500">Palm Desert, CA · $1,495,000</p>
-              <p className="text-[11px] text-amber-700 font-medium mt-2">
-                Simulates missing pool-to-guest house footage — full demo flow.
-              </p>
             </button>
 
+            {/* PRESET 2 — 740 Park Ave */}
             <button
               type="button"
               onClick={() => handleSelectPreset('park_ave')}
-              className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative flex gap-3.5 ${
                 selectedPreset === 'park_ave'
-                  ? 'border-[#194534] bg-emerald-50/50 ring-2 ring-[#194534]/20'
-                  : 'border-stone-200 bg-white hover:border-stone-300'
+                  ? 'border-[#0B1713] bg-white ring-2 ring-[#0B1713] shadow-md'
+                  : 'border-[#E5E0D8] bg-white hover:border-stone-300 shadow-xs'
               }`}
             >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-stone-900">740 Park Avenue</span>
-                <span className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">
-                  Recapture Test
-                </span>
+              <img
+                src={propAdmiraltyImg}
+                alt="740 Park Avenue"
+                className="h-16 w-20 rounded-xl object-cover shrink-0 border border-stone-200"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <span className="text-[13.5px] font-extrabold text-stone-900 truncate">740 Park Avenue</span>
+                  <span className="text-[10px] font-bold bg-stone-100 text-stone-700 px-2 py-0.5 rounded-full shrink-0">
+                    Penthouse
+                  </span>
+                </div>
+                <p className="text-[12px] text-stone-500 truncate">Upper East Side, NY · $18,500/mo</p>
+                <p className="text-[11px] text-stone-500 font-medium mt-1">
+                  Simulates terrace doorway recapture
+                </p>
               </div>
-              <p className="text-xs text-stone-500">Upper East Side, NY · \$18,500/mo</p>
-              <p className="text-[11px] text-amber-700 font-medium mt-2">
-                Simulates missing terrace doorway footage.
-              </p>
             </button>
 
+            {/* PRESET 3 — 1048 Ocean Drive */}
             <button
               type="button"
               onClick={() => handleSelectPreset('ocean_dr')}
-              className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative flex gap-3.5 ${
                 selectedPreset === 'ocean_dr'
-                  ? 'border-[#194534] bg-emerald-50/50 ring-2 ring-[#194534]/20'
-                  : 'border-stone-200 bg-white hover:border-stone-300'
+                  ? 'border-[#0B1713] bg-white ring-2 ring-[#0B1713] shadow-md'
+                  : 'border-[#E5E0D8] bg-white hover:border-stone-300 shadow-xs'
               }`}
             >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-stone-900">1048 Ocean Drive</span>
-                <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
-                  Full Coverage
-                </span>
+              <img
+                src={propBourdillonImg}
+                alt="1048 Ocean Drive"
+                className="h-16 w-20 rounded-xl object-cover shrink-0 border border-stone-200"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <span className="text-[13.5px] font-extrabold text-stone-900 truncate">1048 Ocean Drive</span>
+                  <span className="text-[10px] font-bold bg-[#EBF2EC] text-[#2F613D] px-2 py-0.5 rounded-full shrink-0">
+                    Full Coverage
+                  </span>
+                </div>
+                <p className="text-[12px] text-stone-500 truncate">South Beach, Miami · $35,000/mo</p>
+                <p className="text-[11px] text-[#2F613D] font-semibold mt-1">
+                  100% complete footage · Direct build
+                </p>
               </div>
-              <p className="text-xs text-stone-500">South Beach, Miami · \$35,000/mo</p>
-              <p className="text-[11px] text-emerald-700 font-medium mt-2">
-                All rooms captured. Direct reconstruction flow.
-              </p>
             </button>
 
+            {/* PRESET 4 — 452 Beverly Glen */}
             <button
               type="button"
               onClick={() => handleSelectPreset('beverly_glen')}
-              className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative flex gap-3.5 ${
                 selectedPreset === 'beverly_glen'
-                  ? 'border-[#194534] bg-emerald-50/50 ring-2 ring-[#194534]/20'
-                  : 'border-stone-200 bg-white hover:border-stone-300'
+                  ? 'border-[#0B1713] bg-white ring-2 ring-[#0B1713] shadow-md'
+                  : 'border-[#E5E0D8] bg-white hover:border-stone-300 shadow-xs'
               }`}
             >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-stone-900">452 Beverly Glen</span>
-                <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">
-                  Bel Air Estate
-                </span>
+              <img
+                src={propOrchidImg}
+                alt="452 Beverly Glen"
+                className="h-16 w-20 rounded-xl object-cover shrink-0 border border-stone-200"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <span className="text-[13.5px] font-extrabold text-stone-900 truncate">452 Beverly Glen</span>
+                  <span className="text-[10px] font-bold bg-stone-100 text-stone-700 px-2 py-0.5 rounded-full shrink-0">
+                    Bel Air
+                  </span>
+                </div>
+                <p className="text-[12px] text-stone-500 truncate">Los Angeles, CA · $24,000/mo</p>
+                <p className="text-[11px] text-stone-500 font-medium mt-1">
+                  Complete architectural asset set
+                </p>
               </div>
-              <p className="text-xs text-stone-500">Los Angeles, CA · \$24,000/mo</p>
-              <p className="text-[11px] text-emerald-700 font-medium mt-2">
-                Complete architectural photo set.
-              </p>
             </button>
 
           </div>
         </div>
 
         {/* Listing Form Preview */}
-        <div className="rounded-2xl bg-white border border-stone-200/80 p-8 shadow-xs">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-stone-500 mb-6">
-            Listing Metadata & Spatial Assets
-          </h3>
+        <div className="rounded-2xl bg-white border border-[#E5E0D8] p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="flex items-center justify-between border-b border-[#E5E0D8] pb-4">
+            <div>
+              <h3 className="text-[16px] font-extrabold text-[#0B1713]">
+                Listing Details & Attached Media
+              </h3>
+              <p className="text-[12.5px] text-stone-500 mt-0.5">
+                Payload data dispatched to OpenHouse Ingestion Webhook
+              </p>
+            </div>
+            <span className="text-[11.5px] font-bold uppercase tracking-wider text-stone-500">
+              {bedrooms} Beds · {bathrooms} Baths
+            </span>
+          </div>
 
-          <div className="space-y-5">
+          <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">Property Title / Unit</label>
+                <label className="block text-[12px] font-bold text-stone-700 mb-1.5">Property Title / Unit</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-3.5 py-2.5 text-sm font-medium text-stone-900 focus:border-[#194534] focus:bg-white focus:outline-none"
+                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#FAF8F5]/80 px-3.5 py-2.5 text-[13.5px] font-medium text-stone-900 focus:border-[#0B1713] focus:bg-white focus:outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">Address / Location</label>
+                <label className="block text-[12px] font-bold text-stone-700 mb-1.5">Address / City, State</label>
                 <input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-3.5 py-2.5 text-sm font-medium text-stone-900 focus:border-[#194534] focus:bg-white focus:outline-none"
+                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#FAF8F5]/80 px-3.5 py-2.5 text-[13.5px] font-medium text-stone-900 focus:border-[#0B1713] focus:bg-white focus:outline-none transition-all"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-bold text-stone-700 mb-1">Property Type</label>
+                <label className="block text-[12px] font-bold text-stone-700 mb-1.5">Property Type</label>
                 <input
                   type="text"
                   value={type}
                   onChange={(e) => setType(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-3.5 py-2.5 text-sm font-medium text-stone-900 focus:border-[#194534] focus:bg-white focus:outline-none"
+                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#FAF8F5]/80 px-3.5 py-2.5 text-[13.5px] font-medium text-stone-900 focus:border-[#0B1713] focus:bg-white focus:outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">Bedrooms</label>
+                <label className="block text-[12px] font-bold text-stone-700 mb-1.5">Bedrooms</label>
                 <input
                   type="number"
                   value={bedrooms}
                   onChange={(e) => setBedrooms(Number(e.target.value))}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-3.5 py-2.5 text-sm font-medium text-stone-900 focus:border-[#194534] focus:bg-white focus:outline-none"
+                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#FAF8F5]/80 px-3.5 py-2.5 text-[13.5px] font-medium text-stone-900 focus:border-[#0B1713] focus:bg-white focus:outline-none transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-stone-700 mb-1">Bathrooms</label>
+                <label className="block text-[12px] font-bold text-stone-700 mb-1.5">Bathrooms</label>
                 <input
                   type="number"
                   value={bathrooms}
                   onChange={(e) => setBathrooms(Number(e.target.value))}
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-3.5 py-2.5 text-sm font-medium text-stone-900 focus:border-[#194534] focus:bg-white focus:outline-none"
+                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#FAF8F5]/80 px-3.5 py-2.5 text-[13.5px] font-medium text-stone-900 focus:border-[#0B1713] focus:bg-white focus:outline-none transition-all"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-stone-700 mb-1">Price</label>
-              <input
-                type="text"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-3.5 py-2.5 text-sm font-medium text-stone-900 focus:border-[#194534] focus:bg-white focus:outline-none"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-[12px] font-bold text-stone-700 mb-1.5">Listed Price</label>
+                <input
+                  type="text"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-full rounded-xl border border-[#E5E0D8] bg-[#FAF8F5]/80 px-3.5 py-2.5 text-[13.5px] font-medium text-stone-900 focus:border-[#0B1713] focus:bg-white focus:outline-none transition-all"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-[12px] font-bold text-stone-700 mb-1.5">Attached Media Files</label>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E0D8] bg-[#FAF8F5] px-3 py-2 text-[12px] font-semibold text-stone-800">
+                    📷 16 High-Res Photos
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E0D8] bg-[#FAF8F5] px-3 py-2 text-[12px] font-semibold text-stone-800">
+                    📐 1 CAD Floor Plan
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E0D8] bg-[#FAF8F5] px-3 py-2 text-[12px] font-semibold text-stone-800">
+                    📹 1 Walkthrough Video
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-700 mb-1">Description</label>
+              <label className="block text-[12px] font-bold text-stone-700 mb-1.5">Description</label>
               <textarea
-                rows={3}
+                rows={2}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 bg-stone-50/50 px-3.5 py-2.5 text-sm font-medium text-stone-900 focus:border-[#194534] focus:bg-white focus:outline-none"
+                className="w-full rounded-xl border border-[#E5E0D8] bg-[#FAF8F5]/80 px-3.5 py-2.5 text-[13.5px] font-medium text-stone-900 focus:border-[#0B1713] focus:bg-white focus:outline-none transition-all"
               />
             </div>
 
             {/* Test Simulation Controls */}
-            <div className="pt-2 border-t border-stone-100">
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-stone-50 border border-stone-200/80">
+            <div className="pt-2">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-[#FAF8F5] border border-[#E5E0D8]">
                 <div>
-                  <span className="text-xs font-bold text-stone-900">Flag Missing Room Coverage</span>
-                  <p className="text-[11px] text-stone-500">
-                    When enabled, OpenHouse detects insufficient terrace footage and triggers a guided 15s mobile capture request.
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-bold text-stone-900">Simulate Spatial Gap Detection</span>
+                    <span className="text-[10px] font-extrabold bg-[#D97945]/10 text-[#D97945] px-2 py-0.5 rounded-full uppercase">
+                      Gemini 3.7 Flash QA
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-stone-500 mt-0.5">
+                    When enabled, OpenHouse identifies the missing pool transition and generates a 15s mobile recapture link.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMissingSpaceFlag(!missingSpaceFlag)}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    missingSpaceFlag ? 'bg-[#194534]' : 'bg-stone-300'
+                    missingSpaceFlag ? 'bg-[#2F613D]' : 'bg-stone-300'
                   }`}
                 >
                   <span
@@ -367,28 +485,31 @@ export function ListingPortalScreen() {
             </div>
 
             {/* Ingestion Trigger Button */}
-            <div className="pt-4 flex items-center justify-between">
-              <div className="text-xs text-stone-500">
-                Webhook target: <code className="font-mono text-stone-700">POST /api/webhook/listing-intake</code>
+            <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-[#E5E0D8]">
+              <div className="text-[12px] text-stone-500">
+                <span>Webhook endpoint: </span>
+                <code className="font-mono font-semibold text-stone-800 bg-stone-100 px-2 py-1 rounded">
+                  POST /api/webhook/listing-intake
+                </code>
               </div>
 
               <button
                 type="button"
                 onClick={handlePublish}
                 disabled={isPublishing}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#194534] px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-[#2F613D] transition-all disabled:opacity-50 cursor-pointer"
+                className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#0B1713] px-7 py-3.5 text-[13.5px] font-bold text-white shadow-md hover:bg-black active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isPublishing ? (
                   <>
                     <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                    <span>Transmitting Webhook to OpenHouse...</span>
+                    <span>Transmitting to OpenHouse Engine...</span>
                   </>
                 ) : (
                   <>
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
-                    <span>Trigger Listing Ingestion</span>
+                    <span>Publish & Trigger OpenHouse Ingestion →</span>
                   </>
                 )}
               </button>
@@ -399,15 +520,15 @@ export function ListingPortalScreen() {
 
         {/* Webhook Broadcast Notification */}
         {webhookSent && (
-          <div className="mt-6 rounded-2xl bg-[#0B1713] text-white p-6 border border-stone-800 shadow-xl animate-fade-in">
+          <div className="rounded-2xl bg-[#0B1713] text-white p-6 border border-stone-800 shadow-xl animate-fade-in">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-3 w-3 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                Webhook Received by OpenHouse Engine
+              <div className="h-3 w-3 rounded-full bg-[#4ADE80] animate-ping" />
+              <span className="text-[12px] font-bold uppercase tracking-wider text-[#4ADE80]">
+                Webhook Intercepted by OpenHouse Intelligence Engine
               </span>
             </div>
-            <p className="text-sm text-stone-300">
-              Listing at <strong className="text-white">{address}</strong> ingested. Autonomous quality analysis has started in your workspace.
+            <p className="text-[13.5px] text-stone-300">
+              Listing at <strong className="text-white">{address}</strong> ingested. Autonomous Gemini 3.7 Flash spatial analysis has started in your workspace.
             </p>
           </div>
         )}
