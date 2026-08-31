@@ -42,7 +42,7 @@ function Logo({ light = false }: { light?: boolean }) {
   )
 }
 
-function Header({ onInterest }: { onInterest: () => void }) {
+function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const close = () => setMobileOpen(false)
   return (
@@ -54,11 +54,9 @@ function Header({ onInterest }: { onInterest: () => void }) {
           <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#process" data-testid="link-how-it-works">How it works</a>
           <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#professionals" data-testid="link-professionals">For professionals</a>
           <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#trust" data-testid="link-trust">Trust</a>
-          <Link className="text-[12px] font-medium text-[#4d7145] transition-colors hover:text-black" to="/portal">MLS Gateway</Link>
         </nav>
         <div className="hidden items-center gap-5 md:flex">
-          <button onClick={onInterest} className="text-[12px] font-medium text-black/65 transition-colors hover:text-black cursor-pointer" data-testid="link-early-access">Early Access</button>
-          <Link to="/login" className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" data-testid="link-sign-in">Sign in</Link>
+          <Link to="/portal" className="text-[12px] font-medium text-[#4d7145] transition-colors hover:text-black" data-testid="link-portal">MLS Gateway</Link>
           <Link to="/public/homestead-pd" className="bg-[#11120f] px-5 py-2.5 text-[11px] font-medium text-[#f7f6f1] transition-transform hover:-translate-y-0.5 rounded-lg" data-testid="button-header-see-home">See a home</Link>
         </div>
         <button className="md:hidden p-1 text-stone-800" onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? 'Close menu' : 'Open menu'} aria-expanded={mobileOpen} data-testid="button-mobile-menu">
@@ -79,10 +77,7 @@ function Header({ onInterest }: { onInterest: () => void }) {
               </a>
             ))}
             <Link to="/portal" onClick={close} className="flex items-center justify-between border-b border-black/10 py-3 text-sm font-bold text-[#194534]">
-              MLS Gateway Simulator <ArrowRight size={14} />
-            </Link>
-            <Link to="/login" onClick={close} className="flex items-center justify-between border-b border-black/10 py-3 text-sm font-medium text-stone-700">
-              Sign In to Workspace <ArrowRight size={14} />
+              MLS Gateway <ArrowRight size={14} />
             </Link>
             <Link to="/public/homestead-pd" onClick={close} className="mt-4 flex items-center justify-center bg-[#11120f] py-3 text-xs font-semibold text-[#f7f6f1] rounded-lg" data-testid="button-mobile-see-home">
               See Live 3D Experience
@@ -146,7 +141,7 @@ function InterestPanel({ open, onClose }: { open: boolean; onClose: () => void }
   )
 }
 
-function Hero({ onInterest }: { onInterest: () => void }) {
+function Hero() {
   const ref = useReveal<HTMLElement>()
   return (
     <section id="top" ref={ref} className="reveal page-grid relative mx-auto max-w-[1440px] px-6 pb-8 pt-12 lg:px-12 lg:pb-11 lg:pt-20" data-testid="section-hero">
@@ -166,9 +161,6 @@ function Hero({ onInterest }: { onInterest: () => void }) {
             <Link to="/portal" className="group flex items-center gap-2 text-xs font-medium text-black/70 hover:text-black px-4 py-3.5 rounded-lg border border-stone-300 hover:bg-stone-100/60" data-testid="link-hero-professionals">
               For property professionals <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
             </Link>
-            <button onClick={onInterest} className="text-xs font-medium text-[#194534] hover:underline underline-offset-4 cursor-pointer">
-              Get Early Access →
-            </button>
           </div>
           <p className="mt-5 font-mono text-[9.5px] text-black/45">No specialist camera&nbsp; · &nbsp;No app required for visitors</p>
         </div>
@@ -511,9 +503,9 @@ export function LandingScreen() {
   const [interestOpen, setInterestOpen] = useState(false)
   return (
     <div className="site-shell min-h-screen bg-[#f8f7f3] text-stone-900 font-sans selection:bg-[#4d7145]/20">
-      <Header onInterest={() => setInterestOpen(true)} />
+      <Header />
       <main>
-        <Hero onInterest={() => setInterestOpen(true)} />
+        <Hero />
         <FlowSection />
         <ExperienceSection />
         <EvidenceSection />
