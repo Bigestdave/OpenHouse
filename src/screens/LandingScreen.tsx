@@ -54,7 +54,7 @@ function Header({ onInterest }: { onInterest: () => void }) {
           <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#process" data-testid="link-how-it-works">How it works</a>
           <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#professionals" data-testid="link-professionals">For professionals</a>
           <a className="text-[12px] font-medium text-black/65 transition-colors hover:text-black" href="#trust" data-testid="link-trust">Trust</a>
-          <Link className="text-[12px] font-semibold text-[#194534] bg-emerald-50 px-2.5 py-1 rounded-md transition-colors hover:bg-emerald-100" to="/portal">MLS Gateway</Link>
+          <Link className="text-[12px] font-medium text-[#4d7145] transition-colors hover:text-black" to="/portal">MLS Gateway</Link>
         </nav>
         <div className="hidden items-center gap-5 md:flex">
           <button onClick={onInterest} className="text-[12px] font-medium text-black/65 transition-colors hover:text-black cursor-pointer" data-testid="link-early-access">Early Access</button>
