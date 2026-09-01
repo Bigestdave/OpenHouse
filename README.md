@@ -1,4 +1,4 @@
-# OpenHouse 🏡
+# OpenHouse 
 ### Autonomous 3D Real Estate Inspection Layer Powered by Google Gemini & Google Cloud
 
 > **Winner Submission for #AllThingsAgenticHackathon**  
@@ -6,7 +6,7 @@
 
 ---
 
-## 🌟 Overview & Problem Statement
+##  Overview & Problem Statement
 The biggest bottleneck in modern real estate is physical viewings. Prospective tenants and buyers waste hours traveling to inspect properties, while realtors spend over 60% of their week scheduling visits that lead nowhere.
 
 **OpenHouse solves this autonomously:**
@@ -17,7 +17,7 @@ The biggest bottleneck in modern real estate is physical viewings. Prospective t
 
 ---
 
-## 🛠️ Google Technologies Required & Disclosed
+##  Google Technologies Required & Disclosed
 
 ### 1. Google Gemini Models
 - **Gemini 3.7 Flash:** Multi-modal vision analysis evaluating room coverage, boundary transitions, daylight orientations, and spatial cross-referencing against architectural floor plans.
@@ -33,7 +33,7 @@ The biggest bottleneck in modern real estate is physical viewings. Prospective t
 
 ---
 
-## 📐 System Architecture Diagram
+##  System Architecture Diagram
 
 ```mermaid
 graph TD
@@ -57,7 +57,7 @@ graph TD
 
 ---
 
-## 🚀 Quickstart & Spin-up Instructions (Reproducibility)
+##  Quickstart & Spin-up Instructions (Reproducibility)
 
 Follow these simple steps to run OpenHouse locally:
 
@@ -86,7 +86,7 @@ npm run preview
 
 ---
 
-## 🚢 Google Cloud Run Deployment
+##  Google Cloud Run Deployment
 
 To deploy directly to Google Cloud Run:
 
@@ -107,15 +107,15 @@ gcloud run deploy openhouse-app \
 
 ---
 
-## 🔑 Demo Access & Testing Credentials
+##  Demo Access & Testing Credentials
 
 For Hackathon Judges and Evaluators:
-- **Demo URL:** [http://localhost:5173/#/login](http://localhost:5173/#/login)
+- **Demo URL:** [[http://openhouseapp.vercel.app/#/login](https://openhouseapp.vercel.app/#/login))
 - **Quick Demo Login:** Click the button **"Quick Demo Login (David Olabowale)"** on the sign-in page to instantly access the workspace with zero friction.
 - **Manual Stage Controller:** Press the backtick key (\`) anywhere in the application to access the hidden floating demo stage controller.
 
 ---
 
-## 👥 Team & Disclosures
+##  Team & Disclosures
 - **Author:** David Olabowale (@Bigestdave)
 - **Built for:** Google All Things Agentic Hackathon
